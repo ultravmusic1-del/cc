@@ -1,0 +1,104 @@
+"use client";
+
+import { AnimatePresence } from "framer-motion";
+import { NavProvider, useNav } from "@/lib/store";
+import Header from "./Header";
+import StickyNav from "./StickyNav";
+import MobileMenu from "./MobileMenu";
+import ProductDetailModal from "./ProductDetailModal";
+import AboutDrawer from "./AboutDrawer";
+import HomeScreen from "./screens/HomeScreen";
+import BarsScreen from "./screens/BarsScreen";
+import NutritionScreen from "./screens/NutritionScreen";
+import AboutScreen from "./screens/AboutScreen";
+import OrderingScreen from "./screens/OrderingScreen";
+import WholesaleScreen from "./screens/WholesaleScreen";
+import { PRODUCTS } from "@/lib/content";
+
+function Shell() {
+  const { view, overlay, closeOverlay } = useNav();
+
+  return (
+    <main className="grain relative min-h-[100dvh] w-full">
+      {/* ── Persistent desktop stage ─────────────────────────────
+          Dark side gutters + an illuminated centre "panel" so the
+          mobile-first column reads as a boutique app on wide screens. */}
+      <div
+        aria-hidden
+        className="fixed inset-0 -z-20"
+        style={{
+          background:
+            "radial-gradient(120% 90% at 50% -10%, #55101f, #470d1a 70%, #3d0b16)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="stage-bg fixed inset-y-0 left-1/2 -z-10 w-full max-w-[540px] -translate-x-1/2 lg:border-x lg:border-[var(--hairline)]"
+        style={{ boxShadow: "0 0 140px 20px rgba(15,3,7,0.6)" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10 hidden overflow-hidden lg:block"
+      >
+        <span className="c-watermark absolute left-[3%] top-1/2 -translate-y-1/2 select-none font-display text-[40rem]">
+          C
+        </span>
+        <span
+          className="absolute right-[8%] top-[18%] h-64 w-64 rounded-full"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(236,91,69,0.12), transparent 70%)",
+          }}
+        />
+        <p className="absolute right-[4%] top-1/2 -translate-y-1/2 rotate-90 font-display text-sm italic tracking-[0.3em] text-[rgba(233,173,190,0.28)]">
+          Handcrafted in Bahrain
+        </p>
+      </div>
+
+      <Header />
+
+      {/* Base screens swap instantly with an entrance animation only.
+          No blocking exit transition — taps never wedge mid-transition. */}
+      {view === "home" && <HomeScreen key="home" />}
+      {view === "bars" && <BarsScreen key="bars" />}
+      {view === "nutrition" && <NutritionScreen key="nutrition" />}
+      {view === "about" && <AboutScreen key="about" />}
+      {view === "ordering" && <OrderingScreen key="ordering" />}
+      {view === "wholesale" && <WholesaleScreen key="wholesale" />}
+
+      <StickyNav />
+
+      {/* Overlays */}
+      <AnimatePresence>
+        {overlay?.type === "menu" && (
+          <MobileMenu key="menu" onClose={closeOverlay} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {overlay?.type === "product" && (
+          <ProductDetailModal
+            key="product"
+            product={PRODUCTS[overlay.productId]}
+            onClose={closeOverlay}
+          />
+        )}
+        {overlay?.type === "about-drawer" && (
+          <AboutDrawer
+            key="drawer"
+            drawerId={overlay.drawerId}
+            onClose={closeOverlay}
+          />
+        )}
+      </AnimatePresence>
+    </main>
+  );
+}
+
+export default function App() {
+  return (
+    <NavProvider>
+      <Shell />
+    </NavProvider>
+  );
+}

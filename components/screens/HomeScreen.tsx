@@ -1,0 +1,152 @@
+"use client";
+
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import Icon from "../ui/Icon";
+import { useNav } from "@/lib/store";
+import { BRAND, HERO, HERO_BENEFITS } from "@/lib/content";
+
+const stagger = {
+  animate: { transition: { staggerChildren: 0.09, delayChildren: 0.15 } },
+};
+const rise = {
+  initial: { opacity: 0, y: 22 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+export default function HomeScreen() {
+  const { goTo } = useNav();
+
+  return (
+    <section className="relative min-h-[100dvh] w-full overflow-hidden">
+      {/* Ambient couture C */}
+      <span
+        aria-hidden
+        className="c-watermark absolute -left-24 top-10 select-none font-display text-[26rem] lg:hidden"
+      >
+        C
+      </span>
+
+      <motion.div
+        variants={stagger}
+        initial="initial"
+        animate="animate"
+        className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[var(--app-max)] flex-col justify-center px-5 pb-24 pt-[4.6rem]"
+      >
+        {/* Eyebrow */}
+        <motion.p
+          variants={rise}
+          className="eyebrow mt-1 text-center text-[rgba(233,173,190,0.85)]"
+        >
+          Handcrafted in Bahrain · {BRAND.launch}
+        </motion.p>
+
+        {/* Headline */}
+        <motion.h1
+          variants={rise}
+          className="mt-3.5 text-center font-heading text-[2.35rem] font-semibold leading-[1.03] tracking-[-0.02em] text-cream"
+        >
+          Healthy treats
+          <br />
+          should still feel{" "}
+          <span className="font-display font-medium italic text-coral">
+            indulgent.
+          </span>
+        </motion.h1>
+
+        {/* Hero bars — static, grounded, flush */}
+        <motion.div
+          variants={rise}
+          className="relative mx-auto mt-4 flex w-full max-w-[280px] items-center justify-center"
+        >
+          <div
+            aria-hidden
+            className="absolute left-1/2 top-1/2 h-[82%] w-[86%] -translate-x-1/2 -translate-y-[54%] rounded-full"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(236,91,69,0.22), rgba(236,91,69,0) 66%)",
+            }}
+          />
+          {/* grounded contact shadow */}
+          <div
+            aria-hidden
+            className="absolute bottom-2 left-1/2 h-6 w-[62%] -translate-x-1/2 rounded-[100%]"
+            style={{
+              background:
+                "radial-gradient(ellipse, rgba(10,2,5,0.55), rgba(10,2,5,0) 72%)",
+              filter: "blur(5px)",
+            }}
+          />
+          <div className="relative w-[76%]">
+            <Image
+              src="/images/oat-bar-hero.png"
+              alt="Stack of Candy Couture handcrafted oat bars"
+              width={1080}
+              height={952}
+              priority
+              className="h-auto w-full drop-shadow-[0_18px_22px_rgba(15,3,7,0.4)]"
+            />
+          </div>
+        </motion.div>
+
+        {/* Subtext */}
+        <motion.p
+          variants={rise}
+          className="mx-auto mt-1 max-w-[19rem] text-center text-[0.92rem] leading-relaxed text-[rgba(227,210,194,0.78)]"
+        >
+          {HERO.subtext}
+        </motion.p>
+
+        {/* CTAs */}
+        <motion.div variants={rise} className="mt-5 flex flex-col gap-2.5">
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => goTo("bars")}
+            className="btn-coral group inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-[0.95rem] font-semibold tracking-wide"
+          >
+            Choose Your Bar
+            <ArrowRight className="h-[18px] w-[18px] transition-transform group-hover:translate-x-1" />
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => goTo("about")}
+            className="btn-ghost inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-[0.9rem] font-semibold tracking-wide"
+          >
+            Our Story
+          </motion.button>
+        </motion.div>
+
+        {/* Benefit carousel */}
+        <motion.div
+          variants={rise}
+          className="no-scrollbar -mx-5 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5"
+        >
+          {HERO_BENEFITS.map((b) => (
+            <div
+              key={b.label}
+              className="glass-card flex min-w-[7rem] shrink-0 snap-start flex-col items-center gap-1.5 rounded-2xl px-4 py-3 text-center"
+            >
+              <Icon name={b.icon} className="h-5 w-5 text-olive" />
+              <span className="font-heading text-lg font-semibold leading-none text-cream">
+                {b.value}
+                {b.unit && (
+                  <span className="text-sm font-medium text-[rgba(227,210,194,0.7)]">
+                    {b.unit}
+                  </span>
+                )}
+              </span>
+              <span className="text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[rgba(227,210,194,0.62)]">
+                {b.label}
+              </span>
+            </div>
+          ))}
+        </motion.div>
+      </motion.div>
+    </section>
+  );
+}
