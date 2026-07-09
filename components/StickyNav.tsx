@@ -13,7 +13,7 @@ const items: {
   icon?: typeof HeartPulse;
   img?: string;
 }[] = [
-  { id: "bars", label: "Bars", img: "/images/icons/oat-bar.png" },
+  { id: "bars", label: "Bars", img: "/images/icons/oat-bar-bold.png" },
   { id: "nutrition", label: "Nutrition", icon: HeartPulse },
   { id: "ordering", label: "Order", icon: ShoppingBag },
   { id: "menu", label: "Menu", icon: LayoutGrid },

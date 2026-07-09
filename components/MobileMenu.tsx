@@ -7,6 +7,7 @@ import Logo from "./Logo";
 import { useNav, type ViewId, type AboutDrawerId } from "@/lib/store";
 
 const mainItems: { id: ViewId | "about-expand"; label: string }[] = [
+  { id: "home", label: "Home" },
   { id: "bars", label: "Bars" },
   { id: "nutrition", label: "Nutrition" },
   { id: "about-expand", label: "About" },

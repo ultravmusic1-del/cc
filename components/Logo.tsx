@@ -2,46 +2,45 @@
 
 interface LogoProps {
   size?: "sm" | "md" | "lg";
-  withWatermark?: boolean;
   className?: string;
+  /** @deprecated retained for call-site compatibility; the wordmark now
+   *  carries its own mark, so there is no separate watermark to toggle. */
+  withWatermark?: boolean;
 }
 
-const sizes = {
-  sm: { line: "text-[0.78rem]", gap: "leading-[1.05]", tracking: "0.42em" },
-  md: { line: "text-base", gap: "leading-[1.02]", tracking: "0.44em" },
-  lg: { line: "text-xl", gap: "leading-[1.0]", tracking: "0.46em" },
+// Pixel heights per size; width is derived from the artwork's aspect ratio.
+const heights: Record<NonNullable<LogoProps["size"]>, number> = {
+  sm: 32,
+  md: 36,
+  lg: 48,
 };
+const RATIO = 415 / 95; // cropped logo artwork dimensions
 
-/** Centred Candy Couture wordmark with the couture "C" behind it. */
-export default function Logo({
-  size = "md",
-  withWatermark = true,
-  className = "",
-}: LogoProps) {
-  const s = sizes[size];
+/**
+ * Candy Couture bilingual wordmark. Rendered from the brand logo PNG via a CSS
+ * mask filled with currentColor, so the burgundy artwork shows as cream on the
+ * dark chrome and scales crisply.
+ */
+export default function Logo({ size = "md", className = "" }: LogoProps) {
+  const h = heights[size];
   return (
-    <div className={`relative inline-flex flex-col items-center ${className}`}>
-      {withWatermark && (
-        <span
-          aria-hidden
-          className="c-watermark pointer-events-none absolute left-1/2 top-1/2 -z-0 -translate-x-1/2 -translate-y-[52%] font-display text-[3.4em]"
-          style={{ color: "rgba(233,173,190,0.14)" }}
-        >
-          C
-        </span>
-      )}
-      <span
-        className={`relative z-10 font-display font-medium text-cream ${s.line} ${s.gap}`}
-        style={{ letterSpacing: s.tracking }}
-      >
-        CANDY
-      </span>
-      <span
-        className={`relative z-10 font-display font-medium text-cream ${s.line} ${s.gap}`}
-        style={{ letterSpacing: s.tracking }}
-      >
-        COUTURE
-      </span>
-    </div>
+    <span
+      role="img"
+      aria-label="Candy Couture"
+      className={`inline-block text-cream ${className}`}
+      style={{
+        height: h,
+        width: Math.round(h * RATIO),
+        backgroundColor: "currentColor",
+        maskImage: "url(/images/candy-couture-logo.png)",
+        WebkitMaskImage: "url(/images/candy-couture-logo.png)",
+        maskSize: "contain",
+        WebkitMaskSize: "contain",
+        maskRepeat: "no-repeat",
+        WebkitMaskRepeat: "no-repeat",
+        maskPosition: "center",
+        WebkitMaskPosition: "center",
+      }}
+    />
   );
 }
