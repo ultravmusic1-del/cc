@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
+
+// Run the scroll reset before paint on the client (so a new page never paints
+// at the old scroll position — the key fix for mobile), falling back to
+// useEffect on the server to avoid the SSR warning.
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 import { AnimatePresence } from "framer-motion";
 import { NavProvider, useNav } from "@/lib/store";
 import { LangProvider } from "@/lib/i18n";
@@ -34,18 +40,30 @@ function Shell() {
 
   // Every view is its own "page" — reset scroll to the top whenever the view
   // changes, no matter how (sticky nav, menu, header, back button/hash).
-  // `scroll-behavior: smooth` (set globally on <html>) also applies to
-  // programmatic scrollTop writes, turning the reset into a ~500ms animation
-  // that gets interrupted when the new page swaps in — leaving the page still
-  // scrolled. So temporarily force instant scrolling for the jump to the top.
-  useEffect(() => {
-    const root = document.documentElement;
-    const prev = root.style.scrollBehavior;
-    root.style.scrollBehavior = "auto";
-    root.scrollTop = 0;
-    document.body.scrollTop = 0;
-    window.scrollTo(0, 0);
-    root.style.scrollBehavior = prev;
+  // Notes that make this work on mobile as well as desktop:
+  //  - `scroll-behavior: smooth` (global on <html>) also applies to programmatic
+  //    scroll writes, animating the reset; we force instant on both scrollers.
+  //  - mobile browsers report scroll on <body> in some cases, so reset both.
+  //  - run before paint (useLayoutEffect) so the new page never paints scrolled,
+  //    and re-assert on the next frame since mobile re-adjusts scroll a tick
+  //    later (toolbar resize / momentum settling).
+  useIsoLayoutEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const jump = () => {
+      const hp = html.style.scrollBehavior;
+      const bp = body.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
+      body.style.scrollBehavior = "auto";
+      window.scrollTo(0, 0);
+      html.scrollTop = 0;
+      body.scrollTop = 0;
+      html.style.scrollBehavior = hp;
+      body.style.scrollBehavior = bp;
+    };
+    jump();
+    const raf = requestAnimationFrame(jump);
+    return () => cancelAnimationFrame(raf);
   }, [view]);
 
   return (
