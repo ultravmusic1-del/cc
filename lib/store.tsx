@@ -76,7 +76,8 @@ export function NavProvider({ children }: { children: ReactNode }) {
       } else if (window.location.hash !== `#${next}`) {
         window.location.hash = next;
       }
-      window.scrollTo({ top: 0, behavior: "auto" });
+      // Scroll-to-top is handled by the view-change effect in App (instant,
+      // covers every nav path); doing it here too would race a smooth scroll.
     }
   }, []);
 

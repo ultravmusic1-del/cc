@@ -33,12 +33,19 @@ function Shell() {
   }, [hasOverlay]);
 
   // Every view is its own "page" — reset scroll to the top whenever the view
-  // changes, no matter how (sticky nav, menu, header, back button/hash). Runs
-  // after the new screen renders, and writes scrollTop directly so it's instant
-  // even with `scroll-behavior: smooth` set globally.
+  // changes, no matter how (sticky nav, menu, header, back button/hash).
+  // `scroll-behavior: smooth` (set globally on <html>) also applies to
+  // programmatic scrollTop writes, turning the reset into a ~500ms animation
+  // that gets interrupted when the new page swaps in — leaving the page still
+  // scrolled. So temporarily force instant scrolling for the jump to the top.
   useEffect(() => {
-    document.documentElement.scrollTop = 0;
+    const root = document.documentElement;
+    const prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
+    root.scrollTop = 0;
     document.body.scrollTop = 0;
+    window.scrollTo(0, 0);
+    root.style.scrollBehavior = prev;
   }, [view]);
 
   return (
