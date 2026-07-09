@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import MaskIcon from "../ui/MaskIcon";
 import { useNav } from "@/lib/store";
-import { BRAND, HERO, HERO_BENEFITS } from "@/lib/content";
+import { HERO, HERO_BENEFITS } from "@/lib/content";
 
 const stagger = {
   animate: { transition: { staggerChildren: 0.09, delayChildren: 0.15 } },
@@ -41,9 +41,9 @@ export default function HomeScreen() {
         {/* Eyebrow */}
         <motion.p
           variants={rise}
-          className="eyebrow mt-1 text-center text-[rgba(233,173,190,0.85)]"
+          className="eyebrow mt-1 text-center text-[0.72rem] text-[rgba(233,173,190,0.85)]"
         >
-          Handcrafted in Bahrain · {BRAND.launch}
+          Handcrafted in Bahrain
         </motion.p>
 
         {/* Headline */}
