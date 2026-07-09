@@ -52,7 +52,9 @@ export const HERO = {
 export const HERO_BENEFITS = [
   { icon: "/images/icons/wholegrain-oats.png", title: "Wholegrain Oats" },
   {
-    icon: "/images/icons/dark-chocolate-chunks.png",
+    // Pre-tinted (olive body + darker grooves) so the waffle detail survives —
+    // a flat mask collapsed this filled icon into a solid silhouette.
+    icon: "/images/icons/dark-chocolate-chunks-olive.png",
     title: "Dark Chocolate Chunks",
   },
   { icon: "/images/icons/smart-snacking.png", title: "Smart Snacking" },

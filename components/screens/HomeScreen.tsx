@@ -129,7 +129,16 @@ export default function HomeScreen() {
               key={b.title}
               className="glass-card flex flex-col items-center justify-start gap-2.5 rounded-2xl px-2 py-4 text-center"
             >
-              <MaskIcon src={b.icon} className="h-9 w-9 shrink-0 text-olive" />
+              {b.icon.includes("-olive") ? (
+                // Already tinted (keeps internal detail) — render as-is.
+                <span
+                  aria-hidden
+                  className="h-9 w-9 shrink-0 bg-contain bg-center bg-no-repeat"
+                  style={{ backgroundImage: `url(${b.icon})` }}
+                />
+              ) : (
+                <MaskIcon src={b.icon} className="h-9 w-9 shrink-0 text-olive" />
+              )}
               <span className="text-[0.64rem] font-semibold uppercase leading-tight tracking-[0.1em] text-[rgba(227,210,194,0.82)]">
                 {b.title}
               </span>
