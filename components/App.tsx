@@ -1,14 +1,9 @@
 "use client";
 
 import { useEffect, useLayoutEffect } from "react";
-
-// Run the scroll reset before paint on the client (so a new page never paints
-// at the old scroll position — the key fix for mobile), falling back to
-// useEffect on the server to avoid the SSR warning.
-const useIsoLayoutEffect =
-  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 import { AnimatePresence } from "framer-motion";
 import { NavProvider, useNav } from "@/lib/store";
+import { scrollToTop } from "@/lib/scroll";
 import { LangProvider } from "@/lib/i18n";
 import Header from "./Header";
 import StickyNav from "./StickyNav";
@@ -22,6 +17,12 @@ import AboutScreen from "./screens/AboutScreen";
 import OrderingScreen from "./screens/OrderingScreen";
 import WholesaleScreen from "./screens/WholesaleScreen";
 import { useContent } from "@/lib/i18n";
+
+// Run the scroll reset before paint on the client (so a new page never paints
+// at the old scroll position — the key fix for mobile), falling back to
+// useEffect on the server to avoid the SSR warning.
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 function Shell() {
   const { view, overlay, closeOverlay } = useNav();
@@ -48,22 +49,13 @@ function Shell() {
   //    and re-assert on the next frame since mobile re-adjusts scroll a tick
   //    later (toolbar resize / momentum settling).
   useIsoLayoutEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const jump = () => {
-      const hp = html.style.scrollBehavior;
-      const bp = body.style.scrollBehavior;
-      html.style.scrollBehavior = "auto";
-      body.style.scrollBehavior = "auto";
-      window.scrollTo(0, 0);
-      html.scrollTop = 0;
-      body.scrollTop = 0;
-      html.style.scrollBehavior = hp;
-      body.style.scrollBehavior = bp;
+    scrollToTop(); // before paint
+    const raf = requestAnimationFrame(scrollToTop); // next frame (mobile)
+    const t = setTimeout(scrollToTop, 0); // macrotask (iOS Safari)
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
     };
-    jump();
-    const raf = requestAnimationFrame(jump);
-    return () => cancelAnimationFrame(raf);
   }, [view]);
 
   return (

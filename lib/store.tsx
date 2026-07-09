@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import type { ProductId } from "./content";
+import { scrollToTop } from "./scroll";
 
 const VIEWS: ViewId[] = [
   "home",
@@ -61,6 +62,9 @@ export function NavProvider({ children }: { children: ReactNode }) {
   // Sync view <-> URL hash so the browser back button works and views
   // are deep-linkable. This is what makes the app feel like real pages.
   useEffect(() => {
+    // Own scroll position ourselves — stop the browser (esp. iOS Safari)
+    // from restoring a scroll offset on hash navigation.
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     setView(viewFromHash());
     const onHash = () => setView(viewFromHash());
     window.addEventListener("hashchange", onHash);
@@ -76,8 +80,10 @@ export function NavProvider({ children }: { children: ReactNode }) {
       } else if (window.location.hash !== `#${next}`) {
         window.location.hash = next;
       }
-      // Scroll-to-top is handled by the view-change effect in App (instant,
-      // covers every nav path); doing it here too would race a smooth scroll.
+      // Reset inside the tap gesture — iOS Safari honors gesture-context
+      // scrolls far more reliably than a later effect. The App view-change
+      // effect re-asserts (rAF + timeout) and covers hash/back navigation.
+      scrollToTop();
     }
   }, []);
 
