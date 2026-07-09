@@ -33,7 +33,7 @@ const arabic = Cairo({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://candycouture.bh"),
+  metadataBase: new URL("https://www.candycouture.co"),
   title: "Candy Couture | Handcrafted Oat Bars in Bahrain",
   description:
     "Handcrafted oat bars made in Bahrain with whole grain oats, dark chocolate, and real ingredients. Choose from Oat Cookie Bar and Oat Protein Bar.",
