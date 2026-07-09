@@ -24,9 +24,6 @@ export default function BarsScreen() {
         <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream">
           {t.bars.title}
         </h1>
-        <p className="mt-2 text-[0.9rem] text-[rgba(227,210,194,0.72)]">
-          {t.bars.tagline}
-        </p>
       </header>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -155,8 +155,11 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
 
       <div className="relative z-10 mx-4 mt-1 hairline" />
 
-      {/* levels */}
-      <div className="relative z-10 flex-1 overflow-hidden">
+      {/* levels — scroll vertically when the list is taller than the viewport
+          (e.g. short phones or when the mobile browser toolbar is showing) so
+          the last row (Contact) is never clipped. min-h-0 lets this flex child
+          shrink; overflow-x stays hidden for the level slide animation. */}
+      <div className="soft-scroll relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-4">
         <AnimatePresence mode="wait" initial={false}>
           {level === "main" && (
             <motion.nav

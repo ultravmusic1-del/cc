@@ -20,6 +20,11 @@
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+    /* Reserve the scrollbar gutter symmetrically so centred content (header
+       logo, hero) sits on the window's true centre and never shifts when a
+       scrollbar appears/disappears between pages. No effect with mobile
+       overlay scrollbars, which already reserve nothing. */
+    scrollbar-gutter: stable both-edges;
   }
 
   body {
