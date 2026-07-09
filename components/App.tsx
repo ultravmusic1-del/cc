@@ -51,10 +51,12 @@ function Shell() {
   useIsoLayoutEffect(() => {
     scrollToTop(); // before paint
     const raf = requestAnimationFrame(scrollToTop); // next frame (mobile)
-    const t = setTimeout(scrollToTop, 0); // macrotask (iOS Safari)
+    const t0 = setTimeout(scrollToTop, 0); // macrotask (iOS Safari)
+    const t1 = setTimeout(scrollToTop, 150); // outlast iOS momentum / entrance
     return () => {
       cancelAnimationFrame(raf);
-      clearTimeout(t);
+      clearTimeout(t0);
+      clearTimeout(t1);
     };
   }, [view]);
 
