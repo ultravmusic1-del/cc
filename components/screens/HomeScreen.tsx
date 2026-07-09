@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import MaskIcon from "../ui/MaskIcon";
 import { useNav } from "@/lib/store";
-import { HERO, HERO_BENEFITS } from "@/lib/content";
+import { useContent, useT } from "@/lib/i18n";
 
 const stagger = {
   animate: { transition: { staggerChildren: 0.09, delayChildren: 0.15 } },
@@ -21,6 +21,8 @@ const rise = {
 
 export default function HomeScreen() {
   const { goTo } = useNav();
+  const c = useContent();
+  const t = useT();
 
   return (
     <section className="relative min-h-[100dvh] w-full overflow-hidden">
@@ -43,7 +45,7 @@ export default function HomeScreen() {
           variants={rise}
           className="eyebrow mt-1 text-center text-[0.72rem] text-[rgba(233,173,190,0.85)]"
         >
-          Handcrafted in Bahrain
+          {t.home.eyebrow}
         </motion.p>
 
         {/* Headline */}
@@ -51,11 +53,12 @@ export default function HomeScreen() {
           variants={rise}
           className="mt-3.5 text-center font-heading text-[2.35rem] font-semibold leading-[1.03] tracking-[-0.02em] text-cream"
         >
-          Healthy treats
+          {t.home.line1}
           <br />
-          should still feel{" "}
+          {t.home.line2}
+          <br />
           <span className="font-display font-medium italic text-coral">
-            indulgent.
+            {t.home.line3}
           </span>
         </motion.h1>
 
@@ -100,7 +103,7 @@ export default function HomeScreen() {
           variants={rise}
           className="mx-auto mt-1 max-w-[19rem] text-center text-[0.92rem] leading-relaxed text-[rgba(227,210,194,0.78)]"
         >
-          {HERO.subtext}
+          {c.hero.subtext}
         </motion.p>
 
         {/* CTAs */}
@@ -110,21 +113,21 @@ export default function HomeScreen() {
             onClick={() => goTo("bars")}
             className="btn-coral group inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-[0.95rem] font-semibold tracking-wide"
           >
-            Choose Your Bar
-            <ArrowRight className="h-[18px] w-[18px] transition-transform group-hover:translate-x-1" />
+            {t.home.chooseBar}
+            <ArrowRight className="h-[18px] w-[18px] transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={() => goTo("about")}
             className="btn-ghost inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-[0.9rem] font-semibold tracking-wide"
           >
-            Our Story
+            {t.home.ourStory}
           </motion.button>
         </motion.div>
 
         {/* What's inside — three signature pillars */}
         <motion.div variants={rise} className="mt-5 grid grid-cols-3 gap-2.5">
-          {HERO_BENEFITS.map((b) => (
+          {c.heroBenefits.map((b) => (
             <div
               key={b.title}
               className="glass-card flex flex-col items-center justify-start gap-2.5 rounded-2xl px-2 py-4 text-center"

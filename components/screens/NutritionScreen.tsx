@@ -5,23 +5,28 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScreenShell from "../ScreenShell";
 import Segmented from "../ui/Segmented";
 import WhatsAppButton from "../ui/WhatsAppButton";
-import { PRODUCTS, type ProductId } from "@/lib/content";
+import { type ProductId } from "@/lib/content";
+import { useContent, useT, fill } from "@/lib/i18n";
 
 export default function NutritionScreen() {
   const [id, setId] = useState<ProductId>("cookie");
-  const product = PRODUCTS[id];
+  const c = useContent();
+  const t = useT();
+  const product = c.products[id];
   const highlights = product.nutrition.filter((n) => n.highlight);
   const rest = product.nutrition.filter((n) => !n.highlight);
 
   return (
     <ScreenShell>
       <header className="text-center">
-        <p className="eyebrow text-[rgba(233,173,190,0.8)]">Know your bar</p>
+        <p className="eyebrow text-[rgba(233,173,190,0.8)]">
+          {t.nutrition.eyebrow}
+        </p>
         <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream">
-          Nutrition
+          {t.nutrition.title}
         </h1>
         <p className="mt-2 text-[0.9rem] text-[rgba(227,210,194,0.72)]">
-          Honest numbers for every bar.
+          {t.nutrition.subtitle}
         </p>
       </header>
 
@@ -31,8 +36,8 @@ export default function NutritionScreen() {
         value={id}
         onChange={setId}
         options={[
-          { id: "cookie", label: "Oat Cookie" },
-          { id: "protein", label: "Oat Protein" },
+          { id: "cookie", label: t.nutrition.segCookie },
+          { id: "protein", label: t.nutrition.segProtein },
         ]}
       />
 
@@ -46,7 +51,7 @@ export default function NutritionScreen() {
           className="mt-5"
         >
           <p className="mb-3 text-center text-[0.74rem] text-[rgba(227,210,194,0.55)]">
-            Per {product.servingSize.toLowerCase()}
+            {fill(t.nutrition.per, { serving: product.servingSize })}
           </p>
 
           <div className="grid grid-cols-2 gap-3">
@@ -86,7 +91,10 @@ export default function NutritionScreen() {
           </p>
 
           <div className="mx-auto mt-5 max-w-[22rem]">
-            <WhatsAppButton intent={id} label={`Order the ${product.name}`} />
+            <WhatsAppButton
+              intent={id}
+              label={fill(t.nutrition.orderThe, { name: product.name })}
+            />
           </div>
         </motion.div>
       </AnimatePresence>

@@ -1,25 +1,37 @@
 // ─────────────────────────────────────────────────────────────
-// WhatsApp ordering config.
-// Set the number via the NEXT_PUBLIC_WHATSAPP_NUMBER environment
-// variable (in Vercel → Settings → Environment Variables, or a local
-// .env.local). International format, digits only — no "+" or spaces.
-// Falls back to the placeholder until it is provided.
+// WhatsApp ordering config. Set the number via NEXT_PUBLIC_WHATSAPP_NUMBER
+// (Vercel env or .env.local); falls back to the Candy Couture line.
+// The pre-filled message follows the active site language.
 // ─────────────────────────────────────────────────────────────
 
+import type { Lang } from "./content";
+
+// Candy Couture ordering line (+973 3836 6111), international, digits only.
 export const WHATSAPP_NUMBER =
-  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "XXXXXXXXXXX";
+  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "97338366111";
 
-const messages = {
-  general: "Hi Candy Couture, I would like to place an order.",
-  cookie: "Hi Candy Couture, I would like to order the Oat Cookie Bar.",
-  protein: "Hi Candy Couture, I would like to order the Oat Protein Bar.",
-  wholesale:
-    "Hi Candy Couture, I would like to enquire about wholesale orders.",
-} as const;
+export type WhatsAppIntent = "general" | "cookie" | "protein" | "wholesale";
 
-export type WhatsAppIntent = keyof typeof messages;
+const messages: Record<Lang, Record<WhatsAppIntent, string>> = {
+  en: {
+    general: "Hi Candy Couture, I would like to place an order.",
+    cookie: "Hi Candy Couture, I would like to order the Oat Cookie Bar.",
+    protein: "Hi Candy Couture, I would like to order the Oat Protein Bar.",
+    wholesale:
+      "Hi Candy Couture, I would like to enquire about wholesale orders.",
+  },
+  ar: {
+    general: "مرحبًا كاندي كوتور، أودّ تقديم طلب.",
+    cookie: "مرحبًا كاندي كوتور، أودّ طلب لوح شوفان الكوكيز.",
+    protein: "مرحبًا كاندي كوتور، أودّ طلب لوح شوفان البروتين.",
+    wholesale: "مرحبًا كاندي كوتور، أودّ الاستفسار عن طلبات الجملة.",
+  },
+};
 
-export function whatsappLink(intent: WhatsAppIntent = "general"): string {
-  const text = encodeURIComponent(messages[intent]);
+export function whatsappLink(
+  intent: WhatsAppIntent = "general",
+  lang: Lang = "en",
+): string {
+  const text = encodeURIComponent(messages[lang][intent]);
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
 }

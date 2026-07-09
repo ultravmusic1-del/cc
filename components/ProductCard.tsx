@@ -5,10 +5,12 @@ import { motion } from "framer-motion";
 import { Box } from "lucide-react";
 import type { Product } from "@/lib/content";
 import { useNav } from "@/lib/store";
+import { useT, fill } from "@/lib/i18n";
 import WhatsAppButton from "./ui/WhatsAppButton";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { openProduct } = useNav();
+  const t = useT();
   const isCoral = product.accent === "coral";
   const accent = isCoral ? "#ec5b45" : "#e9adbe";
 
@@ -44,7 +46,7 @@ export default function ProductCard({ product }: { product: Product }) {
             }`,
           }}
         >
-          {isCoral ? "High Protein" : "Classic"}
+          {isCoral ? t.card.highProtein : t.card.classic}
         </span>
       </div>
 
@@ -52,7 +54,7 @@ export default function ProductCard({ product }: { product: Product }) {
       <button
         onClick={() => openProduct(product.id)}
         className="relative z-10 mx-auto mt-1 flex aspect-square w-[82%] items-center justify-center"
-        aria-label={`View ${product.name}`}
+        aria-label={product.name}
       >
         <span
           aria-hidden
@@ -89,31 +91,31 @@ export default function ProductCard({ product }: { product: Product }) {
           {product.pricePerBar}
         </span>
         <span className="text-[0.72rem] font-medium text-[rgba(227,210,194,0.6)]">
-          /bar
+          {t.card.perBar}
         </span>
       </div>
       <p className="relative z-10 mt-1 text-center text-[0.68rem] text-[rgba(227,210,194,0.5)]">
-        {product.pricePerBox} per box of 10
+        {fill(t.card.perBoxOf10, { price: product.pricePerBox })}
       </p>
 
       {/* meta */}
       <div className="relative z-10 mt-2.5 flex items-center justify-center gap-1.5 whitespace-nowrap text-[0.66rem] text-[rgba(227,210,194,0.66)]">
         <Box className="h-3.5 w-3.5 shrink-0 text-olive" strokeWidth={1.5} />
-        Box of 10 · Min. 10
+        {t.card.boxMin}
       </div>
 
       {/* actions — pushed to the bottom so both cards align */}
       <div className="relative z-10 mt-auto flex flex-col gap-2 pt-4">
         <WhatsAppButton
           intent={product.id}
-          label="WhatsApp"
+          label={t.card.whatsapp}
           className="!gap-1.5 !px-3 !py-2.5 !text-[0.82rem]"
         />
         <button
           onClick={() => openProduct(product.id)}
           className="btn-ghost rounded-full px-4 py-2 text-[0.76rem] font-semibold tracking-wide transition-colors hover:border-coral hover:text-coral"
         >
-          View Details
+          {t.card.viewDetails}
         </button>
       </div>
     </motion.article>

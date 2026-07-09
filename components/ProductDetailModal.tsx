@@ -2,21 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence, useDragControls } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useDragControls,
+  useIsPresent,
+} from "framer-motion";
 import { X } from "lucide-react";
 import type { Product } from "@/lib/content";
-import { STORAGE } from "@/lib/content";
+import { useContent, useT, fill } from "@/lib/i18n";
 import WhatsAppButton from "./ui/WhatsAppButton";
 import CountUp from "./ui/CountUp";
 
 type TabId = "overview" | "ingredients" | "nutrition" | "storage" | "allergens";
-const TABS: { id: TabId; label: string }[] = [
-  { id: "overview", label: "Overview" },
-  { id: "ingredients", label: "Ingredients" },
-  { id: "nutrition", label: "Nutrition" },
-  { id: "storage", label: "Storage" },
-  { id: "allergens", label: "Allergens" },
-];
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -37,7 +35,19 @@ export default function ProductDetailModal({
   const [tab, setTab] = useState<TabId>("overview");
   const panelRef = useRef<HTMLDivElement>(null);
   const dragControls = useDragControls();
+  const isPresent = useIsPresent();
+  const ui = useT();
+  const { storage } = useContent();
   const isCoral = product.accent === "coral";
+
+  const tabs: { id: TabId; label: string }[] = [
+    { id: "overview", label: ui.modal.tabs.overview },
+    { id: "ingredients", label: ui.modal.tabs.ingredients },
+    { id: "nutrition", label: ui.modal.tabs.nutrition },
+    { id: "storage", label: ui.modal.tabs.storage },
+    { id: "allergens", label: ui.modal.tabs.allergens },
+  ];
+  const allergenChips = [ui.modal.gluten, ui.modal.dairy, ui.modal.nuts];
 
   // ESC to close + focus trap. (Scroll lock is centralized in App's Shell.)
   useEffect(() => {
@@ -68,7 +78,10 @@ export default function ProductDetailModal({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center">
+    <div
+      style={{ pointerEvents: isPresent ? undefined : "none" }}
+      className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center"
+    >
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -132,7 +145,7 @@ export default function ProductDetailModal({
               className="text-[0.6rem] font-bold uppercase tracking-[0.18em]"
               style={{ color: isCoral ? "#ec5b45" : "#e9adbe" }}
             >
-              {isCoral ? "High Protein" : "Classic"}
+              {isCoral ? ui.modal.badgeHigh : ui.modal.badgeClassic}
             </p>
             <h2
               id="pd-title"
@@ -143,7 +156,7 @@ export default function ProductDetailModal({
           </div>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={ui.modal.close}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--hairline)] text-cream/80 transition-colors hover:text-cream"
           >
             <X className="h-4 w-4" />
@@ -155,14 +168,14 @@ export default function ProductDetailModal({
           role="tablist"
           className="no-scrollbar flex gap-2 overflow-x-auto px-5 pb-3"
         >
-          {TABS.map((t) => {
-            const active = t.id === tab;
+          {tabs.map((tb) => {
+            const active = tb.id === tab;
             return (
               <button
-                key={t.id}
+                key={tb.id}
                 role="tab"
                 aria-selected={active}
-                onClick={() => setTab(t.id)}
+                onClick={() => setTab(tb.id)}
                 className={`relative shrink-0 rounded-full px-4 py-2 text-[0.78rem] font-semibold transition-colors ${
                   active
                     ? "text-cream"
@@ -176,7 +189,7 @@ export default function ProductDetailModal({
                     transition={{ type: "spring", stiffness: 420, damping: 34 }}
                   />
                 )}
-                <span className="relative z-10">{t.label}</span>
+                <span className="relative z-10">{tb.label}</span>
               </button>
             );
           })}
@@ -200,12 +213,18 @@ export default function ProductDetailModal({
                     {product.description}
                   </p>
                   <div className="glass-card rounded-2xl px-4 py-1.5">
-                    <Row label="Serving size" value={product.servingSize} />
-                    <Row label="Price" value={`${product.pricePerBar} / bar`} />
-                    <Row label="Per box" value={`${product.pricePerBox} · 10 bars`} />
-                    <Row label="Minimum order" value={product.moq} />
-                    <Row label="Shelf life" value={product.shelfLife} />
-                    <Row label="Made" value="Handmade in Bahrain" />
+                    <Row label={ui.modal.servingSize} value={product.servingSize} />
+                    <Row
+                      label={ui.modal.price}
+                      value={fill(ui.modal.perBarSlash, { price: product.pricePerBar })}
+                    />
+                    <Row
+                      label={ui.modal.perBox}
+                      value={fill(ui.modal.boxLine, { price: product.pricePerBox })}
+                    />
+                    <Row label={ui.modal.minimumOrder} value={product.moq} />
+                    <Row label={ui.modal.shelfLife} value={product.shelfLife} />
+                    <Row label={ui.modal.made} value={ui.modal.madeVal} />
                   </div>
                 </div>
               )}
@@ -216,7 +235,7 @@ export default function ProductDetailModal({
                     {product.ingredients}
                   </p>
                   <p className="eyebrow mt-4 mb-2 text-[rgba(233,173,190,0.7)]">
-                    Hero ingredients
+                    {ui.modal.heroIngredients}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {product.ingredientChips.map((c) => (

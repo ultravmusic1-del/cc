@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion, useDragControls } from "framer-motion";
+import { motion, useDragControls, useIsPresent } from "framer-motion";
 import { X } from "lucide-react";
-import Icon from "./ui/Icon";
 import WhatsAppButton from "./ui/WhatsAppButton";
 import type { AboutDrawerId } from "@/lib/store";
 import { BRAND, PHILOSOPHY } from "@/lib/content";
@@ -23,6 +22,7 @@ export default function AboutDrawer({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const dragControls = useDragControls();
+  const isPresent = useIsPresent();
 
   // ESC to close + initial focus. (Scroll lock is centralized in App's Shell.)
   useEffect(() => {
@@ -38,7 +38,10 @@ export default function AboutDrawer({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center">
+    <div
+      style={{ pointerEvents: isPresent ? undefined : "none" }}
+      className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center"
+    >
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -101,9 +104,12 @@ export default function AboutDrawer({
               <p className="text-[0.95rem] leading-relaxed text-[rgba(227,210,194,0.8)]">
                 {BRAND.storyBody}
               </p>
+              <p className="text-[0.95rem] leading-relaxed text-[rgba(227,210,194,0.8)]">
+                {BRAND.storyClose}
+              </p>
               <div className="glass-card rounded-2xl px-4 py-4">
                 <p className="font-display text-lg italic text-coral">
-                  “Wholesome ingredients. Indulgent taste.”
+                  “Too good to share.”
                 </p>
                 <p className="mt-2 text-[0.78rem] text-[rgba(227,210,194,0.6)]">
                   Handcrafted in {BRAND.location}.
@@ -113,25 +119,13 @@ export default function AboutDrawer({
           )}
 
           {drawerId === "philosophy" && (
-            <div className="grid grid-cols-1 gap-3">
-              {PHILOSOPHY.map((p) => (
-                <div
-                  key={p.title}
-                  className="glass-card flex items-start gap-3 rounded-2xl px-4 py-3.5"
-                >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[rgba(159,149,54,0.4)]">
-                    <Icon name={p.icon} className="h-[18px] w-[18px] text-olive" />
-                  </span>
-                  <span>
-                    <span className="block font-heading text-[0.98rem] font-semibold text-cream">
-                      {p.title}
-                    </span>
-                    <span className="block text-[0.78rem] text-[rgba(227,210,194,0.64)]">
-                      {p.note}
-                    </span>
-                  </span>
-                </div>
-              ))}
+            <div className="space-y-4">
+              <p className="font-display text-lg italic leading-snug text-coral">
+                {PHILOSOPHY.lede}
+              </p>
+              <p className="text-[0.95rem] leading-relaxed text-[rgba(227,210,194,0.82)]">
+                {PHILOSOPHY.body}
+              </p>
             </div>
           )}
 

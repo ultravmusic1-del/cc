@@ -6,21 +6,23 @@ import { animate, stagger } from "animejs";
 import { HeartPulse, ShoppingBag, LayoutGrid } from "lucide-react";
 import MaskIcon from "./ui/MaskIcon";
 import { useNav, type ViewId } from "@/lib/store";
+import { useT } from "@/lib/i18n";
 
 const items: {
   id: ViewId | "menu";
-  label: string;
+  labelKey: "bars" | "nutrition" | "order" | "menu";
   icon?: typeof HeartPulse;
   img?: string;
 }[] = [
-  { id: "bars", label: "Bars", img: "/images/icons/oat-bar-bold.png" },
-  { id: "nutrition", label: "Nutrition", icon: HeartPulse },
-  { id: "ordering", label: "Order", icon: ShoppingBag },
-  { id: "menu", label: "Menu", icon: LayoutGrid },
+  { id: "bars", labelKey: "bars", img: "/images/icons/oat-bar-bold.png" },
+  { id: "nutrition", labelKey: "nutrition", icon: HeartPulse },
+  { id: "ordering", labelKey: "order", icon: ShoppingBag },
+  { id: "menu", labelKey: "menu", icon: LayoutGrid },
 ];
 
 export default function StickyNav() {
   const { view, overlay, goTo, openMenu } = useNav();
+  const t = useT();
   const barRef = useRef<HTMLDivElement>(null);
 
   // One-time staggered entrance for the nav items (anime.js). Framer owns
@@ -51,7 +53,8 @@ export default function StickyNav() {
           ref={barRef}
           className="flex items-stretch justify-between gap-1 rounded-full border border-[var(--hairline)] bg-[rgba(45,9,17,0.92)] px-2 py-1.5 shadow-float backdrop-blur-md"
         >
-          {items.map(({ id, label, icon: Ico, img }) => {
+          {items.map(({ id, labelKey, icon: Ico, img }) => {
+            const label = t.nav[labelKey];
             const active =
               id === "menu" ? overlay?.type === "menu" : view === id;
             const iconClass = `relative z-10 h-[19px] w-[19px] transition-colors ${

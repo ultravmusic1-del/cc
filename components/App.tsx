@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { NavProvider, useNav } from "@/lib/store";
+import { LangProvider } from "@/lib/i18n";
 import Header from "./Header";
 import StickyNav from "./StickyNav";
 import MobileMenu from "./MobileMenu";
@@ -14,10 +15,11 @@ import NutritionScreen from "./screens/NutritionScreen";
 import AboutScreen from "./screens/AboutScreen";
 import OrderingScreen from "./screens/OrderingScreen";
 import WholesaleScreen from "./screens/WholesaleScreen";
-import { PRODUCTS } from "@/lib/content";
+import { useContent } from "@/lib/i18n";
 
 function Shell() {
   const { view, overlay, closeOverlay } = useNav();
+  const c = useContent();
 
   // Single source of truth for the body scroll lock. Locking is keyed only on
   // "is ANY overlay open", and always restores to the real default ("") — so
@@ -91,7 +93,7 @@ function Shell() {
         {overlay?.type === "product" && (
           <ProductDetailModal
             key="product"
-            product={PRODUCTS[overlay.productId]}
+            product={c.products[overlay.productId]}
             onClose={closeOverlay}
           />
         )}
@@ -109,8 +111,10 @@ function Shell() {
 
 export default function App() {
   return (
-    <NavProvider>
-      <Shell />
-    </NavProvider>
+    <LangProvider>
+      <NavProvider>
+        <Shell />
+      </NavProvider>
+    </LangProvider>
   );
 }

@@ -4,9 +4,11 @@ import { Menu, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
 import Logo from "./Logo";
 import { useNav } from "@/lib/store";
+import { useT } from "@/lib/i18n";
 
 export default function Header() {
   const { goTo, openMenu } = useNav();
+  const t = useT();
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-[var(--hairline)] bg-[rgba(70,13,27,0.92)] pt-safe backdrop-blur-md">
@@ -16,7 +18,7 @@ export default function Header() {
         <div className="flex flex-1 items-center justify-start">
           <button
             onClick={openMenu}
-            aria-label="Open menu"
+            aria-label={t.header.openMenu}
             className="flex h-10 w-10 items-center justify-center rounded-full text-cream/90 transition-colors hover:bg-white/5"
           >
             <Menu className="h-[22px] w-[22px]" strokeWidth={1.5} />
@@ -25,7 +27,7 @@ export default function Header() {
 
         <button
           onClick={() => goTo("home")}
-          aria-label="Candy Couture — home"
+          aria-label={t.header.home}
           className="shrink-0"
         >
           <Logo size="md" />
@@ -35,7 +37,7 @@ export default function Header() {
           <motion.button
             whileTap={{ scale: 0.94 }}
             onClick={() => goTo("ordering")}
-            aria-label="Ordering information"
+            aria-label={t.header.ordering}
             className="flex h-10 w-10 items-center justify-center rounded-full text-cream/90 transition-colors hover:bg-white/5 hover:text-coral"
           >
             <ShoppingBag className="h-[22px] w-[22px]" strokeWidth={1.5} />

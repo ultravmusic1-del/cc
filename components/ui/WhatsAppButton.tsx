@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { whatsappLink, type WhatsAppIntent } from "@/lib/whatsapp";
+import { useLang, useT } from "@/lib/i18n";
 
 /** Simple inline WhatsApp glyph so we don't pull in a brand-icon pack. */
 function WhatsAppGlyph({ className = "" }: { className?: string }) {
@@ -22,11 +23,14 @@ interface Props {
 
 export default function WhatsAppButton({
   intent = "general",
-  label = "WhatsApp",
+  label,
   variant = "outline",
   className = "",
   onClick,
 }: Props) {
+  const { lang } = useLang();
+  const t = useT();
+  const text = label ?? t.whatsapp.defaultLabel;
   const base =
     "inline-flex w-full items-center justify-center gap-2.5 rounded-full px-6 py-3.5 text-sm font-semibold tracking-wide transition-colors";
   const styles =
@@ -36,16 +40,16 @@ export default function WhatsAppButton({
 
   return (
     <motion.a
-      href={whatsappLink(intent)}
+      href={whatsappLink(intent, lang)}
       target="_blank"
       rel="noopener noreferrer"
       onClick={onClick}
       whileTap={{ scale: 0.97 }}
       className={`${base} ${styles} ${className}`}
-      aria-label={`Order on WhatsApp — ${label}`}
+      aria-label={`${t.whatsapp.ariaPrefix} — ${text}`}
     >
       <WhatsAppGlyph className="h-[18px] w-[18px]" />
-      {label}
+      {text}
     </motion.a>
   );
 }

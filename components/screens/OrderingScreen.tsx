@@ -13,27 +13,36 @@ import {
 import ScreenShell from "../ScreenShell";
 import WhatsAppButton from "../ui/WhatsAppButton";
 import Footer from "../Footer";
-import { ORDERING } from "@/lib/content";
-
-const rules = [
-  { icon: ShoppingBag, label: "Minimum order", value: ORDERING.minimum },
-  { icon: MapPin, label: "Delivery area", value: ORDERING.deliveryArea },
-  { icon: Truck, label: "Delivery fee", value: ORDERING.deliveryFee },
-  { icon: Gift, label: "Free delivery over", value: ORDERING.freeDeliveryOver },
-  { icon: CreditCard, label: "Payment", value: ORDERING.payment },
-  { icon: Clock, label: "Order cutoff", value: "2:00 PM · next-day" },
-];
+import { useContent, useT } from "@/lib/i18n";
 
 export default function OrderingScreen() {
+  const c = useContent();
+  const t = useT();
+
+  const rules = [
+    { icon: ShoppingBag, label: t.ordering.minimum, value: c.ordering.minimum },
+    { icon: MapPin, label: t.ordering.deliveryArea, value: c.ordering.deliveryArea },
+    { icon: Truck, label: t.ordering.deliveryFee, value: c.ordering.deliveryFee },
+    {
+      icon: Gift,
+      label: t.ordering.freeOver,
+      value: c.ordering.freeDeliveryOver,
+    },
+    { icon: CreditCard, label: t.ordering.payment, value: c.ordering.payment },
+    { icon: Clock, label: t.ordering.cutoff, value: c.ordering.cutoff },
+  ];
+
   return (
     <ScreenShell>
       <header className="text-center">
-        <p className="eyebrow text-[rgba(233,173,190,0.8)]">How it works</p>
+        <p className="eyebrow text-[rgba(233,173,190,0.8)]">
+          {t.ordering.eyebrow}
+        </p>
         <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream">
-          Ordering
+          {t.ordering.title}
         </h1>
         <p className="mt-2 text-[0.9rem] text-[rgba(227,210,194,0.72)]">
-          Order before 2 PM for next-day delivery.
+          {t.ordering.subtitle}
         </p>
       </header>
 
@@ -60,12 +69,12 @@ export default function OrderingScreen() {
       <div className="glass-card mt-3 flex items-center gap-3 rounded-2xl px-4 py-3.5">
         <Store className="h-5 w-5 shrink-0 text-olive" strokeWidth={1.5} />
         <p className="text-[0.82rem] text-[rgba(227,210,194,0.78)]">
-          Wholesale orders are handled personally — just say hello on WhatsApp.
+          {t.ordering.wholesaleNote}
         </p>
       </div>
 
       <div className="mx-auto mt-6 w-full max-w-[24rem]">
-        <WhatsAppButton intent="general" label="Order on WhatsApp" />
+        <WhatsAppButton intent="general" label={t.ordering.orderCta} />
       </div>
 
       <Footer />
