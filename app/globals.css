@@ -65,11 +65,13 @@
     background: linear-gradient(90deg, transparent, var(--hairline-strong) 18%, var(--hairline-strong) 82%, transparent);
   }
 
+  /* Solid frosted look WITHOUT backdrop-filter. These cards sit on the
+     opaque burgundy stage, so a more opaque fill reads identically to a
+     blurred one — but costs the mobile GPU nothing. (Stacking 5–7 real
+     backdrop-filter layers per screen was a primary freeze/crash cause.) */
   .glass-card {
-    background: linear-gradient(180deg, rgba(113, 24, 43, 0.72), rgba(74, 13, 27, 0.72));
+    background: linear-gradient(180deg, rgba(120, 27, 47, 0.92), rgba(74, 13, 27, 0.94));
     border: 1px solid var(--hairline);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
   }
 
   .btn-coral {
@@ -116,14 +118,18 @@
     scrollbar-thickness: none;
     scrollbar-width: none;
   }
+  /* Film-grain texture. A *fixed*, full-viewport layer with
+     mix-blend-mode forces the browser to re-composite the entire page
+     every frame — a documented iOS Safari crash / Android freeze trigger.
+     Dropping the blend mode (and pinning it behind content instead of at
+     z-60 over everything) keeps the texture while removing the cost. */
   .grain::after {
     content: "";
     position: fixed;
     inset: 0;
-    z-index: 60;
+    z-index: -5;
     pointer-events: none;
-    opacity: 0.05;
-    mix-blend-mode: overlay;
+    opacity: 0.045;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 }

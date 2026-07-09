@@ -38,15 +38,12 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
   const { goTo, openAboutDrawer } = useNav();
   const [level, setLevel] = useState<"main" | "about">("main");
 
+  // Scroll lock is handled centrally in App's Shell (keyed on any overlay
+  // being open). This effect only wires up Escape-to-close.
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      document.removeEventListener("keydown", onKey);
-    };
+    return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
   const openDrawer = (id: AboutDrawerId) => {

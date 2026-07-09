@@ -38,19 +38,6 @@ const config: Config = {
       transitionTimingFunction: {
         luxe: "cubic-bezier(0.22, 1, 0.36, 1)",
       },
-      keyframes: {
-        floaty: {
-          "0%, 100%": { transform: "translateY(0px) rotate(0deg)" },
-          "50%": { transform: "translateY(-14px) rotate(-0.6deg)" },
-        },
-        shimmer: {
-          "0%": { backgroundPosition: "0% 50%" },
-          "100%": { backgroundPosition: "200% 50%" },
-        },
-      },
-      animation: {
-        floaty: "floaty 7s ease-in-out infinite",
-      },
     },
   },
   plugins: [],

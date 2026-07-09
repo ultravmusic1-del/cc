@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import { X } from "lucide-react";
 import type { Product } from "@/lib/content";
 import { STORAGE } from "@/lib/content";
 import WhatsAppButton from "./ui/WhatsAppButton";
+import CountUp from "./ui/CountUp";
 
 type TabId = "overview" | "ingredients" | "nutrition" | "storage" | "allergens";
 const TABS: { id: TabId; label: string }[] = [
@@ -35,12 +36,11 @@ export default function ProductDetailModal({
 }) {
   const [tab, setTab] = useState<TabId>("overview");
   const panelRef = useRef<HTMLDivElement>(null);
+  const dragControls = useDragControls();
   const isCoral = product.accent === "coral";
 
-  // ESC to close + focus trap + scroll lock
+  // ESC to close + focus trap. (Scroll lock is centralized in App's Shell.)
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
       if (e.key === "Tab" && panelRef.current) {
@@ -62,7 +62,6 @@ export default function ProductDetailModal({
     document.addEventListener("keydown", onKey);
     const t = window.setTimeout(() => panelRef.current?.focus(), 30);
     return () => {
-      document.body.style.overflow = prev;
       document.removeEventListener("keydown", onKey);
       window.clearTimeout(t);
     };
@@ -86,6 +85,8 @@ export default function ProductDetailModal({
         aria-labelledby="pd-title"
         tabIndex={-1}
         drag="y"
+        dragControls={dragControls}
+        dragListener={false}
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={{ top: 0, bottom: 0.4 }}
         onDragEnd={(_, info) => {
@@ -97,8 +98,13 @@ export default function ProductDetailModal({
         transition={{ type: "spring", stiffness: 320, damping: 34 }}
         className="panel-bg relative z-10 flex max-h-[92dvh] w-full max-w-[var(--app-max)] flex-col overflow-hidden rounded-t-[2rem] border border-[var(--hairline)] shadow-float sm:max-h-[88dvh] sm:rounded-[2rem]"
       >
-        {/* grab handle */}
-        <div className="flex justify-center pt-3 sm:hidden">
+        {/* grab handle — the ONLY drag trigger, so scrolling the body below
+            never hijacks into a sheet drag (was a "frozen scroll" bug) */}
+        <div
+          onPointerDown={(e) => dragControls.start(e)}
+          className="flex cursor-grab justify-center pt-3 active:cursor-grabbing sm:hidden"
+          style={{ touchAction: "none" }}
+        >
           <span className="h-1 w-11 rounded-full bg-[rgba(233,173,190,0.35)]" />
         </div>
 
@@ -117,6 +123,7 @@ export default function ProductDetailModal({
               alt=""
               width={120}
               height={106}
+              sizes="44px"
               className="h-auto w-11"
             />
           </div>
@@ -238,7 +245,7 @@ export default function ProductDetailModal({
                           className="glass-card flex flex-col items-center rounded-2xl py-3"
                         >
                           <span className="font-heading text-xl font-bold text-coral">
-                            {n.value}
+                            <CountUp value={n.value} duration={1100} />
                           </span>
                           <span className="text-[0.64rem] font-semibold uppercase tracking-[0.12em] text-[rgba(227,210,194,0.6)]">
                             {n.label}

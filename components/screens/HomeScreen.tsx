@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Icon from "../ui/Icon";
+import CountUp from "../ui/CountUp";
 import { useNav } from "@/lib/store";
 import { BRAND, HERO, HERO_BENEFITS } from "@/lib/content";
 
@@ -89,6 +90,7 @@ export default function HomeScreen() {
               width={1080}
               height={952}
               priority
+              sizes="(max-width: 520px) 60vw, 220px"
               className="h-auto w-full drop-shadow-[0_18px_22px_rgba(15,3,7,0.4)]"
             />
           </div>
@@ -126,14 +128,14 @@ export default function HomeScreen() {
           variants={rise}
           className="no-scrollbar -mx-5 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5"
         >
-          {HERO_BENEFITS.map((b) => (
+          {HERO_BENEFITS.map((b, i) => (
             <div
               key={b.label}
               className="glass-card flex min-w-[7rem] shrink-0 snap-start flex-col items-center gap-1.5 rounded-2xl px-4 py-3 text-center"
             >
               <Icon name={b.icon} className="h-5 w-5 text-olive" />
               <span className="font-heading text-lg font-semibold leading-none text-cream">
-                {b.value}
+                <CountUp value={b.value} delay={550 + i * 90} />
                 {b.unit && (
                   <span className="text-sm font-medium text-[rgba(227,210,194,0.7)]">
                     {b.unit}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { NavProvider, useNav } from "@/lib/store";
 import Header from "./Header";
@@ -17,6 +18,17 @@ import { PRODUCTS } from "@/lib/content";
 
 function Shell() {
   const { view, overlay, closeOverlay } = useNav();
+
+  // Single source of truth for the body scroll lock. Locking is keyed only on
+  // "is ANY overlay open", and always restores to the real default ("") — so
+  // overlapping overlays (e.g. the menu exit-animating while a drawer opens)
+  // can never hand a stale "hidden" value forward and wedge the page. Each
+  // overlay used to save/restore body.style.overflow itself, which leaked a
+  // permanent scroll lock and made the whole app unclickable.
+  const hasOverlay = overlay !== null;
+  useEffect(() => {
+    document.body.style.overflow = hasOverlay ? "hidden" : "";
+  }, [hasOverlay]);
 
   return (
     <main className="grain relative min-h-[100dvh] w-full">

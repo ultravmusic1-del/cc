@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { animate, stagger } from "animejs";
 import { Cookie, HeartPulse, ShoppingBag, LayoutGrid } from "lucide-react";
 import { useNav, type ViewId } from "@/lib/store";
 
@@ -17,6 +19,25 @@ const items: {
 
 export default function StickyNav() {
   const { view, overlay, goTo, openMenu } = useNav();
+  const barRef = useRef<HTMLDivElement>(null);
+
+  // One-time staggered entrance for the nav items (anime.js). Framer owns
+  // the sliding active pill; this only animates the icons/labels in on load.
+  useEffect(() => {
+    const el = barRef.current;
+    if (!el) return;
+    const reduce = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduce) return;
+    animate(el.querySelectorAll("[data-nav-item]"), {
+      opacity: [0, 1],
+      translateY: [10, 0],
+      duration: 600,
+      delay: stagger(70, { start: 250 }),
+      ease: "out(3)",
+    });
+  }, []);
 
   return (
     <nav
@@ -24,13 +45,17 @@ export default function StickyNav() {
       className="fixed inset-x-0 bottom-0 z-40 pb-safe"
     >
       <div className="mx-auto w-full max-w-[var(--app-max)] px-4 pb-2">
-        <div className="flex items-stretch justify-between gap-1 rounded-full border border-[var(--hairline)] bg-[rgba(45,9,17,0.82)] px-2 py-1.5 shadow-float backdrop-blur-xl">
+        <div
+          ref={barRef}
+          className="flex items-stretch justify-between gap-1 rounded-full border border-[var(--hairline)] bg-[rgba(45,9,17,0.92)] px-2 py-1.5 shadow-float backdrop-blur-md"
+        >
           {items.map(({ id, label, icon: Ico }) => {
             const active =
               id === "menu" ? overlay?.type === "menu" : view === id;
             return (
               <button
                 key={id}
+                data-nav-item
                 onClick={() => (id === "menu" ? openMenu() : goTo(id as ViewId))}
                 aria-label={label}
                 aria-current={active ? "page" : undefined}

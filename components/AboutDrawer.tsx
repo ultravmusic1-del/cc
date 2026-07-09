@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useDragControls } from "framer-motion";
 import { X } from "lucide-react";
 import Icon from "./ui/Icon";
 import WhatsAppButton from "./ui/WhatsAppButton";
@@ -22,17 +22,16 @@ export default function AboutDrawer({
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const dragControls = useDragControls();
 
+  // ESC to close + initial focus. (Scroll lock is centralized in App's Shell.)
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKey);
     const t = window.setTimeout(() => ref.current?.focus(), 30);
     return () => {
-      document.body.style.overflow = prev;
       document.removeEventListener("keydown", onKey);
       window.clearTimeout(t);
     };
@@ -56,6 +55,8 @@ export default function AboutDrawer({
         aria-labelledby="drawer-title"
         tabIndex={-1}
         drag="y"
+        dragControls={dragControls}
+        dragListener={false}
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={{ top: 0, bottom: 0.4 }}
         onDragEnd={(_, info) => info.offset.y > 120 && onClose()}
@@ -65,7 +66,11 @@ export default function AboutDrawer({
         transition={{ type: "spring", stiffness: 320, damping: 34 }}
         className="panel-bg relative z-10 flex max-h-[90dvh] w-full max-w-[var(--app-max)] flex-col overflow-hidden rounded-t-[2rem] border border-[var(--hairline)] shadow-float sm:max-h-[84dvh] sm:rounded-[2rem]"
       >
-        <div className="flex justify-center pt-3 sm:hidden">
+        <div
+          onPointerDown={(e) => dragControls.start(e)}
+          className="flex cursor-grab justify-center pt-3 active:cursor-grabbing sm:hidden"
+          style={{ touchAction: "none" }}
+        >
           <span className="h-1 w-11 rounded-full bg-[rgba(233,173,190,0.35)]" />
         </div>
 

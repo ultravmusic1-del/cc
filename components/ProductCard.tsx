@@ -68,6 +68,7 @@ export default function ProductCard({ product }: { product: Product }) {
           alt={product.imageAlt}
           width={540}
           height={476}
+          sizes="(max-width: 520px) 45vw, 220px"
           className="relative h-auto w-full drop-shadow-[0_14px_18px_rgba(15,3,7,0.45)]"
         />
       </button>
