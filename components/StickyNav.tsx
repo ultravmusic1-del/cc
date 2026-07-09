@@ -51,7 +51,7 @@ export default function StickyNav() {
       <div className="mx-auto w-full max-w-[var(--app-max)] px-4 pb-2">
         <div
           ref={barRef}
-          className="flex items-stretch justify-between gap-1 rounded-full border border-[var(--hairline)] bg-[rgba(45,9,17,0.92)] px-2 py-1.5 shadow-float backdrop-blur-md"
+          className="flex items-stretch justify-between gap-1 rounded-full border border-[var(--hairline)] bg-[rgba(45,9,17,0.78)] px-2 py-1.5 shadow-[0_10px_34px_-14px_rgba(15,3,7,0.65)] backdrop-blur-xl"
         >
           {items.map(({ id, labelKey, icon: Ico, img }) => {
             const label = t.nav[labelKey];

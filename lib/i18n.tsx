@@ -108,7 +108,7 @@ export interface UIStrings {
     highProtein: string;
     classic: string;
     perBar: string;
-    perBoxOf10: string; // "{price} per box of 10"
+    perBoxOf10: string; // "{price} per pack of 10"
     boxMin: string;
     whatsapp: string;
     viewDetails: string;
@@ -138,7 +138,7 @@ export interface UIStrings {
     gluten: string;
     dairy: string;
     nuts: string;
-    ctaSub: string; // "/ bar · {box} per box"
+    ctaSub: string; // "/ bar · {box} per pack"
     orderCta: string;
     close: string;
   };
@@ -214,7 +214,7 @@ const EN_UI: UIStrings = {
     wholesaleVal: "Options available",
     delivery: "Delivery",
     deliveryVal: "Across Bahrain",
-    boxNote: "One box equals {n}. Minimum order 10.",
+    boxNote: "One pack equals {n}. Minimum order 10.",
   },
   nutrition: {
     eyebrow: "Know your bar",
@@ -247,7 +247,7 @@ const EN_UI: UIStrings = {
     philosophyT: "Product Philosophy",
     philosophyN: "Real ingredients, no shortcuts",
     giftingT: "Gifting & Wholesale",
-    giftingN: "Boxes, bulk & business orders",
+    giftingN: "Packs, bulk & business orders",
     testimonialsT: "Brand Testimonials",
     comingSoon: "Coming soon",
   },
@@ -257,8 +257,8 @@ const EN_UI: UIStrings = {
     subtitle: "Boutique bars, at scale.",
     p: [
       { t: "Wholesale orders", n: "Available through WhatsApp" },
-      { t: "Box quantity", n: "10 bars per box" },
-      { t: "Premium gift boxes", n: "Coming soon" },
+      { t: "Pack quantity", n: "10 bars per pack" },
+      { t: "Premium gift packs", n: "Coming soon" },
       { t: "Delivery", n: "Bahrain only" },
     ],
     closing: "Tell us what you need and we'll take care of the rest.",
@@ -268,8 +268,8 @@ const EN_UI: UIStrings = {
     highProtein: "High Protein",
     classic: "Classic",
     perBar: "/bar",
-    perBoxOf10: "{price} per box of 10",
-    boxMin: "Box of 10 · Min. 10",
+    perBoxOf10: "{price} per pack of 10",
+    boxMin: "Pack of 10 · Min. 10",
     whatsapp: "WhatsApp",
     viewDetails: "View Details",
   },
@@ -285,7 +285,7 @@ const EN_UI: UIStrings = {
     },
     servingSize: "Serving size",
     price: "Price",
-    perBox: "Per box",
+    perBox: "Per pack",
     minimumOrder: "Minimum order",
     shelfLife: "Shelf life",
     made: "Made",
@@ -298,7 +298,7 @@ const EN_UI: UIStrings = {
     gluten: "Gluten",
     dairy: "Dairy",
     nuts: "Nuts",
-    ctaSub: "/ bar · {box} per box",
+    ctaSub: "/ bar · {box} per pack",
     orderCta: "Order on WhatsApp",
     close: "Close",
   },
@@ -308,9 +308,9 @@ const EN_UI: UIStrings = {
     gifting: "Gifting & Wholesale",
     quote: "Too good to share.",
     handcraftedIn: "Handcrafted in {location}.",
-    boxQty: "Box quantity",
+    boxQty: "Pack quantity",
     boxQtyVal: "10 bars",
-    giftBoxes: "Premium gift boxes",
+    giftBoxes: "Premium gift packs",
     comingSoon: "Coming soon",
     delivery: "Delivery",
     deliveryVal: "Bahrain only",
@@ -380,7 +380,7 @@ const AR_UI: UIStrings = {
     wholesaleVal: "خيارات متاحة",
     delivery: "التوصيل",
     deliveryVal: "في أنحاء البحرين",
-    boxNote: "الصندوق الواحد يساوي {n}. الحد الأدنى للطلب 10.",
+    boxNote: "العبوة الواحدة تساوي {n}. الحد الأدنى للطلب 10.",
   },
   nutrition: {
     eyebrow: "اعرف لوحك",
@@ -412,7 +412,7 @@ const AR_UI: UIStrings = {
     philosophyT: "فلسفة المنتج",
     philosophyN: "مكوّنات حقيقية بلا اختصارات",
     giftingT: "الإهداء والجملة",
-    giftingN: "صناديق وطلبات بالجملة وللشركات",
+    giftingN: "عبوات وطلبات بالجملة وللشركات",
     testimonialsT: "آراء العملاء",
     comingSoon: "قريبًا",
   },
@@ -422,8 +422,8 @@ const AR_UI: UIStrings = {
     subtitle: "ألواح فاخرة، بكميات كبيرة.",
     p: [
       { t: "طلبات الجملة", n: "متاحة عبر واتساب" },
-      { t: "كمية الصندوق", n: "10 ألواح في الصندوق" },
-      { t: "صناديق هدايا فاخرة", n: "قريبًا" },
+      { t: "كمية العبوة", n: "10 ألواح في العبوة" },
+      { t: "عبوات هدايا فاخرة", n: "قريبًا" },
       { t: "التوصيل", n: "البحرين فقط" },
     ],
     closing: "أخبرنا بما تحتاجه وسنتكفّل بالباقي.",
@@ -433,8 +433,8 @@ const AR_UI: UIStrings = {
     highProtein: "عالي البروتين",
     classic: "كلاسيكي",
     perBar: "/لوح",
-    perBoxOf10: "{price} لصندوق من 10",
-    boxMin: "صندوق من 10 · الحد الأدنى 10",
+    perBoxOf10: "{price} لعبوة من 10",
+    boxMin: "عبوة من 10 · الحد الأدنى 10",
     whatsapp: "واتساب",
     viewDetails: "عرض التفاصيل",
   },
@@ -450,7 +450,7 @@ const AR_UI: UIStrings = {
     },
     servingSize: "حجم الحصة",
     price: "السعر",
-    perBox: "الصندوق",
+    perBox: "العبوة",
     minimumOrder: "الحد الأدنى للطلب",
     shelfLife: "مدة الصلاحية",
     made: "المنشأ",
@@ -463,7 +463,7 @@ const AR_UI: UIStrings = {
     gluten: "الغلوتين",
     dairy: "الحليب",
     nuts: "المكسّرات",
-    ctaSub: "/ لوح · {box} للصندوق",
+    ctaSub: "/ لوح · {box} للعبوة",
     orderCta: "اطلب عبر واتساب",
     close: "إغلاق",
   },
@@ -473,9 +473,9 @@ const AR_UI: UIStrings = {
     gifting: "الإهداء والجملة",
     quote: "ألذّ من أن يُشارَك.",
     handcraftedIn: "صُنع يدويًا في {location}.",
-    boxQty: "كمية الصندوق",
+    boxQty: "كمية العبوة",
     boxQtyVal: "10 ألواح",
-    giftBoxes: "صناديق هدايا فاخرة",
+    giftBoxes: "عبوات هدايا فاخرة",
     comingSoon: "قريبًا",
     delivery: "التوصيل",
     deliveryVal: "البحرين فقط",

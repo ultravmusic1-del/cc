@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Box } from "lucide-react";
 import type { Product } from "@/lib/content";
 import { useNav } from "@/lib/store";
 import { useT, fill } from "@/lib/i18n";
@@ -97,12 +96,6 @@ export default function ProductCard({ product }: { product: Product }) {
       <p className="relative z-10 mt-1 text-center text-[0.68rem] text-[rgba(227,210,194,0.5)]">
         {fill(t.card.perBoxOf10, { price: product.pricePerBox })}
       </p>
-
-      {/* meta */}
-      <div className="relative z-10 mt-2.5 flex items-center justify-center gap-1.5 whitespace-nowrap text-[0.66rem] text-[rgba(227,210,194,0.66)]">
-        <Box className="h-3.5 w-3.5 shrink-0 text-olive" strokeWidth={1.5} />
-        {t.card.boxMin}
-      </div>
 
       {/* actions — pushed to the bottom so both cards align */}
       <div className="relative z-10 mt-auto flex flex-col gap-2 pt-4">

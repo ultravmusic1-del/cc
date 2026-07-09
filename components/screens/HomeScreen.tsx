@@ -38,7 +38,7 @@ export default function HomeScreen() {
         variants={stagger}
         initial="initial"
         animate="animate"
-        className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[var(--app-max)] flex-col justify-center px-5 pb-24 pt-[4.6rem]"
+        className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[var(--app-max)] flex-col justify-center px-5 pb-28 pt-[4.6rem]"
       >
         {/* Eyebrow */}
         <motion.p
@@ -97,14 +97,6 @@ export default function HomeScreen() {
             />
           </div>
         </motion.div>
-
-        {/* Subtext */}
-        <motion.p
-          variants={rise}
-          className="mx-auto mt-1 max-w-[19rem] text-center text-[0.92rem] leading-relaxed text-[rgba(227,210,194,0.78)]"
-        >
-          {c.hero.subtext}
-        </motion.p>
 
         {/* CTAs */}
         <motion.div variants={rise} className="mt-5 flex flex-col gap-2.5">

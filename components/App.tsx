@@ -32,6 +32,15 @@ function Shell() {
     document.body.style.overflow = hasOverlay ? "hidden" : "";
   }, [hasOverlay]);
 
+  // Every view is its own "page" — reset scroll to the top whenever the view
+  // changes, no matter how (sticky nav, menu, header, back button/hash). Runs
+  // after the new screen renders, and writes scrollTop directly so it's instant
+  // even with `scroll-behavior: smooth` set globally.
+  useEffect(() => {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [view]);
+
   return (
     <main className="grain relative min-h-[100dvh] w-full">
       {/* ── Persistent desktop stage ─────────────────────────────
@@ -79,6 +88,18 @@ function Shell() {
       {view === "about" && <AboutScreen key="about" />}
       {view === "ordering" && <OrderingScreen key="ordering" />}
       {view === "wholesale" && <WholesaleScreen key="wholesale" />}
+
+      {/* Bottom scrim — fades page content into the burgundy behind the nav so
+          the floating bar reads as grounded instead of clashing with content
+          that scrolls up underneath it. Sits above screens (z-10), below nav. */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-32"
+        style={{
+          background:
+            "linear-gradient(to top, #480d1a 16%, rgba(72,13,26,0.82) 44%, rgba(72,13,26,0) 100%)",
+        }}
+      />
 
       <StickyNav />
 
