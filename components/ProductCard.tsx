@@ -78,7 +78,9 @@ export default function ProductCard({
           width={600}
           height={600}
           priority={priority}
-          sizes="(max-width: 520px) 45vw, 220px"
+          // Desktop clause first — `sizes` is first-match, so the existing
+          // mobile clauses resolve exactly as before.
+          sizes="(min-width: 1024px) 360px, (max-width: 520px) 45vw, 220px"
           className="relative h-auto w-full drop-shadow-[0_14px_18px_rgba(15,3,7,0.45)]"
         />
       </button>

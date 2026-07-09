@@ -19,7 +19,7 @@ export default function WholesaleScreen() {
         <p className="eyebrow text-[rgba(233,173,190,0.8)]">
           {t.wholesale.eyebrow}
         </p>
-        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream">
+        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream lg:text-[2.75rem]">
           {t.wholesale.title}
         </h1>
         <p className="mt-2 text-[0.9rem] text-[rgba(227,210,194,0.72)]">
@@ -27,14 +27,14 @@ export default function WholesaleScreen() {
         </p>
       </header>
 
-      <div className="mt-6 flex flex-col gap-3">
+      <div className="mt-6 flex flex-col gap-3 lg:mt-10 lg:grid lg:grid-cols-2 lg:gap-5">
         {points.map((p, i) => (
           <motion.div
             key={p.t}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.06 * i, ease: [0.22, 1, 0.36, 1] }}
-            className="glass-card flex items-center gap-4 rounded-2xl px-4 py-4"
+            className="glass-card flex items-center gap-4 rounded-2xl px-4 py-4 lg:px-6 lg:py-6"
           >
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[rgba(233,173,190,0.35)]">
               <p.icon className="h-5 w-5 text-pink" strokeWidth={1.5} />
@@ -51,7 +51,7 @@ export default function WholesaleScreen() {
         ))}
       </div>
 
-      <p className="mt-6 text-center text-[0.85rem] leading-relaxed text-[rgba(227,210,194,0.72)]">
+      <p className="mt-6 text-center text-[0.85rem] leading-relaxed text-[rgba(227,210,194,0.72)] lg:mx-auto lg:max-w-[62ch]">
         {t.wholesale.closing}
       </p>
 

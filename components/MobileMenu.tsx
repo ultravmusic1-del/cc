@@ -162,7 +162,7 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0, transition: { staggerChildren: 0.06, delayChildren: 0.05 } }}
               exit={{ opacity: 0, x: -30, transition: { duration: 0.2 } }}
-              className="flex flex-col px-6 pt-6"
+              className="flex flex-col px-6 pt-6 lg:mx-auto lg:w-full lg:max-w-[640px] lg:pt-10"
             >
               {mainItems.map((item) => (
                 <motion.button
@@ -190,7 +190,7 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
               initial={{ opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0, transition: { staggerChildren: 0.06, delayChildren: 0.05 } }}
               exit={{ opacity: 0, x: 30, transition: { duration: 0.2 } }}
-              className="flex flex-col px-6 pt-6"
+              className="flex flex-col px-6 pt-6 lg:mx-auto lg:w-full lg:max-w-[640px] lg:pt-10"
             >
               <motion.p
                 variants={rowRise}
@@ -239,7 +239,7 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
               initial={{ opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0, transition: { staggerChildren: 0.06, delayChildren: 0.05 } }}
               exit={{ opacity: 0, x: 30, transition: { duration: 0.2 } }}
-              className="flex flex-col px-6 pt-6"
+              className="flex flex-col px-6 pt-6 lg:mx-auto lg:w-full lg:max-w-[640px] lg:pt-10"
             >
               <motion.p
                 variants={rowRise}
@@ -278,7 +278,7 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
       </div>
 
       {/* language toggle */}
-      <div className="relative z-10 mx-6 mb-3">
+      <div className="relative z-10 mx-6 mb-3 lg:mx-auto lg:w-full lg:max-w-[640px]">
         <p className="eyebrow mb-2 text-center text-[rgba(233,173,190,0.6)]">
           {t.menu.language}
         </p>

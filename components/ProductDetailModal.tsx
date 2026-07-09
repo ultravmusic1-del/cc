@@ -136,7 +136,7 @@ export default function ProductDetailModal({
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", stiffness: 320, damping: 34 }}
-        className="panel-bg relative z-10 flex max-h-[92dvh] w-full max-w-[var(--app-max)] flex-col overflow-hidden rounded-t-[2rem] border border-[var(--hairline)] shadow-float sm:max-h-[88dvh] sm:rounded-[2rem]"
+        className="panel-bg relative z-10 flex max-h-[92dvh] w-full max-w-[var(--panel-max)] flex-col overflow-hidden rounded-t-[2rem] border border-[var(--hairline)] shadow-float sm:max-h-[88dvh] sm:rounded-[2rem]"
       >
         {/* grab handle — the ONLY drag trigger, so scrolling the body below
             never hijacks into a sheet drag (was a "frozen scroll" bug) */}

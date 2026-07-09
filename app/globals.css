@@ -13,7 +13,25 @@
   --cream: #f4e8dc;
   --hairline: rgba(233, 173, 190, 0.22);
   --hairline-strong: rgba(227, 210, 194, 0.34);
+  /* Content column. Widens on desktop (below). */
   --app-max: 480px;
+  /* Overlay sheets (product modal, about drawer). Deliberately a SEPARATE knob
+     from --app-max: those panels must stay sheet-sized when the page column
+     grows, or they balloon to full width on desktop. */
+  --panel-max: 480px;
+  /* The illuminated centre panel behind the column; tracks --app-max + gutters. */
+  --stage-max: 540px;
+}
+
+/* ── Desktop (>= 1024px) ────────────────────────────────────────────────
+   The ONLY place the layout scale changes. Everything below this width —
+   phones and tablets — renders exactly as it always has. */
+@media (min-width: 1024px) {
+  :root {
+    --app-max: 1120px;
+    --panel-max: 560px;
+    --stage-max: 1216px;
+  }
 }
 
 @layer base {

@@ -69,7 +69,7 @@ export default function AboutDrawer({
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", stiffness: 320, damping: 34 }}
-        className="panel-bg relative z-10 flex max-h-[90dvh] w-full max-w-[var(--app-max)] flex-col overflow-hidden rounded-t-[2rem] border border-[var(--hairline)] shadow-float sm:max-h-[84dvh] sm:rounded-[2rem]"
+        className="panel-bg relative z-10 flex max-h-[90dvh] w-full max-w-[var(--panel-max)] flex-col overflow-hidden rounded-t-[2rem] border border-[var(--hairline)] shadow-float sm:max-h-[84dvh] sm:rounded-[2rem]"
       >
         <div
           onPointerDown={(e) => dragControls.start(e)}

@@ -38,7 +38,7 @@ export default function OrderingScreen() {
         <p className="eyebrow text-[rgba(233,173,190,0.8)]">
           {t.ordering.eyebrow}
         </p>
-        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream">
+        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream lg:text-[2.75rem]">
           {t.ordering.title}
         </h1>
         <p className="mt-2 text-[0.9rem] text-[rgba(227,210,194,0.72)]">
@@ -46,14 +46,14 @@ export default function OrderingScreen() {
         </p>
       </header>
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div className="mt-6 grid grid-cols-2 gap-3 lg:mt-10 lg:grid-cols-3 lg:gap-5">
         {rules.map((r, i) => (
           <motion.div
             key={r.label}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.05 * i, ease: [0.22, 1, 0.36, 1] }}
-            className="glass-card flex flex-col gap-2 rounded-2xl px-4 py-4"
+            className="glass-card flex flex-col gap-2 rounded-2xl px-4 py-4 lg:px-6 lg:py-6"
           >
             <r.icon className="h-5 w-5 text-coral" strokeWidth={1.5} />
             <span className="text-[0.66rem] font-semibold uppercase tracking-[0.12em] text-[rgba(227,210,194,0.58)]">

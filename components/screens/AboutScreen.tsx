@@ -32,17 +32,18 @@ export default function AboutScreen() {
     <ScreenShell>
       <header>
         <p className="eyebrow text-[rgba(233,173,190,0.8)]">{t.about.eyebrow}</p>
-        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream">
+        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream lg:text-[2.75rem]">
           {t.about.title}
         </h1>
-        <p className="mt-3 text-[0.92rem] leading-relaxed text-[rgba(227,210,194,0.78)]">
+        {/* Cap the measure — a 1120px line is unreadable. */}
+        <p className="mt-3 text-[0.92rem] leading-relaxed text-[rgba(227,210,194,0.78)] lg:max-w-[62ch] lg:text-[1.02rem]">
           {c.brand.storyLede}
         </p>
       </header>
 
       <div className="hairline my-6" />
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-5">
         {cards.map((card, i) => (
           <motion.button
             key={card.id}
@@ -51,7 +52,7 @@ export default function AboutScreen() {
             transition={{ duration: 0.4, delay: 0.08 * i, ease: [0.22, 1, 0.36, 1] }}
             whileTap={{ scale: 0.98 }}
             onClick={() => openAboutDrawer(card.id)}
-            className="glass-card flex items-center gap-4 rounded-2xl px-4 py-4 text-start transition-colors hover:border-[rgba(236,91,69,0.5)]"
+            className="glass-card flex items-center gap-4 rounded-2xl px-4 py-4 text-start transition-colors hover:border-[rgba(236,91,69,0.5)] lg:px-6 lg:py-6"
           >
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[rgba(159,149,54,0.45)]">
               <card.icon className="h-5 w-5 text-olive" strokeWidth={1.5} />
@@ -69,7 +70,7 @@ export default function AboutScreen() {
         ))}
 
         {/* Coming soon */}
-        <div className="flex items-center gap-4 rounded-2xl border border-dashed border-[var(--hairline)] px-4 py-4 opacity-70">
+        <div className="flex items-center gap-4 rounded-2xl border border-dashed border-[var(--hairline)] px-4 py-4 opacity-70 lg:px-6 lg:py-6">
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[var(--hairline)]">
             <Lock className="h-4 w-4 text-[rgba(233,173,190,0.6)]" strokeWidth={1.5} />
           </span>

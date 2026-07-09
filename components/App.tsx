@@ -57,12 +57,14 @@ function Shell() {
       />
       <div
         aria-hidden
-        className="stage-bg fixed inset-y-0 left-1/2 -z-10 w-full max-w-[540px] -translate-x-1/2 lg:border-x lg:border-[var(--hairline)]"
+        className="stage-bg fixed inset-y-0 left-1/2 -z-10 w-full max-w-[var(--stage-max)] -translate-x-1/2 lg:border-x lg:border-[var(--hairline)]"
         style={{ boxShadow: "0 0 140px 20px rgba(15,3,7,0.6)" }}
       />
+      {/* Gutter flourishes. Gated at 2xl, not lg: once the stage is 1216px wide
+          the side gutters are too narrow to hold them until ~1536px. */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 hidden overflow-hidden lg:block"
+        className="pointer-events-none fixed inset-0 -z-10 hidden overflow-hidden 2xl:block"
       >
         <span
           className="absolute right-[8%] top-[18%] h-64 w-64 rounded-full"
@@ -92,7 +94,7 @@ function Shell() {
           that scrolls up underneath it. Sits above screens (z-10), below nav. */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-32"
+        className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-32 lg:hidden"
         style={{
           background:
             "linear-gradient(to top, #480d1a 16%, rgba(72,13,26,0.82) 44%, rgba(72,13,26,0) 100%)",

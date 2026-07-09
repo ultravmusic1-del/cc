@@ -23,7 +23,7 @@ export default function NutritionScreen() {
         <p className="eyebrow text-[rgba(233,173,190,0.8)]">
           {t.nutrition.eyebrow}
         </p>
-        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream">
+        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream lg:text-[2.75rem]">
           {t.nutrition.title}
         </h1>
         <p className="mt-2 text-[0.9rem] text-[rgba(227,210,194,0.72)]">
@@ -55,16 +55,19 @@ export default function NutritionScreen() {
             {fill(t.nutrition.per, { serving: product.servingSize })}
           </p>
 
-          <div className="grid grid-cols-2 gap-3">
+          {/* Plain block on mobile (children stack exactly as before); a
+              two-up grid on desktop. */}
+          <div className="lg:mx-auto lg:grid lg:max-w-[880px] lg:grid-cols-2 lg:items-start lg:gap-6">
+          <div className="grid grid-cols-2 gap-3 lg:gap-5">
             {highlights.map((n) => (
               <div
                 key={n.label}
-                className="glass-card flex flex-col items-center rounded-2xl py-5"
+                className="glass-card flex flex-col items-center rounded-2xl py-5 lg:py-8"
               >
                 <CountUp
                   value={n.value}
                   duration={1100}
-                  className="font-heading text-3xl font-bold text-coral"
+                  className="font-heading text-3xl font-bold text-coral lg:text-4xl"
                 />
                 <span className="mt-1 text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-[rgba(227,210,194,0.62)]">
                   {n.label}
@@ -73,7 +76,7 @@ export default function NutritionScreen() {
             ))}
           </div>
 
-          <div className="glass-card mt-3 rounded-2xl px-5 py-2">
+          <div className="glass-card mt-3 rounded-2xl px-5 py-2 lg:mt-0">
             {rest.map((n, i) => (
               <div
                 key={n.label}
@@ -90,6 +93,7 @@ export default function NutritionScreen() {
                 />
               </div>
             ))}
+          </div>
           </div>
 
           <p className="mt-4 text-center text-[0.72rem] text-[rgba(227,210,194,0.5)]">

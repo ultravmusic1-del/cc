@@ -46,7 +46,9 @@ export default function StickyNav() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 pb-safe"
+      // Desktop moves navigation into the Header; a floating bottom bar on a
+      // wide screen reads as a phone app.
+      className="fixed inset-x-0 bottom-0 z-40 pb-safe lg:hidden"
     >
       <div className="mx-auto w-full max-w-[var(--app-max)] px-4 pb-2">
         <div

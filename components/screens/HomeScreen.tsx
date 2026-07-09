@@ -76,12 +76,14 @@ export default function HomeScreen() {
         variants={stagger}
         initial="initial"
         animate="animate"
-        className="relative z-10 mx-auto flex min-h-full w-full max-w-[var(--app-max)] flex-col justify-center px-5 pb-28 pt-[4.6rem]"
+        // Desktop becomes a two-column grid. DOM order is unchanged — each child
+        // is placed explicitly — so the mobile flex column is untouched.
+        className="relative z-10 mx-auto flex min-h-full w-full max-w-[var(--app-max)] flex-col justify-center px-5 pb-28 pt-[4.6rem] lg:grid lg:grid-cols-2 lg:items-center lg:content-center lg:gap-x-16 lg:px-8 lg:pb-20 lg:pt-28"
       >
         {/* Eyebrow */}
         <motion.p
           variants={rise}
-          className="eyebrow mt-1 text-center text-[0.72rem] text-[rgba(233,173,190,0.85)]"
+          className="eyebrow mt-1 text-center text-[0.72rem] text-[rgba(233,173,190,0.85)] lg:col-start-1 lg:row-start-1 lg:mt-0 lg:text-start"
         >
           {t.home.eyebrow}
         </motion.p>
@@ -89,7 +91,7 @@ export default function HomeScreen() {
         {/* Headline — word-by-word reveal (anime.js) */}
         <h1
           ref={headlineRef}
-          className="mt-3.5 text-center font-heading text-[2.35rem] font-semibold leading-[1.03] tracking-[-0.02em] text-cream"
+          className="mt-3.5 text-center font-heading text-[2.35rem] font-semibold leading-[1.03] tracking-[-0.02em] text-cream lg:col-start-1 lg:row-start-2 lg:mt-5 lg:text-[3.5rem] lg:text-start"
         >
           {words(t.home.line1)}
           <br />
@@ -103,7 +105,7 @@ export default function HomeScreen() {
         {/* Hero bars — static, grounded, flush */}
         <motion.div
           variants={rise}
-          className="relative mx-auto mt-4 flex w-full max-w-[280px] items-center justify-center"
+          className="relative mx-auto mt-4 flex w-full max-w-[280px] items-center justify-center lg:col-start-2 lg:row-start-1 lg:row-span-3 lg:mt-0 lg:max-w-[480px] lg:self-center"
         >
           <div
             aria-hidden
@@ -130,18 +132,23 @@ export default function HomeScreen() {
               width={785}
               height={698}
               priority
-              sizes="(max-width: 520px) 60vw, 220px"
+              // Desktop clause first: `sizes` is first-match, so the two mobile
+              // clauses below evaluate exactly as they did before.
+              sizes="(min-width: 1024px) 380px, (max-width: 520px) 60vw, 220px"
               className="h-auto w-full drop-shadow-[0_14px_20px_rgba(15,3,7,0.35)]"
             />
           </div>
         </motion.div>
 
         {/* CTAs */}
-        <motion.div variants={rise} className="mt-5 flex flex-col gap-2.5">
+        <motion.div
+          variants={rise}
+          className="mt-5 flex flex-col gap-2.5 lg:col-start-1 lg:row-start-3 lg:mt-9 lg:flex-row lg:gap-4"
+        >
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={() => goTo("bars")}
-            className="btn-coral group inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-[0.95rem] font-semibold tracking-wide"
+            className="btn-coral group inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-[0.95rem] font-semibold tracking-wide lg:px-8 lg:py-4 lg:text-[1rem]"
           >
             {t.home.chooseBar}
             <ArrowRight className="h-[18px] w-[18px] transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />
@@ -149,24 +156,27 @@ export default function HomeScreen() {
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={() => goTo("about")}
-            className="btn-ghost inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-[0.9rem] font-semibold tracking-wide"
+            className="btn-ghost inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-[0.9rem] font-semibold tracking-wide lg:px-8 lg:py-4 lg:text-[0.95rem]"
           >
             {t.home.ourStory}
           </motion.button>
         </motion.div>
 
         {/* What's inside — three signature pillars */}
-        <motion.div variants={rise} className="mt-5 grid grid-cols-3 gap-2.5">
+        <motion.div
+          variants={rise}
+          className="mt-5 grid grid-cols-3 gap-2.5 lg:col-span-2 lg:col-start-1 lg:row-start-4 lg:mt-16 lg:gap-6"
+        >
           {c.heroBenefits.map((b) => (
             <div
               key={b.title}
-              className="glass-card flex flex-col items-center justify-start gap-2.5 rounded-2xl px-2 py-4 text-center"
+              className="glass-card flex flex-col items-center justify-start gap-2.5 rounded-2xl px-2 py-4 text-center lg:flex-row lg:justify-center lg:gap-4 lg:px-6 lg:py-6 lg:text-start"
             >
               <MaskIcon
                 src={b.icon}
-                className="h-12 w-12 shrink-0 text-pink"
+                className="h-12 w-12 shrink-0 text-pink lg:h-11 lg:w-11"
               />
-              <span className="text-[0.64rem] font-semibold uppercase leading-tight tracking-[0.1em] text-[rgba(227,210,194,0.82)]">
+              <span className="text-[0.64rem] font-semibold uppercase leading-tight tracking-[0.1em] text-[rgba(227,210,194,0.82)] lg:text-[0.72rem] lg:tracking-[0.14em]">
                 {b.title}
               </span>
             </div>

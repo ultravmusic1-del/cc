@@ -30,7 +30,7 @@ export default function ScreenShell({
       className="screen-scroll relative w-full"
     >
       <div
-        className={`relative z-10 mx-auto flex min-h-full w-full max-w-[var(--app-max)] flex-col px-5 pb-28 pt-20 ${
+        className={`relative z-10 mx-auto flex min-h-full w-full max-w-[var(--app-max)] flex-col px-5 pb-28 pt-20 lg:px-8 lg:pb-20 lg:pt-28 ${
           center ? "justify-center" : ""
         } ${className}`}
       >

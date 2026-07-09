@@ -21,12 +21,12 @@ export default function BarsScreen() {
     <ScreenShell>
       <header className="text-center">
         <p className="eyebrow text-[rgba(233,173,190,0.8)]">{t.bars.eyebrow}</p>
-        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream">
+        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream lg:text-[2.75rem]">
           {t.bars.title}
         </h1>
       </header>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mx-auto lg:mt-10 lg:w-full lg:max-w-[880px] lg:gap-8">
         {products.map((p, i) => (
           <motion.div
             key={p.id}
@@ -41,7 +41,7 @@ export default function BarsScreen() {
       </div>
 
       {/* footer info strip */}
-      <div className="glass-card mt-5 flex items-stretch justify-between rounded-2xl px-2 py-3">
+      <div className="glass-card mt-5 flex items-stretch justify-between rounded-2xl px-2 py-3 lg:mx-auto lg:mt-8 lg:w-full lg:max-w-[880px] lg:px-6 lg:py-5">
         {infoItems.map((it, i) => (
           <div
             key={it.title}
