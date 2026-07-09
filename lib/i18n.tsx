@@ -214,7 +214,7 @@ const EN_UI: UIStrings = {
     wholesaleVal: "Options available",
     delivery: "Delivery",
     deliveryVal: "Across Bahrain",
-    boxNote: "One pack equals {n}. Minimum order 10.",
+    boxNote: "1 pack equals {n}. Minimum order 1 pack.",
   },
   nutrition: {
     eyebrow: "Know your bar",
@@ -380,7 +380,7 @@ const AR_UI: UIStrings = {
     wholesaleVal: "خيارات متاحة",
     delivery: "التوصيل",
     deliveryVal: "في أنحاء البحرين",
-    boxNote: "العبوة الواحدة تساوي {n}. الحد الأدنى للطلب 10.",
+    boxNote: "عبوة واحدة تساوي {n}. الحد الأدنى للطلب عبوة واحدة.",
   },
   nutrition: {
     eyebrow: "اعرف لوحك",

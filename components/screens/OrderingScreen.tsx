@@ -67,7 +67,7 @@ export default function OrderingScreen() {
       </div>
 
       <div className="glass-card mt-3 flex items-center gap-3 rounded-2xl px-4 py-3.5">
-        <Store className="h-5 w-5 shrink-0 text-olive" strokeWidth={1.5} />
+        <Store className="h-5 w-5 shrink-0 text-pink" strokeWidth={1.5} />
         <p className="text-[0.82rem] text-[rgba(227,210,194,0.78)]">
           {t.ordering.wholesaleNote}
         </p>
