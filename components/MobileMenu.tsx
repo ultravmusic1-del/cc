@@ -19,42 +19,43 @@ import Logo from "./Logo";
 import { useNav, type ViewId, type AboutDrawerId } from "@/lib/store";
 import { CONTACT } from "@/lib/content";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import { useT, useLang } from "@/lib/i18n";
 
 type MenuLevel = "main" | "about" | "contact";
 
 const mainItems: {
   id: ViewId | "about-expand" | "contact-expand";
-  label: string;
+  key: "home" | "bars" | "nutrition" | "about" | "ordering" | "wholesale" | "contact";
 }[] = [
-  { id: "home", label: "Home" },
-  { id: "bars", label: "Bars" },
-  { id: "nutrition", label: "Nutrition" },
-  { id: "about-expand", label: "About" },
-  { id: "ordering", label: "Ordering" },
-  { id: "wholesale", label: "Wholesale" },
-  { id: "contact-expand", label: "Contact" },
+  { id: "home", key: "home" },
+  { id: "bars", key: "bars" },
+  { id: "nutrition", key: "nutrition" },
+  { id: "about-expand", key: "about" },
+  { id: "ordering", key: "ordering" },
+  { id: "wholesale", key: "wholesale" },
+  { id: "contact-expand", key: "contact" },
 ];
 
 const contactItems: {
-  label: string;
+  key: "email" | "instagram" | "whatsapp";
   value: string;
   href: string;
   icon: typeof Mail;
 }[] = [
   {
-    label: "Email",
+    key: "email",
     value: CONTACT.email,
     href: `mailto:${CONTACT.email}`,
     icon: Mail,
   },
   {
-    label: "Instagram",
+    key: "instagram",
     value: CONTACT.instagram,
     href: CONTACT.instagramUrl,
     icon: Instagram,
   },
   {
-    label: "WhatsApp",
+    key: "whatsapp",
     value: CONTACT.whatsapp,
     href: `https://wa.me/${WHATSAPP_NUMBER}`,
     icon: MessageCircle,
@@ -63,14 +64,14 @@ const contactItems: {
 
 const aboutItems: {
   id: AboutDrawerId | "soon";
-  label: string;
+  key: "aboutUs" | "philosophy" | "gifting" | "testimonials";
   icon: typeof Leaf;
   soon?: boolean;
 }[] = [
-  { id: "about-us", label: "About Us", icon: Leaf },
-  { id: "philosophy", label: "Product Philosophy", icon: Sprout },
-  { id: "gifting", label: "Gifting", icon: Heart },
-  { id: "soon", label: "Brand Testimonials", icon: Lock, soon: true },
+  { id: "about-us", key: "aboutUs", icon: Leaf },
+  { id: "philosophy", key: "philosophy", icon: Sprout },
+  { id: "gifting", key: "gifting", icon: Heart },
+  { id: "soon", key: "testimonials", icon: Lock, soon: true },
 ];
 
 const listStagger = {
@@ -83,6 +84,8 @@ const rowRise = {
 
 export default function MobileMenu({ onClose }: { onClose: () => void }) {
   const { goTo, openAboutDrawer } = useNav();
+  const t = useT();
+  const { lang, setLang } = useLang();
   const [level, setLevel] = useState<MenuLevel>("main");
   // Once dismissed, stop intercepting clicks immediately — even if the exit
   // animation stalls (e.g. RAF-throttled), so it can never wedge the page.
@@ -111,7 +114,7 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
       className="stage-bg fixed inset-0 z-[60] flex flex-col"
       role="dialog"
       aria-modal="true"
-      aria-label="Menu"
+      aria-label={t.menu.aria}
     >
       <span
         aria-hidden
@@ -131,11 +134,11 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
               exit={{ opacity: 0, x: -6 }}
               transition={{ duration: 0.2 }}
               onClick={() => (level !== "main" ? setLevel("main") : onClose())}
-              aria-label={level !== "main" ? "Back" : "Close menu"}
+              aria-label={level !== "main" ? t.menu.back : t.menu.close}
               className="flex h-10 w-10 items-center justify-center rounded-full text-cream/90 transition-colors hover:bg-white/5"
             >
               {level !== "main" ? (
-                <ArrowLeft className="h-6 w-6" strokeWidth={1.5} />
+                <ArrowLeft className="h-6 w-6 rtl:-scale-x-100" strokeWidth={1.5} />
               ) : (
                 <X className="h-6 w-6" strokeWidth={1.5} />
               )}
@@ -173,12 +176,12 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
                     else if (item.id === "contact-expand") setLevel("contact");
                     else goTo(item.id as ViewId);
                   }}
-                  className="group flex items-center justify-between border-b border-[var(--hairline)] py-5 text-left"
+                  className="group flex items-center justify-between border-b border-[var(--hairline)] py-5 text-start"
                 >
                   <span className="font-display text-[2.1rem] font-medium leading-none text-cream transition-colors group-hover:text-pink">
-                    {item.label}
+                    {t.menu.items[item.key]}
                   </span>
-                  <ArrowRight className="h-6 w-6 text-coral transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="h-6 w-6 text-coral transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />
                 </motion.button>
               ))}
             </motion.nav>
@@ -198,7 +201,7 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
                 animate="animate"
                 className="eyebrow mb-2 text-[rgba(233,173,190,0.7)]"
               >
-                About
+                {t.menu.aboutHeader}
               </motion.p>
               {aboutItems.map((item) => (
                 <motion.button
@@ -208,7 +211,7 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
                   onClick={() =>
                     !item.soon && openDrawer(item.id as AboutDrawerId)
                   }
-                  className={`group flex items-center gap-4 border-b border-[var(--hairline)] py-4 text-left ${
+                  className={`group flex items-center gap-4 border-b border-[var(--hairline)] py-4 text-start ${
                     item.soon ? "opacity-55" : ""
                   }`}
                 >
@@ -217,16 +220,16 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
                   </span>
                   <span className="flex-1">
                     <span className="block font-heading text-[1.35rem] font-medium text-cream">
-                      {item.label}
+                      {t.menu.about[item.key]}
                     </span>
                     {item.soon && (
                       <span className="text-[0.72rem] text-[rgba(227,210,194,0.55)]">
-                        Coming soon
+                        {t.menu.comingSoon}
                       </span>
                     )}
                   </span>
                   {!item.soon && (
-                    <ArrowRight className="h-5 w-5 text-coral transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="h-5 w-5 text-coral transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />
                   )}
                 </motion.button>
               ))}
@@ -247,29 +250,29 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
                 animate="animate"
                 className="eyebrow mb-2 text-[rgba(233,173,190,0.7)]"
               >
-                Contact Us
+                {t.menu.contactHeader}
               </motion.p>
               {contactItems.map((item) => (
                 <motion.a
-                  key={item.label}
+                  key={item.key}
                   variants={rowRise}
                   href={item.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="group flex items-center gap-4 border-b border-[var(--hairline)] py-4 text-left"
+                  className="group flex items-center gap-4 border-b border-[var(--hairline)] py-4 text-start"
                 >
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[rgba(159,149,54,0.4)]">
                     <item.icon className="h-5 w-5 text-olive" strokeWidth={1.5} />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[rgba(233,173,190,0.7)]">
-                      {item.label}
+                      {t.menu.contact[item.key]}
                     </span>
-                    <span className="block truncate font-heading text-[1.05rem] font-medium text-cream">
+                    <span className="block truncate font-heading text-[1.05rem] font-medium text-cream" dir="ltr">
                       {item.value}
                     </span>
                   </span>
-                  <ArrowUpRight className="h-5 w-5 shrink-0 text-coral transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  <ArrowUpRight className="h-5 w-5 shrink-0 text-coral transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:-scale-x-100" />
                 </motion.a>
               ))}
             </motion.nav>
@@ -277,8 +280,31 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
         </AnimatePresence>
       </div>
 
-      <p className="relative z-10 pb-8 pt-4 text-center text-[0.72rem] uppercase tracking-[0.24em] text-[rgba(227,210,194,0.45)] pb-safe">
-        Too good to share
+      {/* language toggle */}
+      <div className="relative z-10 mx-6 mb-3">
+        <p className="eyebrow mb-2 text-center text-[rgba(233,173,190,0.6)]">
+          {t.menu.language}
+        </p>
+        <div className="flex gap-1 rounded-full border border-[var(--hairline)] p-1">
+          {(["en", "ar"] as const).map((l) => (
+            <button
+              key={l}
+              onClick={() => setLang(l)}
+              aria-pressed={lang === l}
+              className={`flex-1 rounded-full py-2 text-[0.82rem] font-semibold transition-colors ${
+                lang === l
+                  ? "btn-coral text-cream"
+                  : "text-[rgba(227,210,194,0.7)] hover:text-cream"
+              }`}
+            >
+              {l === "en" ? t.menu.langEnglish : t.menu.langArabic}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p className="relative z-10 pb-8 pt-1 text-center text-[0.72rem] uppercase tracking-[0.24em] text-[rgba(227,210,194,0.45)] pb-safe">
+        {t.menu.tooGood}
       </p>
     </motion.div>
   );

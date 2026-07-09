@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda, Hanken_Grotesk, Open_Sans } from "next/font/google";
+import { Bodoni_Moda, Hanken_Grotesk, Open_Sans, Cairo } from "next/font/google";
 import "./globals.css";
 
 const display = Bodoni_Moda({
@@ -20,6 +20,15 @@ const body = Open_Sans({
   subsets: ["latin"],
   weight: ["400", "600"],
   variable: "--font-body",
+  display: "swap",
+});
+
+// Arabic face — the Latin families above have poor/fallback Arabic glyphs.
+// Applied on <html dir="rtl"> via a rule in globals.css.
+const arabic = Cairo({
+  subsets: ["arabic", "latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-arabic",
   display: "swap",
 });
 
@@ -63,7 +72,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${heading.variable} ${body.variable}`}
+      suppressHydrationWarning
+      className={`${display.variable} ${heading.variable} ${body.variable} ${arabic.variable}`}
     >
       <body className="antialiased">{children}</body>
     </html>

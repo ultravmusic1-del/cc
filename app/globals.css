@@ -40,6 +40,22 @@
     font-family: var(--font-heading), system-ui, sans-serif;
     letter-spacing: -0.015em;
   }
+
+  /* Arabic: the Latin faces (Bodoni/Hanken/Open Sans) have no real Arabic
+     glyphs, so swap the whole page to Cairo when dir is RTL. Attribute-scoped
+     selectors outrank the Tailwind font utilities, so this also covers
+     .font-display / .font-heading / .font-body. */
+  [lang="ar"] body,
+  [lang="ar"] h1,
+  [lang="ar"] h2,
+  [lang="ar"] h3,
+  [lang="ar"] h4,
+  [lang="ar"] .font-display,
+  [lang="ar"] .font-heading,
+  [lang="ar"] .font-body {
+    font-family: var(--font-arabic), "Segoe UI", Tahoma, sans-serif;
+    letter-spacing: 0;
+  }
 }
 
 @layer components {

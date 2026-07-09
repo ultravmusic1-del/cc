@@ -140,6 +140,7 @@ export interface UIStrings {
     nuts: string;
     ctaSub: string; // "/ bar · {box} per box"
     orderCta: string;
+    close: string;
   };
   drawer: {
     aboutUs: string;
@@ -299,6 +300,7 @@ const EN_UI: UIStrings = {
     nuts: "Nuts",
     ctaSub: "/ bar · {box} per box",
     orderCta: "Order on WhatsApp",
+    close: "Close",
   },
   drawer: {
     aboutUs: "About Us",
@@ -463,6 +465,7 @@ const AR_UI: UIStrings = {
     nuts: "المكسّرات",
     ctaSub: "/ لوح · {box} للصندوق",
     orderCta: "اطلب عبر واتساب",
+    close: "إغلاق",
   },
   drawer: {
     aboutUs: "من نحن",

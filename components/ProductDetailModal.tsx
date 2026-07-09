@@ -253,7 +253,7 @@ export default function ProductDetailModal({
               {tab === "nutrition" && (
                 <div>
                   <p className="mb-3 text-[0.76rem] text-[rgba(227,210,194,0.6)]">
-                    Per {product.servingSize.toLowerCase()}
+                    {fill(ui.modal.per, { serving: product.servingSize })}
                   </p>
                   <div className="mb-3 grid grid-cols-2 gap-2">
                     {product.nutrition
@@ -284,14 +284,14 @@ export default function ProductDetailModal({
 
               {tab === "storage" && (
                 <div className="glass-card rounded-2xl px-4 py-1.5">
-                  <Row label="Shelf life" value={STORAGE.shelfLife} />
+                  <Row label={ui.modal.shelfLife} value={storage.shelfLife} />
                   <div className="border-b border-[var(--hairline)] py-3 last:border-b-0">
                     <p className="text-[0.85rem] leading-relaxed text-[rgba(227,210,194,0.82)]">
-                      {STORAGE.keep}
+                      {storage.keep}
                     </p>
                   </div>
                   <div className="py-3">
-                    <p className="text-[0.85rem] text-cream">{STORAGE.made}</p>
+                    <p className="text-[0.85rem] text-cream">{storage.made}</p>
                   </div>
                 </div>
               )}
@@ -302,12 +302,12 @@ export default function ProductDetailModal({
                     {product.allergens}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {["Gluten", "Dairy", "Nuts"].map((a) => (
+                    {allergenChips.map((a) => (
                       <span
                         key={a}
                         className="rounded-full border border-[rgba(236,91,69,0.4)] bg-[rgba(236,91,69,0.1)] px-3 py-1.5 text-[0.74rem] font-semibold text-coral"
                       >
-                        Contains {a}
+                        {fill(ui.modal.contains, { a })}
                       </span>
                     ))}
                   </div>
@@ -324,10 +324,10 @@ export default function ProductDetailModal({
               {product.pricePerBar}
             </span>
             <span className="text-[0.72rem] text-[rgba(227,210,194,0.55)]">
-              / bar · {product.pricePerBox} per box
+              {fill(ui.modal.ctaSub, { box: product.pricePerBox })}
             </span>
           </div>
-          <WhatsAppButton intent={product.id} label="Order on WhatsApp" />
+          <WhatsAppButton intent={product.id} label={ui.modal.orderCta} />
         </div>
       </motion.div>
     </div>

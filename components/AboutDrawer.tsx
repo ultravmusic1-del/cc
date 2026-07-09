@@ -5,13 +5,7 @@ import { motion, useDragControls, useIsPresent } from "framer-motion";
 import { X } from "lucide-react";
 import WhatsAppButton from "./ui/WhatsAppButton";
 import type { AboutDrawerId } from "@/lib/store";
-import { BRAND, PHILOSOPHY } from "@/lib/content";
-
-const titles: Record<AboutDrawerId, string> = {
-  "about-us": "About Us",
-  philosophy: "Product Philosophy",
-  gifting: "Gifting & Wholesale",
-};
+import { useContent, useT, fill } from "@/lib/i18n";
 
 export default function AboutDrawer({
   drawerId,
@@ -23,6 +17,14 @@ export default function AboutDrawer({
   const ref = useRef<HTMLDivElement>(null);
   const dragControls = useDragControls();
   const isPresent = useIsPresent();
+  const c = useContent();
+  const ui = useT();
+
+  const titles: Record<AboutDrawerId, string> = {
+    "about-us": ui.drawer.aboutUs,
+    philosophy: ui.drawer.philosophy,
+    gifting: ui.drawer.gifting,
+  };
 
   // ESC to close + initial focus. (Scroll lock is centralized in App's Shell.)
   useEffect(() => {
@@ -86,7 +88,7 @@ export default function AboutDrawer({
           </h2>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={ui.modal.close}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--hairline)] text-cream/80 transition-colors hover:text-cream"
           >
             <X className="h-4 w-4" />
@@ -99,20 +101,20 @@ export default function AboutDrawer({
           {drawerId === "about-us" && (
             <div className="space-y-4">
               <p className="text-[0.95rem] leading-relaxed text-[rgba(227,210,194,0.85)]">
-                {BRAND.storyLede}
+                {c.brand.storyLede}
               </p>
               <p className="text-[0.95rem] leading-relaxed text-[rgba(227,210,194,0.8)]">
-                {BRAND.storyBody}
+                {c.brand.storyBody}
               </p>
               <p className="text-[0.95rem] leading-relaxed text-[rgba(227,210,194,0.8)]">
-                {BRAND.storyClose}
+                {c.brand.storyClose}
               </p>
               <div className="glass-card rounded-2xl px-4 py-4">
                 <p className="font-display text-lg italic text-coral">
-                  “Too good to share.”
+                  “{ui.drawer.quote}”
                 </p>
                 <p className="mt-2 text-[0.78rem] text-[rgba(227,210,194,0.6)]">
-                  Handcrafted in {BRAND.location}.
+                  {fill(ui.drawer.handcraftedIn, { location: c.brand.location })}
                 </p>
               </div>
             </div>
@@ -121,10 +123,10 @@ export default function AboutDrawer({
           {drawerId === "philosophy" && (
             <div className="space-y-4">
               <p className="font-display text-lg italic leading-snug text-coral">
-                {PHILOSOPHY.lede}
+                {c.philosophy.lede}
               </p>
               <p className="text-[0.95rem] leading-relaxed text-[rgba(227,210,194,0.82)]">
-                {PHILOSOPHY.body}
+                {c.philosophy.body}
               </p>
             </div>
           )}
@@ -134,36 +136,35 @@ export default function AboutDrawer({
               <div className="glass-card space-y-3 rounded-2xl px-4 py-4">
                 <div className="flex items-center justify-between">
                   <span className="text-[0.84rem] text-[rgba(227,210,194,0.72)]">
-                    Box quantity
+                    {ui.drawer.boxQty}
                   </span>
                   <span className="text-[0.88rem] font-semibold text-cream">
-                    10 bars
+                    {ui.drawer.boxQtyVal}
                   </span>
                 </div>
                 <div className="hairline" />
                 <div className="flex items-center justify-between">
                   <span className="text-[0.84rem] text-[rgba(227,210,194,0.72)]">
-                    Premium gift boxes
+                    {ui.drawer.giftBoxes}
                   </span>
                   <span className="rounded-full border border-[rgba(233,173,190,0.4)] px-3 py-1 text-[0.68rem] font-semibold text-pink">
-                    Coming soon
+                    {ui.drawer.comingSoon}
                   </span>
                 </div>
                 <div className="hairline" />
                 <div className="flex items-center justify-between">
                   <span className="text-[0.84rem] text-[rgba(227,210,194,0.72)]">
-                    Delivery
+                    {ui.drawer.delivery}
                   </span>
                   <span className="text-[0.88rem] font-semibold text-cream">
-                    Bahrain only
+                    {ui.drawer.deliveryVal}
                   </span>
                 </div>
               </div>
               <p className="text-[0.88rem] leading-relaxed text-[rgba(227,210,194,0.78)]">
-                Planning a corporate order, event or bulk gifting? Wholesale
-                orders are handled personally over WhatsApp.
+                {ui.drawer.giftingText}
               </p>
-              <WhatsAppButton intent="wholesale" label="Enquire on WhatsApp" />
+              <WhatsAppButton intent="wholesale" label={ui.drawer.enquire} />
             </div>
           )}
         </div>
