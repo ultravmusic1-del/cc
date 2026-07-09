@@ -50,11 +50,12 @@ export const HERO = {
 };
 
 export const HERO_BENEFITS = [
-  { value: "205", unit: "kcal", label: "Per bar", icon: "flame" },
-  { value: "10g", unit: "", label: "Protein", icon: "dumbbell" },
-  { value: "100%", unit: "", label: "Whole grain oats", icon: "wheat" },
-  { value: "Fresh", unit: "", label: "Baked to order", icon: "chef" },
-  { value: "Zero", unit: "", label: "Preservatives", icon: "sparkle" },
+  { icon: "/images/icons/wholegrain-oats.png", title: "Wholegrain Oats" },
+  {
+    icon: "/images/icons/dark-chocolate-chunks.png",
+    title: "Dark Chocolate Chunks",
+  },
+  { icon: "/images/icons/smart-snacking.png", title: "Smart Snacking" },
 ];
 
 export const PRODUCTS: Record<ProductId, Product> = {

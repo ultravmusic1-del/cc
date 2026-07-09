@@ -3,8 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import Icon from "../ui/Icon";
-import CountUp from "../ui/CountUp";
+import MaskIcon from "../ui/MaskIcon";
 import { useNav } from "@/lib/store";
 import { BRAND, HERO, HERO_BENEFITS } from "@/lib/content";
 
@@ -123,27 +122,16 @@ export default function HomeScreen() {
           </motion.button>
         </motion.div>
 
-        {/* Benefit carousel */}
-        <motion.div
-          variants={rise}
-          className="no-scrollbar -mx-5 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5"
-        >
-          {HERO_BENEFITS.map((b, i) => (
+        {/* What's inside — three signature pillars */}
+        <motion.div variants={rise} className="mt-5 grid grid-cols-3 gap-2.5">
+          {HERO_BENEFITS.map((b) => (
             <div
-              key={b.label}
-              className="glass-card flex min-w-[7rem] shrink-0 snap-start flex-col items-center gap-1.5 rounded-2xl px-4 py-3 text-center"
+              key={b.title}
+              className="glass-card flex flex-col items-center justify-start gap-2.5 rounded-2xl px-2 py-4 text-center"
             >
-              <Icon name={b.icon} className="h-5 w-5 text-olive" />
-              <span className="font-heading text-lg font-semibold leading-none text-cream">
-                <CountUp value={b.value} delay={550 + i * 90} />
-                {b.unit && (
-                  <span className="text-sm font-medium text-[rgba(227,210,194,0.7)]">
-                    {b.unit}
-                  </span>
-                )}
-              </span>
-              <span className="text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[rgba(227,210,194,0.62)]">
-                {b.label}
+              <MaskIcon src={b.icon} className="h-9 w-9 shrink-0 text-olive" />
+              <span className="text-[0.64rem] font-semibold uppercase leading-tight tracking-[0.1em] text-[rgba(227,210,194,0.82)]">
+                {b.title}
               </span>
             </div>
           ))}
