@@ -19,21 +19,37 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
-    scroll-behavior: smooth;
-    /* Reserve the scrollbar gutter symmetrically so centred content (header
-       logo, hero) sits on the window's true centre and never shifts when a
-       scrollbar appears/disappears between pages. No effect with mobile
-       overlay scrollbars, which already reserve nothing. */
-    scrollbar-gutter: stable both-edges;
+    height: 100%;
   }
 
   body {
+    /* App-shell model: the document itself never scrolls — each screen is its
+       own internal scroll container (.screen-scroll). This is what makes
+       scroll-to-top reliable on iOS Safari, where programmatic document
+       scrolling (scrollTo / scrollTop / scrollIntoView) is ignored after a
+       client-side view swap. A freshly mounted screen simply starts at the
+       top, so no scroll reset is needed. */
+    height: 100%;
+    overflow: hidden;
     background: var(--burgundy);
     color: var(--cream);
     font-family: var(--font-body), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    overscroll-behavior-y: none;
+    overscroll-behavior: none;
+  }
+
+  /* The per-screen scroll container. */
+  .screen-scroll {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    /* Keep centred content (header logo / hero) on the true centre by reserving
+       the scrollbar gutter symmetrically — matches the fixed header which spans
+       the full width. No effect with mobile overlay scrollbars. */
+    scrollbar-gutter: stable both-edges;
   }
 
   ::selection {

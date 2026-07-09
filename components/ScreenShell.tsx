@@ -27,10 +27,10 @@ export default function ScreenShell({
       initial="initial"
       animate="animate"
       transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-      className="relative min-h-[100dvh] w-full overflow-hidden"
+      className="screen-scroll relative w-full"
     >
       <div
-        className={`relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[var(--app-max)] flex-col px-5 pb-28 pt-20 ${
+        className={`relative z-10 mx-auto flex min-h-full w-full max-w-[var(--app-max)] flex-col px-5 pb-28 pt-20 ${
           center ? "justify-center" : ""
         } ${className}`}
       >

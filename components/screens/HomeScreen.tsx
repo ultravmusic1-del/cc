@@ -25,12 +25,12 @@ export default function HomeScreen() {
   const t = useT();
 
   return (
-    <section className="relative min-h-[100dvh] w-full overflow-hidden">
+    <section className="screen-scroll relative w-full">
       <motion.div
         variants={stagger}
         initial="initial"
         animate="animate"
-        className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[var(--app-max)] flex-col justify-center px-5 pb-28 pt-[4.6rem]"
+        className="relative z-10 mx-auto flex min-h-full w-full max-w-[var(--app-max)] flex-col justify-center px-5 pb-28 pt-[4.6rem]"
       >
         {/* Eyebrow */}
         <motion.p

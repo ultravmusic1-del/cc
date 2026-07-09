@@ -28,40 +28,27 @@ function Shell() {
   const { view, overlay, closeOverlay } = useNav();
   const c = useContent();
 
-  // Single source of truth for the body scroll lock. Locking is keyed only on
-  // "is ANY overlay open", and always restores to the real default ("") — so
-  // overlapping overlays (e.g. the menu exit-animating while a drawer opens)
-  // can never hand a stale "hidden" value forward and wedge the page. Each
-  // overlay used to save/restore body.style.overflow itself, which leaked a
-  // permanent scroll lock and made the whole app unclickable.
+  // Lock the active screen's internal scroll while any overlay is open.
+  // (The document itself never scrolls — see body { overflow:hidden }.)
+  // Keyed on both the overlay state and the view, since a view change mounts
+  // a fresh screen element that would otherwise lose the lock.
   const hasOverlay = overlay !== null;
   useEffect(() => {
-    document.body.style.overflow = hasOverlay ? "hidden" : "";
-  }, [hasOverlay]);
+    const screen = document.querySelector<HTMLElement>("main > section");
+    if (screen) screen.style.overflowY = hasOverlay ? "hidden" : "";
+  }, [hasOverlay, view]);
 
-  // Every view is its own "page" — reset scroll to the top whenever the view
-  // changes, no matter how (sticky nav, menu, header, back button/hash).
-  // Notes that make this work on mobile as well as desktop:
-  //  - `scroll-behavior: smooth` (global on <html>) also applies to programmatic
-  //    scroll writes, animating the reset; we force instant on both scrollers.
-  //  - mobile browsers report scroll on <body> in some cases, so reset both.
-  //  - run before paint (useLayoutEffect) so the new page never paints scrolled,
-  //    and re-assert on the next frame since mobile re-adjusts scroll a tick
-  //    later (toolbar resize / momentum settling).
+  // Every view is its own "page" and starts at the top automatically: changing
+  // `view` unmounts the old screen and mounts a brand-new scroll container,
+  // which the browser starts at scrollTop 0 — no programmatic scroll needed
+  // (the fix for iOS Safari, which ignored scrollTo/scrollTop/scrollIntoView).
+  // scrollToTop() is a harmless belt-and-suspenders reset of the container.
   useIsoLayoutEffect(() => {
-    scrollToTop(); // before paint
-    const raf = requestAnimationFrame(scrollToTop); // next frame (mobile)
-    const t0 = setTimeout(scrollToTop, 0); // macrotask (iOS Safari)
-    const t1 = setTimeout(scrollToTop, 150); // outlast iOS momentum / entrance
-    return () => {
-      cancelAnimationFrame(raf);
-      clearTimeout(t0);
-      clearTimeout(t1);
-    };
+    scrollToTop();
   }, [view]);
 
   return (
-    <main className="grain relative min-h-[100dvh] w-full">
+    <main className="grain relative h-full w-full overflow-hidden">
       {/* ── Persistent desktop stage ─────────────────────────────
           Dark side gutters + an illuminated centre "panel" so the
           mobile-first column reads as a boutique app on wide screens. */}
