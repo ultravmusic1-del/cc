@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { NavProvider, useNav } from "@/lib/store";
 import { scrollToTop } from "@/lib/scroll";
+import { useIsoLayoutEffect } from "@/lib/useIsoLayoutEffect";
 import { LangProvider } from "@/lib/i18n";
 import Header from "./Header";
 import StickyNav from "./StickyNav";
@@ -17,12 +18,6 @@ import AboutScreen from "./screens/AboutScreen";
 import OrderingScreen from "./screens/OrderingScreen";
 import WholesaleScreen from "./screens/WholesaleScreen";
 import { useContent } from "@/lib/i18n";
-
-// Run the scroll reset before paint on the client (so a new page never paints
-// at the old scroll position — the key fix for mobile), falling back to
-// useEffect on the server to avoid the SSR warning.
-const useIsoLayoutEffect =
-  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 function Shell() {
   const { view, overlay, closeOverlay } = useNav();

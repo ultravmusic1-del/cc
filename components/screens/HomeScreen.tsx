@@ -1,11 +1,14 @@
 "use client";
 
+import { Fragment, useRef } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { animate, stagger as aStagger } from "animejs";
 import { ArrowRight } from "lucide-react";
 import MaskIcon from "../ui/MaskIcon";
 import { useNav } from "@/lib/store";
-import { useContent, useT } from "@/lib/i18n";
+import { useContent, useT, useLang } from "@/lib/i18n";
+import { useIsoLayoutEffect } from "@/lib/useIsoLayoutEffect";
 
 const stagger = {
   animate: { transition: { staggerChildren: 0.09, delayChildren: 0.15 } },
@@ -19,10 +22,53 @@ const rise = {
   },
 };
 
+/** Splits a line into per-word spans (anime.js targets .hero-word). */
+function words(line: string) {
+  const parts = line.split(" ");
+  return parts.map((w, i) => (
+    <Fragment key={i}>
+      <span className="hero-word inline-block">{w}</span>
+      {i < parts.length - 1 ? " " : ""}
+    </Fragment>
+  ));
+}
+
 export default function HomeScreen() {
   const { goTo } = useNav();
   const c = useContent();
   const t = useT();
+  const { lang } = useLang();
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+
+  // Anime.js: reveal the headline word by word (rise + fade, staggered).
+  // Re-runs on language change; honors reduced-motion. Runs before paint so the
+  // words never flash in their final position first.
+  useIsoLayoutEffect(() => {
+    const el = headlineRef.current;
+    if (!el) return;
+    const wordEls = el.querySelectorAll<HTMLElement>(".hero-word");
+    if (!wordEls.length) return;
+
+    const reduce = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduce) {
+      wordEls.forEach((w) => (w.style.opacity = "1"));
+      return;
+    }
+
+    wordEls.forEach((w) => (w.style.opacity = "0"));
+    const anim = animate(wordEls, {
+      opacity: [0, 1],
+      translateY: [26, 0],
+      duration: 900,
+      delay: aStagger(65, { start: 120 }),
+      ease: "out(3)",
+    });
+    return () => {
+      anim.revert();
+    };
+  }, [lang]);
 
   return (
     <section className="screen-scroll relative w-full">
@@ -40,19 +86,19 @@ export default function HomeScreen() {
           {t.home.eyebrow}
         </motion.p>
 
-        {/* Headline */}
-        <motion.h1
-          variants={rise}
+        {/* Headline — word-by-word reveal (anime.js) */}
+        <h1
+          ref={headlineRef}
           className="mt-3.5 text-center font-heading text-[2.35rem] font-semibold leading-[1.03] tracking-[-0.02em] text-cream"
         >
-          {t.home.line1}
+          {words(t.home.line1)}
           <br />
-          {t.home.line2}
+          {words(t.home.line2)}
           <br />
           <span className="font-display font-medium italic text-coral">
-            {t.home.line3}
+            {words(t.home.line3)}
           </span>
-        </motion.h1>
+        </h1>
 
         {/* Hero bars — static, grounded, flush */}
         <motion.div

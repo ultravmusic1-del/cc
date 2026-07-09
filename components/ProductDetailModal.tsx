@@ -8,9 +8,11 @@ import {
   useDragControls,
   useIsPresent,
 } from "framer-motion";
+import { animate, stagger as aStagger } from "animejs";
 import { X } from "lucide-react";
 import type { Product } from "@/lib/content";
 import { useContent, useT, fill } from "@/lib/i18n";
+import { useIsoLayoutEffect } from "@/lib/useIsoLayoutEffect";
 import WhatsAppButton from "./ui/WhatsAppButton";
 import CountUp from "./ui/CountUp";
 
@@ -18,7 +20,10 @@ type TabId = "overview" | "ingredients" | "nutrition" | "storage" | "allergens";
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between border-b border-[var(--hairline)] py-2.5 last:border-b-0">
+    <div
+      data-cascade
+      className="flex items-center justify-between border-b border-[var(--hairline)] py-2.5 last:border-b-0"
+    >
       <span className="text-[0.82rem] text-[rgba(227,210,194,0.7)]">{label}</span>
       <span className="text-[0.85rem] font-semibold text-cream">{value}</span>
     </div>
@@ -76,6 +81,28 @@ export default function ProductDetailModal({
       window.clearTimeout(t);
     };
   }, [onClose]);
+
+  // Anime.js: cascade the current tab's rows/chips up on open and on every tab
+  // switch. Only translateY (Framer already fades the tab content in), so the
+  // two never fight over opacity. Honors reduced-motion.
+  useIsoLayoutEffect(() => {
+    const reduce = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduce) return;
+    const items =
+      panelRef.current?.querySelectorAll<HTMLElement>("[data-cascade]");
+    if (!items || !items.length) return;
+    const anim = animate(items, {
+      translateY: [12, 0],
+      duration: 460,
+      delay: aStagger(45),
+      ease: "out(3)",
+    });
+    return () => {
+      anim.revert();
+    };
+  }, [tab]);
 
   return (
     <div
@@ -241,6 +268,7 @@ export default function ProductDetailModal({
                     {product.ingredientChips.map((c) => (
                       <span
                         key={c}
+                        data-cascade
                         className="rounded-full border border-[rgba(159,149,54,0.4)] bg-[rgba(159,149,54,0.1)] px-3 py-1.5 text-[0.74rem] font-medium text-[#d7d59a]"
                       >
                         {c}
@@ -261,6 +289,7 @@ export default function ProductDetailModal({
                       .map((n) => (
                         <div
                           key={n.label}
+                          data-cascade
                           className="glass-card flex flex-col items-center rounded-2xl py-3"
                         >
                           <span className="font-heading text-xl font-bold text-coral">
@@ -285,12 +314,15 @@ export default function ProductDetailModal({
               {tab === "storage" && (
                 <div className="glass-card rounded-2xl px-4 py-1.5">
                   <Row label={ui.modal.shelfLife} value={storage.shelfLife} />
-                  <div className="border-b border-[var(--hairline)] py-3 last:border-b-0">
+                  <div
+                    data-cascade
+                    className="border-b border-[var(--hairline)] py-3 last:border-b-0"
+                  >
                     <p className="text-[0.85rem] leading-relaxed text-[rgba(227,210,194,0.82)]">
                       {storage.keep}
                     </p>
                   </div>
-                  <div className="py-3">
+                  <div data-cascade className="py-3">
                     <p className="text-[0.85rem] text-cream">{storage.made}</p>
                   </div>
                 </div>
@@ -305,6 +337,7 @@ export default function ProductDetailModal({
                     {allergenChips.map((a) => (
                       <span
                         key={a}
+                        data-cascade
                         className="rounded-full border border-[rgba(236,91,69,0.4)] bg-[rgba(236,91,69,0.1)] px-3 py-1.5 text-[0.74rem] font-semibold text-coral"
                       >
                         {fill(ui.modal.contains, { a })}
