@@ -3,15 +3,17 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { animate, stagger } from "animejs";
-import { Cookie, HeartPulse, ShoppingBag, LayoutGrid } from "lucide-react";
+import { HeartPulse, ShoppingBag, LayoutGrid } from "lucide-react";
+import MaskIcon from "./ui/MaskIcon";
 import { useNav, type ViewId } from "@/lib/store";
 
 const items: {
   id: ViewId | "menu";
   label: string;
-  icon: typeof Cookie;
+  icon?: typeof HeartPulse;
+  img?: string;
 }[] = [
-  { id: "bars", label: "Bars", icon: Cookie },
+  { id: "bars", label: "Bars", img: "/images/icons/oat-bar.png" },
   { id: "nutrition", label: "Nutrition", icon: HeartPulse },
   { id: "ordering", label: "Order", icon: ShoppingBag },
   { id: "menu", label: "Menu", icon: LayoutGrid },
@@ -49,9 +51,12 @@ export default function StickyNav() {
           ref={barRef}
           className="flex items-stretch justify-between gap-1 rounded-full border border-[var(--hairline)] bg-[rgba(45,9,17,0.92)] px-2 py-1.5 shadow-float backdrop-blur-md"
         >
-          {items.map(({ id, label, icon: Ico }) => {
+          {items.map(({ id, label, icon: Ico, img }) => {
             const active =
               id === "menu" ? overlay?.type === "menu" : view === id;
+            const iconClass = `relative z-10 h-[19px] w-[19px] transition-colors ${
+              active ? "text-coral" : "text-[rgba(227,210,194,0.7)]"
+            }`;
             return (
               <button
                 key={id}
@@ -68,12 +73,11 @@ export default function StickyNav() {
                     transition={{ type: "spring", stiffness: 400, damping: 32 }}
                   />
                 )}
-                <Ico
-                  className={`relative z-10 h-[19px] w-[19px] transition-colors ${
-                    active ? "text-coral" : "text-[rgba(227,210,194,0.7)]"
-                  }`}
-                  strokeWidth={1.6}
-                />
+                {img ? (
+                  <MaskIcon src={img} className={iconClass} />
+                ) : Ico ? (
+                  <Ico className={iconClass} strokeWidth={1.6} />
+                ) : null}
                 <span
                   className={`relative z-10 text-[0.6rem] font-semibold uppercase tracking-[0.12em] transition-colors ${
                     active ? "text-cream" : "text-[rgba(227,210,194,0.6)]"
