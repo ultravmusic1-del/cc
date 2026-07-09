@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bodoni_Moda, Hanken_Grotesk, Open_Sans, Cairo } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const display = Bodoni_Moda({
@@ -75,7 +76,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${display.variable} ${heading.variable} ${body.variable} ${arabic.variable}`}
     >
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

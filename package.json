@@ -12,6 +12,7 @@
     "node": ">=18.18.0"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "animejs": "^4.5.0",
     "framer-motion": "^11.3.19",
     "lucide-react": "^0.418.0",
