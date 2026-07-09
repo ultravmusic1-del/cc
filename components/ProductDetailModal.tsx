@@ -122,7 +122,7 @@ export default function ProductDetailModal({
               src={product.image}
               alt=""
               width={120}
-              height={106}
+              height={120}
               sizes="44px"
               className="h-auto w-11"
             />

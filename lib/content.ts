@@ -89,9 +89,8 @@ export const PRODUCTS: Record<ProductId, Product> = {
       { label: "Fibre", value: "3.2 g" },
     ],
     allergens: "Contains gluten, dairy and nuts.",
-    image: "/images/oat-bar-hero.png",
-    imageAlt:
-      "Stacked Candy Couture oat cookie bars with dark chocolate chips",
+    image: "/images/oat-cookie-bar.png",
+    imageAlt: "Candy Couture Oat Cookie Bar in its packaging",
   },
   protein: {
     id: "protein",
@@ -124,8 +123,8 @@ export const PRODUCTS: Record<ProductId, Product> = {
       { label: "Fibre", value: "3 g" },
     ],
     allergens: "Contains gluten, dairy and nuts.",
-    image: "/images/oat-bar-hero.png",
-    imageAlt: "Stacked Candy Couture high-protein oat bars",
+    image: "/images/oat-protein-bar.png",
+    imageAlt: "Candy Couture Oat Protein Bar in its packaging",
   },
 };
 

@@ -51,23 +51,23 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* image */}
       <button
         onClick={() => openProduct(product.id)}
-        className="relative z-10 mx-auto mt-1 flex aspect-[4/3] w-[70%] items-center justify-center"
+        className="relative z-10 mx-auto mt-1 flex aspect-square w-[82%] items-center justify-center"
         aria-label={`View ${product.name}`}
       >
         <span
           aria-hidden
-          className="absolute left-1/2 top-1/2 h-[70%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+          className="absolute left-1/2 top-1/2 h-[86%] w-[92%] -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
-            background: `radial-gradient(circle, ${
-              isCoral ? "rgba(236,91,69,0.28)" : "rgba(233,173,190,0.2)"
-            }, transparent 68%)`,
+            background: `radial-gradient(ellipse at 50% 46%, ${
+              isCoral ? "rgba(236,91,69,0.34)" : "rgba(233,173,190,0.26)"
+            }, transparent 66%)`,
           }}
         />
         <Image
           src={product.image}
           alt={product.imageAlt}
-          width={540}
-          height={476}
+          width={600}
+          height={600}
           sizes="(max-width: 520px) 45vw, 220px"
           className="relative h-auto w-full drop-shadow-[0_14px_18px_rgba(15,3,7,0.45)]"
         />
