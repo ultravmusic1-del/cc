@@ -35,7 +35,7 @@ export default function BarsScreen() {
             transition={{ duration: 0.5, delay: 0.1 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="h-full"
           >
-            <ProductCard product={p} />
+            <ProductCard product={p} priority={i === 0} />
           </motion.div>
         ))}
       </div>

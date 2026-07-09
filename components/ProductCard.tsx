@@ -7,7 +7,15 @@ import { useNav } from "@/lib/store";
 import { useT, fill } from "@/lib/i18n";
 import WhatsAppButton from "./ui/WhatsAppButton";
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({
+  product,
+  priority = false,
+}: {
+  product: Product;
+  // Set on the first card only: it is the LCP element when someone deep-links
+  // to #bars, and next/image lazy-loads by default.
+  priority?: boolean;
+}) {
   const { openProduct } = useNav();
   const t = useT();
   const isCoral = product.accent === "coral";
@@ -69,6 +77,7 @@ export default function ProductCard({ product }: { product: Product }) {
           alt={product.imageAlt}
           width={600}
           height={600}
+          priority={priority}
           sizes="(max-width: 520px) 45vw, 220px"
           className="relative h-auto w-full drop-shadow-[0_14px_18px_rgba(15,3,7,0.45)]"
         />
