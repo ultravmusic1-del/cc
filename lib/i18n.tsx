@@ -324,7 +324,7 @@ const EN_UI: UIStrings = {
 
 const AR_UI: UIStrings = {
   nav: {
-    bars: "الألواح",
+    bars: "ألواح الشوفان",
     nutrition: "القيم الغذائية",
     order: "اطلب",
     menu: "القائمة",
@@ -343,11 +343,11 @@ const AR_UI: UIStrings = {
     langArabic: "العربية",
     items: {
       home: "الرئيسية",
-      bars: "الألواح",
+      bars: "ألواح الشوفان",
       nutrition: "القيم الغذائية",
       about: "من نحن",
-      ordering: "الطلب",
-      wholesale: "الجملة",
+      ordering: "كيفية الطلب",
+      wholesale: "البيع بالجملة",
       contact: "تواصل معنا",
     },
     aboutHeader: "من نحن",
