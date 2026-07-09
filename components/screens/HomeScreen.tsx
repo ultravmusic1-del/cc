@@ -26,14 +26,6 @@ export default function HomeScreen() {
 
   return (
     <section className="relative min-h-[100dvh] w-full overflow-hidden">
-      {/* Ambient couture C */}
-      <span
-        aria-hidden
-        className="c-watermark absolute -left-24 top-10 select-none font-display text-[26rem] lg:hidden"
-      >
-        C
-      </span>
-
       <motion.div
         variants={stagger}
         initial="initial"
@@ -87,13 +79,13 @@ export default function HomeScreen() {
           />
           <div className="relative w-[76%]">
             <Image
-              src="/images/oat-bar-hero.png"
+              src="/images/oat-bar-hero-2.png"
               alt="Stack of Candy Couture handcrafted oat bars"
-              width={1080}
-              height={952}
+              width={785}
+              height={698}
               priority
               sizes="(max-width: 520px) 60vw, 220px"
-              className="h-auto w-full drop-shadow-[0_18px_22px_rgba(15,3,7,0.4)]"
+              className="h-auto w-full drop-shadow-[0_14px_20px_rgba(15,3,7,0.35)]"
             />
           </div>
         </motion.div>
@@ -124,16 +116,10 @@ export default function HomeScreen() {
               key={b.title}
               className="glass-card flex flex-col items-center justify-start gap-2.5 rounded-2xl px-2 py-4 text-center"
             >
-              {b.icon.includes("-olive") ? (
-                // Already tinted (keeps internal detail) — render as-is.
-                <span
-                  aria-hidden
-                  className="h-9 w-9 shrink-0 bg-contain bg-center bg-no-repeat"
-                  style={{ backgroundImage: `url(${b.icon})` }}
-                />
-              ) : (
-                <MaskIcon src={b.icon} className="h-9 w-9 shrink-0 text-olive" />
-              )}
+              <MaskIcon
+                src={b.icon}
+                className="h-12 w-12 shrink-0 text-pink"
+              />
               <span className="text-[0.64rem] font-semibold uppercase leading-tight tracking-[0.1em] text-[rgba(227,210,194,0.82)]">
                 {b.title}
               </span>

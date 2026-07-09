@@ -63,9 +63,6 @@ function Shell() {
         aria-hidden
         className="pointer-events-none fixed inset-0 -z-10 hidden overflow-hidden lg:block"
       >
-        <span className="c-watermark absolute left-[3%] top-1/2 -translate-y-1/2 select-none font-display text-[40rem]">
-          C
-        </span>
         <span
           className="absolute right-[8%] top-[18%] h-64 w-64 rounded-full"
           style={{

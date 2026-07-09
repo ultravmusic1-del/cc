@@ -6,9 +6,9 @@
 
 import type { Lang } from "./content";
 
-// Candy Couture ordering line (+973 3836 6111), international, digits only.
+// Candy Couture ordering line (+973 37366111), international, digits only.
 export const WHATSAPP_NUMBER =
-  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "97338366111";
+  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "97337366111";
 
 export type WhatsAppIntent = "general" | "cookie" | "protein" | "wholesale";
 

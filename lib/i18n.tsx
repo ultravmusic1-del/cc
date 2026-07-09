@@ -241,7 +241,7 @@ const EN_UI: UIStrings = {
   },
   about: {
     eyebrow: "Our Story",
-    title: "Indulgent, honestly made.",
+    title: "Made with intention",
     aboutUsT: "About Us",
     aboutUsN: "Why we started Candy Couture",
     philosophyT: "Product Philosophy",
@@ -406,7 +406,7 @@ const AR_UI: UIStrings = {
   },
   about: {
     eyebrow: "قصتنا",
-    title: "متعة، مصنوعة بصدق.",
+    title: "صُنع بنيّة",
     aboutUsT: "من نحن",
     aboutUsN: "لماذا أنشأنا كاندي كوتور",
     philosophyT: "فلسفة المنتج",

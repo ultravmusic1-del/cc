@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScreenShell from "../ScreenShell";
 import Segmented from "../ui/Segmented";
 import WhatsAppButton from "../ui/WhatsAppButton";
+import CountUp from "../ui/CountUp";
 import { type ProductId } from "@/lib/content";
 import { useContent, useT, fill } from "@/lib/i18n";
 
@@ -60,9 +61,11 @@ export default function NutritionScreen() {
                 key={n.label}
                 className="glass-card flex flex-col items-center rounded-2xl py-5"
               >
-                <span className="font-heading text-3xl font-bold text-coral">
-                  {n.value}
-                </span>
+                <CountUp
+                  value={n.value}
+                  duration={1100}
+                  className="font-heading text-3xl font-bold text-coral"
+                />
                 <span className="mt-1 text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-[rgba(227,210,194,0.62)]">
                   {n.label}
                 </span>
@@ -71,7 +74,7 @@ export default function NutritionScreen() {
           </div>
 
           <div className="glass-card mt-3 rounded-2xl px-5 py-2">
-            {rest.map((n) => (
+            {rest.map((n, i) => (
               <div
                 key={n.label}
                 className="flex items-center justify-between border-b border-[var(--hairline)] py-3 last:border-b-0"
@@ -79,9 +82,12 @@ export default function NutritionScreen() {
                 <span className="text-[0.85rem] text-[rgba(227,210,194,0.72)]">
                   {n.label}
                 </span>
-                <span className="font-heading text-[0.95rem] font-semibold text-cream">
-                  {n.value}
-                </span>
+                <CountUp
+                  value={n.value}
+                  duration={900}
+                  delay={150 + i * 80}
+                  className="font-heading text-[0.95rem] font-semibold text-cream"
+                />
               </div>
             ))}
           </div>

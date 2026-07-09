@@ -62,10 +62,10 @@ export interface ContentBundle {
 
 // Contact details are values (not translated), shared across languages.
 export const CONTACT = {
-  email: "ashikavalani@gmail.com",
+  email: "candycouturecompany@gmail.com",
   instagram: "@candycoutureco",
   instagramUrl: "https://instagram.com/candycoutureco",
-  whatsapp: "+973 3836 6111",
+  whatsapp: "+973 37366111",
 };
 
 // ── English ───────────────────────────────────────────────────
@@ -86,12 +86,12 @@ const EN: ContentBundle = {
       "Handcrafted in Bahrain with whole grain oats, dark chocolate, and real ingredients.",
   },
   heroBenefits: [
-    { icon: "/images/icons/wholegrain-oats.png", title: "Wholegrain Oats" },
+    { icon: "/images/icons/wholegrain-oats-v2.png", title: "Wholegrain Oats" },
     {
-      icon: "/images/icons/dark-chocolate-chunks-olive.png",
+      icon: "/images/icons/dark-chocolate-chunks-v2.png",
       title: "Dark Chocolate Chunks",
     },
-    { icon: "/images/icons/smart-snacking.png", title: "Smart Snacking" },
+    { icon: "/images/icons/smart-snacking-v2.png", title: "Smart Snacking" },
   ],
   products: {
     cookie: {
@@ -199,12 +199,12 @@ const AR: ContentBundle = {
       "مصنوع يدويًا في البحرين من الشوفان الكامل والشوكولاتة الداكنة ومكوّنات حقيقية.",
   },
   heroBenefits: [
-    { icon: "/images/icons/wholegrain-oats.png", title: "شوفان كامل الحبة" },
+    { icon: "/images/icons/wholegrain-oats-v2.png", title: "شوفان كامل الحبة" },
     {
-      icon: "/images/icons/dark-chocolate-chunks-olive.png",
+      icon: "/images/icons/dark-chocolate-chunks-v2.png",
       title: "قطع شوكولاتة داكنة",
     },
-    { icon: "/images/icons/smart-snacking.png", title: "وجبة خفيفة ذكية" },
+    { icon: "/images/icons/smart-snacking-v2.png", title: "وجبة خفيفة ذكية" },
   ],
   products: {
     cookie: {

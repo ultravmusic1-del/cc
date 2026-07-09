@@ -21,12 +21,6 @@ export default function Error({
 
   return (
     <div className="stage-bg flex min-h-[100dvh] flex-col items-center justify-center px-6 text-center">
-      <span
-        aria-hidden
-        className="c-watermark absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-display text-[20rem]"
-      >
-        C
-      </span>
       <div className="relative z-10 flex max-w-sm flex-col items-center">
         <p className="eyebrow text-[rgba(233,173,190,0.8)]">Something went wrong</p>
         <h1 className="mt-3 font-heading text-2xl font-semibold text-cream">

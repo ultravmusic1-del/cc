@@ -116,12 +116,6 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
       aria-modal="true"
       aria-label={t.menu.aria}
     >
-      <span
-        aria-hidden
-        className="c-watermark absolute left-1/2 top-16 -translate-x-1/2 select-none font-display text-[16rem]"
-      >
-        C
-      </span>
 
       {/* top bar */}
       <div className="relative z-10 flex items-center justify-between px-4 pt-safe">
