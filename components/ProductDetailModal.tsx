@@ -39,6 +39,13 @@ export default function ProductDetailModal({
 }) {
   const [tab, setTab] = useState<TabId>("overview");
   const panelRef = useRef<HTMLDivElement>(null);
+  const tablistRef = useRef<HTMLDivElement>(null);
+  const [pill, setPill] = useState<{
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  } | null>(null);
   const dragControls = useDragControls();
   const isPresent = useIsPresent();
   const ui = useT();
@@ -81,6 +88,40 @@ export default function ProductDetailModal({
       window.clearTimeout(t);
     };
   }, [onClose]);
+
+  // Keep the tab pill under the active tab. Measured before paint so it never
+  // shows a frame in the wrong place; re-measured whenever a tab's box changes
+  // (language switch, font load, resize) so it stays aligned without a
+  // shared-layout animation.
+  useIsoLayoutEffect(() => {
+    const list = tablistRef.current;
+    if (!list) return;
+    const measure = () => {
+      const el = list.querySelector<HTMLElement>(
+        '[role="tab"][aria-selected="true"]',
+      );
+      if (!el) return;
+      const next = {
+        x: el.offsetLeft,
+        y: el.offsetTop,
+        w: el.offsetWidth,
+        h: el.offsetHeight,
+      };
+      setPill((p) =>
+        p && p.x === next.x && p.y === next.y && p.w === next.w && p.h === next.h
+          ? p
+          : next,
+      );
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    list.querySelectorAll<HTMLElement>('[role="tab"]').forEach((el) => {
+      ro.observe(el);
+    });
+    return () => {
+      ro.disconnect();
+    };
+  }, [tab]);
 
   // Anime.js: cascade the current tab's rows/chips up on open and on every tab
   // switch. Only translateY (Framer already fades the tab content in), so the
@@ -192,9 +233,26 @@ export default function ProductDetailModal({
 
         {/* tabs */}
         <div
+          ref={tablistRef}
           role="tablist"
-          className="no-scrollbar flex gap-2 overflow-x-auto px-5 pb-3"
+          className="no-scrollbar relative flex gap-2 overflow-x-auto px-5 pb-3"
         >
+          {/* One persistent pill, deliberately NOT framer's `layoutId` shared
+              layout. A layoutId projection created by a tab switch never settles
+              once the parent AnimatePresence removes this sheet, so the exit
+              animation never completed and the sheet stayed wedged on screen
+              until a reload. Animating a single element that never unmounts
+              gives the same slide with no projection involved. */}
+          {pill && (
+            <motion.span
+              aria-hidden
+              initial={false}
+              animate={{ x: pill.x, width: pill.w }}
+              transition={{ type: "spring", stiffness: 420, damping: 34 }}
+              style={{ top: pill.y, height: pill.h }}
+              className="absolute left-0 rounded-full btn-coral"
+            />
+          )}
           {tabs.map((tb) => {
             const active = tb.id === tab;
             return (
@@ -203,20 +261,13 @@ export default function ProductDetailModal({
                 role="tab"
                 aria-selected={active}
                 onClick={() => setTab(tb.id)}
-                className={`relative shrink-0 rounded-full px-4 py-2 text-[0.78rem] font-semibold transition-colors ${
+                className={`relative z-10 shrink-0 rounded-full px-4 py-2 text-[0.78rem] font-semibold transition-colors ${
                   active
                     ? "text-cream"
                     : "text-[rgba(227,210,194,0.6)] hover:text-cream"
                 }`}
               >
-                {active && (
-                  <motion.span
-                    layoutId="pd-tab"
-                    className="absolute inset-0 rounded-full btn-coral"
-                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                  />
-                )}
-                <span className="relative z-10">{tb.label}</span>
+                {tb.label}
               </button>
             );
           })}
