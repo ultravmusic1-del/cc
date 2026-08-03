@@ -60,6 +60,9 @@ export default function ProductDetailModal({
     { id: "allergens", label: ui.modal.tabs.allergens },
   ];
   const allergenChips = [ui.modal.gluten, ui.modal.dairy, ui.modal.nuts];
+  // Changes when the language does, which is the only thing that resizes the
+  // tab boxes. Used to re-measure the pill without an observer.
+  const tabLabelKey = tabs.map((t) => t.label).join("|");
 
   // ESC to close + focus trap. (Scroll lock is centralized in App's Shell.)
   useEffect(() => {
@@ -90,9 +93,11 @@ export default function ProductDetailModal({
   }, [onClose]);
 
   // Keep the tab pill under the active tab. Measured before paint so it never
-  // shows a frame in the wrong place; re-measured whenever a tab's box changes
-  // (language switch, font load, resize) so it stays aligned without a
-  // shared-layout animation.
+  // shows a frame in the wrong place. Deliberately NOT a ResizeObserver: one
+  // observing the tab boxes fires while the sheet is opening, and each callback
+  // forces a synchronous layout read, which halved the open animation's frame
+  // rate. Re-measuring on tab and language change alone covers everything that
+  // actually moves the tabs, at no cost during the open.
   useIsoLayoutEffect(() => {
     const list = tablistRef.current;
     if (!list) return;
@@ -114,14 +119,7 @@ export default function ProductDetailModal({
       );
     };
     measure();
-    const ro = new ResizeObserver(measure);
-    list.querySelectorAll<HTMLElement>('[role="tab"]').forEach((el) => {
-      ro.observe(el);
-    });
-    return () => {
-      ro.disconnect();
-    };
-  }, [tab]);
+  }, [tab, tabLabelKey]);
 
   // Anime.js: cascade the current tab's rows/chips up on open and on every tab
   // switch. Only translateY (Framer already fades the tab content in), so the
