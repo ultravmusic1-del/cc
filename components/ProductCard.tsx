@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Product } from "@/lib/content";
-import { useNav } from "@/lib/store";
+import { productPath } from "@/lib/routes";
 import { useT, fill } from "@/lib/i18n";
 import WhatsAppButton from "./ui/WhatsAppButton";
 
@@ -16,10 +17,10 @@ export default function ProductCard({
   // to #bars, and next/image lazy-loads by default.
   priority?: boolean;
 }) {
-  const { openProduct } = useNav();
   const t = useT();
   const isCoral = product.accent === "coral";
   const accent = isCoral ? "#ec5b45" : "#e9adbe";
+  const href = productPath(product.id);
 
   return (
     <motion.article
@@ -58,8 +59,8 @@ export default function ProductCard({
       </div>
 
       {/* image */}
-      <button
-        onClick={() => openProduct(product.id)}
+      <Link
+        href={href}
         className="relative z-10 mx-auto mt-1 flex aspect-square w-[82%] items-center justify-center"
         aria-label={product.name}
       >
@@ -83,7 +84,7 @@ export default function ProductCard({
           sizes="(min-width: 1024px) 360px, (max-width: 520px) 45vw, 220px"
           className="relative h-auto w-full drop-shadow-[0_14px_18px_rgba(15,3,7,0.45)]"
         />
-      </button>
+      </Link>
 
       {/* name + tagline */}
       <h3 className="relative z-10 mt-1 text-center font-heading text-[1.02rem] font-semibold leading-tight text-cream">
@@ -115,12 +116,14 @@ export default function ProductCard({
           label={t.card.whatsapp}
           className="!gap-1.5 !px-3 !py-2.5 !text-[0.82rem]"
         />
-        <button
-          onClick={() => openProduct(product.id)}
-          className="btn-ghost rounded-full px-4 py-2 text-[0.76rem] font-semibold tracking-wide transition-colors hover:border-coral hover:text-coral"
+        {/* `text-center` replaces the UA default a <button> had and an <a>
+            does not — every other class is unchanged. */}
+        <Link
+          href={href}
+          className="btn-ghost rounded-full px-4 py-2 text-center text-[0.76rem] font-semibold tracking-wide transition-colors hover:border-coral hover:text-coral"
         >
           {t.card.viewDetails}
-        </button>
+        </Link>
       </div>
     </motion.article>
   );

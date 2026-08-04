@@ -12,13 +12,10 @@ import { LangProvider } from "@/lib/i18n";
 import Header from "./Header";
 import StickyNav from "./StickyNav";
 import MobileMenu from "./MobileMenu";
-import ProductDetailModal from "./ProductDetailModal";
 import AboutDrawer from "./AboutDrawer";
-import { useContent } from "@/lib/i18n";
 
 function Shell({ children }: { children: ReactNode }) {
   const { overlay, closeOverlay } = useNav();
-  const c = useContent();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -115,13 +112,6 @@ function Shell({ children }: { children: ReactNode }) {
       </AnimatePresence>
 
       <AnimatePresence>
-        {overlay?.type === "product" && (
-          <ProductDetailModal
-            key="product"
-            product={c.products[overlay.productId]}
-            onClose={closeOverlay}
-          />
-        )}
         {overlay?.type === "about-drawer" && (
           <AboutDrawer
             key="drawer"
