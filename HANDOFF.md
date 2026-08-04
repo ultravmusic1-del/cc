@@ -384,6 +384,26 @@ prerequisite for ranking on anything but the brand name.
 **Google Business Profile** will probably drive more discovery than all three
 tiers combined. Free, and outside this codebase.
 
+### ⚠️ Production returns 429 to non-browser clients
+
+Measured 3 Aug 2026: `https://www.candycouture.co/` returns **429 with an
+`X-Vercel-Challenge-Token`** to every non-browser client, including a spoofed
+Googlebot user-agent. A real browser gets 200 — Vercel's Attack Challenge Mode
+solves transparently, so **real visitors are unaffected**.
+
+Unproven and important: whether *real* Googlebot (verified Google IPs) is
+challenged. A spoofed Googlebot from an ordinary IP *should* be blocked, so that
+test proves nothing either way. Search Console classifying the apex as "Page
+with redirect" is evidence Googlebot did reach the site at least once.
+
+Settle it via Search Console → URL Inspection → **Test Live URL**, which fetches
+as real Googlebot. If that fails, this outranks the entire SEO plan — Google
+treats sustained 429s like 5xx and stops crawling. Full detail in
+`docs/superpowers/plans/2026-08-03-seo-tier-1.md`.
+
+Also note: `npm run seo:check -- https://www.candycouture.co` reports everything
+failed while this is active. Run it against a local production build instead.
+
 ### Search Console
 
 `public/google84764bf90bc17c8e.html` is the ownership-verification file, served
