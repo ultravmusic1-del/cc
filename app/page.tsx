@@ -1,5 +1,5 @@
-import App from "@/components/App";
+import ScreenSwitch from "@/components/ScreenSwitch";
 
-export default function Page() {
-  return <App />;
+export default function HomePage() {
+  return <ScreenSwitch />;
 }

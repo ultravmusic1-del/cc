@@ -3,6 +3,7 @@ import { Bodoni_Moda, Hanken_Grotesk, Open_Sans, Cairo } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
+import AppShell from "@/components/AppShell";
 import "./globals.css";
 
 const display = Bodoni_Moda({
@@ -74,7 +75,7 @@ export default function RootLayout({
     >
       <body className="antialiased">
         <JsonLd />
-        {children}
+        <AppShell>{children}</AppShell>
         <Analytics />
       </body>
     </html>
