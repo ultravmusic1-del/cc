@@ -20,9 +20,23 @@
 const BASE = (process.argv[2] || process.env.SEO_BASE || "http://localhost:3200").replace(/\/+$/, "");
 const CANON = "https://www.candycouture.co";
 
+// Every route Tier 2 introduces, with a substring its title must contain.
+// Substring rather than exact match so wording can be tuned without breaking
+// the gate — the assertion that matters is that each title is DISTINCT.
+const ROUTES = [
+  { path: "/", titleContains: "Candy Couture" },
+  { path: "/bars", titleContains: "Bars" },
+  { path: "/bars/oat-cookie-bar", titleContains: "Oat Cookie Bar" },
+  { path: "/bars/oat-protein-bar", titleContains: "Oat Protein Bar" },
+  { path: "/nutrition", titleContains: "Nutrition" },
+  { path: "/ordering", titleContains: "Ordering" },
+  { path: "/wholesale", titleContains: "Wholesale" },
+  { path: "/about", titleContains: "About" },
+];
+
 // Fixed check count. If you add or remove a check, update this — the summary
 // prints a warning when the two disagree, so it cannot silently rot.
-const EXPECTED_CHECKS = 26;
+const EXPECTED_CHECKS = 85;
 
 let passed = 0;
 const failures = [];
@@ -114,6 +128,67 @@ async function main() {
     ogUrl === `${CANON}/` || ogUrl === CANON,
     ogUrl ? `got ${ogUrl}` : "absent",
   );
+
+  // ── every route: 200, unique title, self-referencing canonical ───
+  const seenTitles = new Set();
+  for (const route of ROUTES) {
+    const res = await get(route.path);
+    check(`${route.path} returns 200`, res.status === 200, statusOf(res));
+    const routeHtml = res.status === 200 ? await res.text() : "";
+
+    const title = (routeHtml.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || "";
+    check(`${route.path} title mentions "${route.titleContains}"`,
+      title.includes(route.titleContains), title ? `got "${title}"` : "no title");
+    check(`${route.path} title is unique`, title !== "" && !seenTitles.has(title), title);
+    seenTitles.add(title);
+
+    const href = attr(routeHtml, /<link[^>]*rel="canonical"[^>]*>/i, "href");
+    const want = route.path === "/" ? CANON : CANON + route.path;
+    check(`${route.path} canonical is self-referencing`, href === want,
+      href ? `got ${href}` : "absent");
+
+    // The scroll model: each route must ship its own .screen-scroll container.
+    // See HANDOFF.md — this is the iOS Safari fix and must not silently vanish.
+    check(`${route.path} has a .screen-scroll container`,
+      routeHtml.includes("screen-scroll"));
+
+    check(`${route.path} is listed in the sitemap`, sitemapBody.includes(`<loc>${want}</loc>`));
+  }
+
+  // ── product pages must contain the detail, not just a shell ──────
+  for (const [path, needles] of [
+    ["/bars/oat-cookie-bar", ["1.5 BD", "Ingredients", "Allergens", "Contains gluten"]],
+    ["/bars/oat-protein-bar", ["1.8 BD", "Ingredients", "Allergens", "Contains gluten"]],
+  ]) {
+    const res = await get(path);
+    const body = res.status === 200 ? await res.text() : "";
+    for (const needle of needles) {
+      check(`${path} server-renders "${needle}"`, body.includes(needle));
+    }
+  }
+
+  // ── the listing page must link to both product pages ────────────
+  const barsRes = await get("/bars");
+  const barsHtml = barsRes.status === 200 ? await barsRes.text() : "";
+  for (const slug of ["oat-cookie-bar", "oat-protein-bar"]) {
+    check(`/bars links to /bars/${slug}`, barsHtml.includes(`/bars/${slug}`));
+  }
+
+  // Tier 1 left the site with 227 characters of indexable text. If this does
+  // not move, Tier 2 achieved nothing regardless of how many routes exist.
+  let totalText = 0;
+  for (const route of ROUTES) {
+    const res = await get(route.path);
+    if (res.status !== 200) continue;
+    const body = (await res.text())
+      .replace(/<script[\s\S]*?<\/script>/g, " ")
+      .replace(/<style[\s\S]*?<\/style>/g, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    totalText += body.length;
+  }
+  check("indexable text across all routes exceeds 5000 chars", totalText > 5000, `${totalText} chars`);
 
   // ── structured data (always 5 checks, never skipped) ─────────
   const ldBlocks = [
