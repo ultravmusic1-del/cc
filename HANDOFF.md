@@ -384,25 +384,24 @@ prerequisite for ranking on anything but the brand name.
 **Google Business Profile** will probably drive more discovery than all three
 tiers combined. Free, and outside this codebase.
 
-### ⚠️ Production returns 429 to non-browser clients
+### Production 429s to non-browser clients (does NOT block Googlebot)
 
-Measured 3 Aug 2026: `https://www.candycouture.co/` returns **429 with an
-`X-Vercel-Challenge-Token`** to every non-browser client, including a spoofed
-Googlebot user-agent. A real browser gets 200 — Vercel's Attack Challenge Mode
-solves transparently, so **real visitors are unaffected**.
+`https://www.candycouture.co/` returns **429 with an `X-Vercel-Challenge-Token`**
+to every non-browser client — Vercel's Attack Challenge Mode. Real browsers get
+200 and solve it transparently, so visitors are unaffected.
 
-Unproven and important: whether *real* Googlebot (verified Google IPs) is
-challenged. A spoofed Googlebot from an ordinary IP *should* be blocked, so that
-test proves nothing either way. Search Console classifying the apex as "Page
-with redirect" is evidence Googlebot did reach the site at least once.
+**Googlebot is fine.** Confirmed 4 Aug 2026 via Search Console URL Inspection →
+Test Live URL: *"URL is available to Google"*, *"Page can be indexed."* Vercel
+allowlists verified crawlers by reverse DNS.
 
-Settle it via Search Console → URL Inspection → **Test Live URL**, which fetches
-as real Googlebot. If that fails, this outranks the entire SEO plan — Google
-treats sustained 429s like 5xx and stops crawling. Full detail in
-`docs/superpowers/plans/2026-08-03-seo-tier-1.md`.
+Two practical consequences:
 
-Also note: `npm run seo:check -- https://www.candycouture.co` reports everything
-failed while this is active. Run it against a local production build instead.
+- **`npm run seo:check -- https://www.candycouture.co` reports everything failed**
+  while challenge mode is active — the harness is a non-browser client. Run it
+  against a local production build instead.
+- **Don't test crawlability with a spoofed Googlebot user-agent.** From an
+  ordinary IP it is challenged by design and will always look broken. The Live
+  Test in Search Console is the only check that means anything.
 
 ### Search Console
 
