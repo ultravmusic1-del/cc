@@ -349,19 +349,34 @@ opportunity — and the expensive part (translation) is already paid for.
 
 ### Plan, in priority order
 
-> **Tier 1 has a written implementation plan:**
-> `docs/superpowers/plans/2026-08-03-seo-tier-1.md` — task-by-task with complete
-> code, a `npm run seo:check` assertion harness, and the Search Console steps.
-> Start there rather than re-deriving it.
+> Plan and full rationale: `docs/superpowers/plans/2026-08-03-seo-tier-1.md`.
 
-**Tier 1 — quick wins (~half a day, no architecture change)**
-1. `app/robots.ts` + `app/sitemap.ts` (Next 15 generates both natively)
-2. JSON-LD: `LocalBusiness` (Bahrain address, geo, hours, WhatsApp) + a `Product`
-   each with `offers` at 1.5 / 1.8 BD
-3. `alternates.canonical` + `openGraph.url` in `app/layout.tsx`
-4. Resize `app/icon.png` to 48×48 → 298 KB becomes ~2 KB
-5. Convert the three mask PNGs to SVG (they render as flat single-colour masks
-   via `MaskIcon`) → ~480 KB becomes ~5 KB
+**✅ Tier 1 — DONE (4 Aug 2026).** Shipped: `app/robots.ts`, `app/sitemap.ts`,
+`alternates.canonical` + `openGraph.url`, schema.org JSON-LD (Organization + both
+Products), and a 797 KB → 45 KB image reduction. `npm run seo:check` reports
+**26 passed, 0 failed**.
+
+Three things from it that outlive the task:
+
+- **`npm run seo:check` is a deploy gate.** 26 fixed assertions against a running
+  build; exits non-zero on any failure. Run it before shipping anything that
+  touches metadata, routing, or images. If you add a check, bump
+  `EXPECTED_CHECKS` — the summary warns when the constant and the real count
+  disagree. Run it against a **local** production build, not the live host (see
+  the challenge-mode note above).
+- **`lib/seo.ts` fails the build on price drift.** Its numeric prices duplicate
+  the localized display strings in `content.ts` by necessity (schema.org needs a
+  bare number + ISO currency). A module-level assertion throws if the two ever
+  disagree, in either language. Change a price in `content.ts` and you MUST
+  change it there too — the build will tell you.
+- **`scripts/seo-check.mjs` hardcodes the canonical origin on purpose.** Do not
+  "tidy" it to import `SITE_URL`. A check that imports its expected value from
+  the code under test cannot detect a wrong value.
+
+Deliberately not done in Tier 1, and still open: a dedicated ≥112×112 logo asset
+(the current 415×95 wordmark is below Google's minimum for the Organization logo
+feature, so that enhancement will not fire), and `LocalBusiness`/`FoodEstablishment`
+markup, which needs a real postal address the repo does not have.
 
 **Tier 2 — the actual fix (2–4 days, real refactor)**
 Turn the six screens into real routes plus two product pages
