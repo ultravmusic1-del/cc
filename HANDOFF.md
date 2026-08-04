@@ -349,6 +349,11 @@ opportunity — and the expensive part (translation) is already paid for.
 
 ### Plan, in priority order
 
+> **Tier 1 has a written implementation plan:**
+> `docs/superpowers/plans/2026-08-03-seo-tier-1.md` — task-by-task with complete
+> code, a `npm run seo:check` assertion harness, and the Search Console steps.
+> Start there rather than re-deriving it.
+
 **Tier 1 — quick wins (~half a day, no architecture change)**
 1. `app/robots.ts` + `app/sitemap.ts` (Next 15 generates both natively)
 2. JSON-LD: `LocalBusiness` (Bahrain address, geo, hours, WhatsApp) + a `Product`
