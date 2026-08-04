@@ -12,9 +12,86 @@ Ordering happens over WhatsApp.
 
 ---
 
-## Recent changes (3 Aug 2026)
+## 🚧 START HERE — work in progress on `feat/seo-tier-2`
 
-All shipped to production and verified live.
+**`main` is stable and live. Tier 2 is unfinished and lives on a branch.**
+Nothing below has touched production.
+
+```bash
+git fetch origin
+git checkout feat/seo-tier-2
+npm ci
+```
+
+### What Tier 2 is doing
+
+Converting six client-state screens into **eight real routes**, and replacing the
+product modal with product pages. This fixes two problems with one change: the
+site had 1 indexable URL, and Vercel Analytics collapsed every screen to `/` —
+both because navigation set `location.hash` instead of changing the pathname.
+
+Plan: `docs/superpowers/plans/2026-08-04-seo-tier-2.md`
+Design: `docs/superpowers/specs/2026-08-04-seo-tier-2-real-routes-design.md`
+
+### Progress: 4 of 6 tasks
+
+| Task | Status | Commit |
+|---|---|---|
+| T2-1 Extend harness to 85 assertions | ✅ done | `1ac372d` |
+| T2-2 Extract `AppShell` (pure refactor) | ✅ done | `929f44c` |
+| T2-3 Convert six screens to routes | ✅ done | `76573c5` |
+| T2-4 Product pages, delete modal | ⚠️ **code done, visuals unverified** | `8debc9a` |
+| T2-5 Sitemap → 8 routes, `offers.url`, breadcrumbs | ⬜ not started | — |
+| T2-6 Two-viewport verification sweep | ⬜ not started | — |
+
+**Harness right now: `npm run seo:check` → 77 passed, 8 failed** (baseline was
+32/53). Run it against a **local** production build, never the live host — see
+the challenge-mode note below.
+
+### The 8 remaining reds, and what closes them
+
+Seven are `<route> is listed in the sitemap` — `app/sitemap.ts` still returns a
+single entry. **T2-5 closes all seven** by deriving the sitemap from
+`lib/routes.ts`.
+
+The eighth is `indexable text across all routes exceeds 5000 chars — 4623 chars`.
+Be aware: **5000 was my guess when writing the harness, not a measured target.**
+Actual indexable text went 275 → 4623 characters, a 17× improvement, and T2-5
+adds structured data rather than visible copy so it will not move much. Decide
+deliberately: either lower the threshold to something honest like 4000, or add
+real copy. Do not quietly delete the check — it is the only assertion that
+measures whether Tier 2 achieved its actual purpose.
+
+### ⚠️ T2-4 is committed but NOT visually verified
+
+The agent implementing it was interrupted after its file edits and before its
+browser step. Verified: `tsc` clean, `build` clean, `● /bars/[slug]` prerenders
+2 SSG pages, harness 77/8, no dangling `ProductDetailModal`/`openProduct` refs.
+
+**Never verified: nobody has looked at the product pages.** No screenshot, no
+viewport testing, no interaction sweep. The site owner's explicit requirement is
+*"thorough testing before any merging… mobile first site which should also look
+great on PC"* — that is T2-6 and it has not run.
+
+**Do not merge to `main` until T2-6 passes and Vivaan approves.**
+
+### Next actions, in order
+
+1. **T2-5** — `app/sitemap.ts` to 8 routes from `lib/routes.ts`; point
+   `offers.url` in `lib/seo.ts` at the product pages (currently both point at the
+   homepage, which is now wrong); add `BreadcrumbList` to product pages.
+   ⚠️ Keep the homepage sitemap entry as the **bare origin, no trailing slash** —
+   the harness derives the canonical and sitemap expectations identically, so a
+   trailing slash flips two checks red at once.
+2. **T2-6** — the verification sweep: 390×844 and 1440×900 across all 8 routes,
+   scroll invariant, no horizontal overflow, interaction sweep, screenshots.
+3. Update this section, then ask Vivaan before merging.
+
+---
+
+## Recent changes (3–4 Aug 2026)
+
+Everything in this table is **live on production** via `main`.
 
 | Commit | Change |
 |---|---|
@@ -22,13 +99,15 @@ All shipped to production and verified live.
 | `d64c0a1` | **Fix:** product modal wedged on screen after a tab switch, undismissable until reload |
 | `f4aefa7` | **Perf:** modal open animation ~20 fps → **~47 fps** (dropped a `ResizeObserver`) |
 | `3ecda78` | Google Search Console HTML verification file |
+| `2287686` | **SEO Tier 1**: robots.txt, sitemap.xml, canonical + og:url, JSON-LD, 797 KB → 45 KB images |
 
 The two modal commits are one story: `d64c0a1` fixed the wedge but introduced a
 frame-rate regression, and `f4aefa7` fixed that. Both are explained under
 Gotchas — they're the most transferable lessons in this file.
 
-Next up: the **SEO** section near the bottom. Audit is done and measured;
-nothing implemented yet beyond the verification file.
+> Note: `ProductDetailModal.tsx` still exists on `main` and is deleted on
+> `feat/seo-tier-2`. Its gotchas below remain worth reading either way — the
+> `layoutId` lesson applies to any Framer subtree an `AnimatePresence` removes.
 
 ---
 
@@ -81,16 +160,45 @@ Next 15.5.22 still pins its own `postcss@8.4.31`, and Next 15 newly pulls in
 
 ## Architecture
 
-The whole site is **one page** (`app/page.tsx` → `components/App.tsx`). There is
-**no Next.js routing / `next/link`** — it's a custom in-page "router."
+> **This section describes `feat/seo-tier-2`.** On `main` (what is live today)
+> the site is still one page with a hash router: `app/page.tsx` → `components/App.tsx`,
+> a `view` state synced to `location.hash`, and `useNav()` exposing `goTo` /
+> `openProduct`. If you are on `main`, read that instead — everything below the
+> Scroll model heading applies to both.
 
-### Navigation (`lib/store.tsx`)
-- A `view` state (`home | bars | nutrition | about | ordering | wholesale`) picks
-  which screen renders. Overlays (`menu | product | about-drawer`) stack on top.
-- `view` is synced to the **URL hash** (`#bars`, …) so the browser back button
-  works and views are deep-linkable. `history.scrollRestoration = "manual"`.
-- `useNav()` exposes `goTo`, `openMenu`, `openProduct`, `openAboutDrawer`,
-  `closeOverlay`.
+Eight real routes, all statically prerendered:
+
+```
+/                        HomeScreen
+/bars                    BarsScreen
+/bars/oat-cookie-bar     ProductScreen  ┐ app/bars/[slug]/page.tsx
+/bars/oat-protein-bar    ProductScreen  ┘ generateStaticParams, dynamicParams=false
+/nutrition               NutritionScreen
+/ordering                OrderingScreen
+/wholesale               WholesaleScreen
+/about                   AboutScreen
+```
+
+### Navigation
+
+- **`lib/routes.ts` is the single source of truth** for paths and product slugs.
+  The nav, the sitemap and per-page metadata all read from it, so a route cannot
+  exist in one and be missing from another — which is exactly how a page ends up
+  unlinked and unindexed. Slugs are deliberately **not** localized; URLs stay
+  English even in Arabic.
+- `components/AppShell.tsx` holds the chrome (providers, fixed backgrounds,
+  `Header`, `StickyNav`, scrim, overlays) and is rendered by the root layout
+  around `{children}`. Each route's page supplies only its screen.
+- Header / StickyNav / MobileMenu use `next/link`, with active state from
+  `usePathname()`. Several use `motion.create(Link)` so `whileTap` and entrance
+  variants survive the swap from `<button>`.
+- `lib/store.tsx` is now **overlay state only** — `menu` and `about-drawer`.
+  `view`, `goTo`, `viewFromHash` and the `hashchange` listener are gone.
+  `history.scrollRestoration = "manual"` stays; it belongs to the scroll model,
+  not the router.
+- **Legacy `#bars` links still work.** `AppShell` redirects known former hash
+  views to their real route once on mount (`LEGACY_HASH_ROUTES`), so anything
+  shared on WhatsApp before Tier 2 doesn't silently land on Home.
 
 ### Scroll model — app shell (IMPORTANT, this is the iOS fix)
 The **document never scrolls**. Instead:
@@ -103,6 +211,14 @@ The **document never scrolls**. Instead:
 Why: iOS Safari/WebKit **ignores** `scrollTo` / `scrollTop` / `scrollIntoView`
 after a client-side view swap, so every JS "scroll to top" failed on iPhone
 (Android was fine). The app-shell approach sidesteps it entirely.
+
+> **⚠️ Real routes preserve this — but only because `ScreenShell` lives inside
+> each page.** A route change unmounts the page subtree and mounts a fresh
+> `.screen-scroll` container, which is the same remount the old view switch
+> performed. **If anyone ever hoists `ScreenShell` into a layout, it stops
+> remounting and the iOS bug returns** — silently, because it only reproduces on
+> real iOS hardware. `scripts/seo-check.mjs` asserts every route ships a
+> `.screen-scroll` container; that guard exists for this reason.
 `lib/scroll.ts#scrollToTop` remains only as a harmless belt-and-suspenders reset
 of the container. **Keep the site short / low-scroll** — long pages reintroduce
 the problem this design avoids.
@@ -152,22 +268,29 @@ element/property**.
 ```
 app/
   layout.tsx            fonts, metadata/SEO, <html>
-  page.tsx              renders <App/>
+  page.tsx              Home route  → HomeScreen
+  bars/page.tsx         Bars listing
+  bars/[slug]/page.tsx  Product pages (generateStaticParams → 2 SSG pages)
+  nutrition|ordering|wholesale|about/page.tsx   one screen each
+  robots.ts  sitemap.ts   generated /robots.txt and /sitemap.xml
   globals.css           theme vars, app-shell scroll CSS, .screen-scroll, Arabic font
   error.tsx / global-error.tsx
 components/
-  App.tsx               shell: providers, fixed bg/header/nav, screen switch, scroll-lock + reset
+  AppShell.tsx          chrome: providers, fixed bg/header/nav, scroll-lock + reset, wraps {children}
   Header.tsx            fixed top bar (menu / centered logo / order)
   StickyNav.tsx         fixed bottom nav (Bars/Nutrition/Order/Menu)
   MobileMenu.tsx        full-screen menu overlay (+ language toggle, Contact)
-  ProductDetailModal.tsx  bottom sheet w/ tabs (Overview/Ingredients/Nutrition/Storage/Allergens)
   AboutDrawer.tsx       About Us / Philosophy / Gifting drawers
-  ScreenShell.tsx       shared .screen-scroll chrome for content screens
+  ScreenShell.tsx       shared .screen-scroll chrome — MUST stay inside pages, never a layout
+  seo/JsonLd.tsx        server-rendered schema.org graph
   ProductCard.tsx  Footer.tsx  Logo.tsx
-  screens/              HomeScreen, BarsScreen, NutritionScreen, AboutScreen, OrderingScreen, WholesaleScreen
+  screens/              HomeScreen, BarsScreen, NutritionScreen, AboutScreen, OrderingScreen,
+                        WholesaleScreen, ProductScreen
   ui/                   CountUp, MaskIcon, Segmented, Icon, WhatsAppButton
 lib/
-  store.tsx             nav state + hash routing + scroll-restoration
+  routes.ts             ROUTES, PRODUCT_SLUGS, productPath(), LEGACY_HASH_ROUTES
+  seo.ts                SITE_URL, price facts + drift guard, buildJsonLd()
+  store.tsx             overlay state only (menu / about-drawer) + scroll-restoration
   content.ts            bilingual product/brand/contact source of truth
   i18n.tsx              UI strings + LangProvider + hooks
   whatsapp.ts           WhatsAppLink + WHATSAPP_NUMBER
@@ -378,11 +501,11 @@ Deliberately not done in Tier 1, and still open: a dedicated ≥112×112 logo as
 feature, so that enhancement will not fire), and `LocalBusiness`/`FoodEstablishment`
 markup, which needs a real postal address the repo does not have.
 
-**Tier 2 — the actual fix (2–4 days, real refactor)**
-Turn the six screens into real routes plus two product pages
-(`/bars/oat-cookie-bar`, `/bars/oat-protein-bar`). Server-render from
-`content.ts`; keep the app-shell feel by layering client transitions on top.
-Takes the site from **1 indexable page to ~9**.
+**🚧 Tier 2 — IN PROGRESS on `feat/seo-tier-2`, 4 of 6 tasks done.**
+Six screens are now real routes; product pages replace the modal. Indexable text
+275 → **4623 chars**. Remaining: T2-5 (sitemap to 8 routes, `offers.url`,
+breadcrumbs) and T2-6 (two-viewport verification sweep). **Not merged, not
+deployed — see the START HERE section at the top of this file.**
 
 > ⚠️ This conflicts with the app-shell scroll model above. Real routes must not
 > reintroduce document scrolling, or the iOS bug returns. Budget time for it.
