@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, useIsPresent } from "framer-motion";
 import {
   X,
@@ -16,15 +18,20 @@ import {
   MessageCircle,
 } from "lucide-react";
 import Logo from "./Logo";
-import { useNav, type ViewId, type AboutDrawerId } from "@/lib/store";
+import { useNav, type AboutDrawerId } from "@/lib/store";
+import { ROUTES, type RouteKey } from "@/lib/routes";
 import { CONTACT } from "@/lib/content";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { useT, useLang } from "@/lib/i18n";
 
 type MenuLevel = "main" | "about" | "contact";
 
+/** Created once at module scope — re-creating a motion component during render
+    remounts it and loses the animation state. */
+const MotionLink = motion.create(Link);
+
 const mainItems: {
-  id: ViewId | "about-expand" | "contact-expand";
+  id: RouteKey | "about-expand" | "contact-expand";
   key: "home" | "bars" | "nutrition" | "about" | "ordering" | "wholesale" | "contact";
 }[] = [
   { id: "home", key: "home" },
@@ -83,7 +90,8 @@ const rowRise = {
 };
 
 export default function MobileMenu({ onClose }: { onClose: () => void }) {
-  const { goTo, openAboutDrawer } = useNav();
+  const { openAboutDrawer } = useNav();
+  const router = useRouter();
   const t = useT();
   const { lang, setLang } = useLang();
   const [level, setLevel] = useState<MenuLevel>("main");
@@ -99,8 +107,11 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  // These both navigate and open a drawer, so they stay buttons: the drawer is
+  // overlay state the URL does not carry. openAboutDrawer replaces the menu
+  // overlay, which is what closes the menu here.
   const openDrawer = (id: AboutDrawerId) => {
-    goTo("about");
+    router.push(ROUTES.about);
     openAboutDrawer(id);
   };
 
@@ -164,23 +175,46 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
               exit={{ opacity: 0, x: -30, transition: { duration: 0.2 } }}
               className="flex flex-col px-6 pt-6 lg:mx-auto lg:w-full lg:max-w-[640px] lg:pt-10"
             >
-              {mainItems.map((item) => (
-                <motion.button
-                  key={item.id}
-                  variants={rowRise}
-                  onClick={() => {
-                    if (item.id === "about-expand") setLevel("about");
-                    else if (item.id === "contact-expand") setLevel("contact");
-                    else goTo(item.id as ViewId);
-                  }}
-                  className="group flex items-center justify-between border-b border-[var(--hairline)] py-5 text-start"
-                >
-                  <span className="font-display text-[2.1rem] font-medium leading-none text-cream transition-colors group-hover:text-pink">
-                    {t.menu.items[item.key]}
-                  </span>
-                  <ArrowRight className="h-6 w-6 text-coral transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />
-                </motion.button>
-              ))}
+              {mainItems.map((item) => {
+                const expands =
+                  item.id === "about-expand" || item.id === "contact-expand";
+                const rowClass =
+                  "group flex items-center justify-between border-b border-[var(--hairline)] py-5 text-start";
+                const rowInner = (
+                  <>
+                    <span className="font-display text-[2.1rem] font-medium leading-none text-cream transition-colors group-hover:text-pink">
+                      {t.menu.items[item.key]}
+                    </span>
+                    <ArrowRight className="h-6 w-6 text-coral transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />
+                  </>
+                );
+
+                // The two "expand" rows push a deeper menu level rather than
+                // navigating, so they stay buttons; every other row is a real
+                // destination and must be a crawlable link.
+                return expands ? (
+                  <motion.button
+                    key={item.id}
+                    variants={rowRise}
+                    onClick={() =>
+                      setLevel(item.id === "about-expand" ? "about" : "contact")
+                    }
+                    className={rowClass}
+                  >
+                    {rowInner}
+                  </motion.button>
+                ) : (
+                  <MotionLink
+                    key={item.id}
+                    variants={rowRise}
+                    href={ROUTES[item.id as RouteKey]}
+                    onClick={onClose}
+                    className={rowClass}
+                  >
+                    {rowInner}
+                  </MotionLink>
+                );
+              })}
             </motion.nav>
           )}
 

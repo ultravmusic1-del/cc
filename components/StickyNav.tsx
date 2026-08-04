@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { animate, stagger } from "animejs";
 import { HeartPulse, ShoppingBag, LayoutGrid } from "lucide-react";
 import MaskIcon from "./ui/MaskIcon";
-import { useNav, type ViewId } from "@/lib/store";
+import { useNav } from "@/lib/store";
+import { ROUTES } from "@/lib/routes";
 import { useT } from "@/lib/i18n";
 
 const items: {
-  id: ViewId | "menu";
+  id: "menu" | Exclude<keyof typeof ROUTES, "home">;
   labelKey: "bars" | "nutrition" | "order" | "menu";
   icon?: typeof HeartPulse;
   img?: string;
@@ -21,7 +24,8 @@ const items: {
 ];
 
 export default function StickyNav() {
-  const { view, overlay, goTo, openMenu } = useNav();
+  const { overlay, openMenu } = useNav();
+  const pathname = usePathname();
   const t = useT();
   const barRef = useRef<HTMLDivElement>(null);
 
@@ -58,19 +62,12 @@ export default function StickyNav() {
           {items.map(({ id, labelKey, icon: Ico, img }) => {
             const label = t.nav[labelKey];
             const active =
-              id === "menu" ? overlay?.type === "menu" : view === id;
+              id === "menu" ? overlay?.type === "menu" : pathname === ROUTES[id];
             const iconClass = `relative z-10 h-[19px] w-[19px] transition-colors ${
               active ? "text-coral" : "text-[rgba(227,210,194,0.7)]"
             }`;
-            return (
-              <button
-                key={id}
-                data-nav-item
-                onClick={() => (id === "menu" ? openMenu() : goTo(id as ViewId))}
-                aria-label={label}
-                aria-current={active ? "page" : undefined}
-                className="relative flex flex-1 flex-col items-center gap-1 rounded-full py-2 transition-colors"
-              >
+            const inner = (
+              <>
                 {active && (
                   <motion.span
                     layoutId="nav-pill"
@@ -90,7 +87,35 @@ export default function StickyNav() {
                 >
                   {label}
                 </span>
+              </>
+            );
+            const className =
+              "relative flex flex-1 flex-col items-center gap-1 rounded-full py-2 transition-colors";
+
+            // "Menu" opens an overlay rather than navigating, so it stays a
+            // button; the rest are real destinations and must be crawlable.
+            return id === "menu" ? (
+              <button
+                key={id}
+                data-nav-item
+                onClick={openMenu}
+                aria-label={label}
+                aria-current={active ? "page" : undefined}
+                className={className}
+              >
+                {inner}
               </button>
+            ) : (
+              <Link
+                key={id}
+                data-nav-item
+                href={ROUTES[id]}
+                aria-label={label}
+                aria-current={active ? "page" : undefined}
+                className={className}
+              >
+                {inner}
+              </Link>
             );
           })}
         </div>

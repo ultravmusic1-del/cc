@@ -2,13 +2,18 @@
 
 import { Fragment, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { animate, stagger as aStagger } from "animejs";
 import { ArrowRight } from "lucide-react";
 import MaskIcon from "../ui/MaskIcon";
-import { useNav } from "@/lib/store";
+import { ROUTES } from "@/lib/routes";
 import { useContent, useT, useLang } from "@/lib/i18n";
 import { useIsoLayoutEffect } from "@/lib/useIsoLayoutEffect";
+
+/** Created once at module scope — re-creating a motion component during render
+    remounts it and loses the animation state. */
+const MotionLink = motion.create(Link);
 
 const stagger = {
   animate: { transition: { staggerChildren: 0.09, delayChildren: 0.15 } },
@@ -34,7 +39,6 @@ function words(line: string) {
 }
 
 export default function HomeScreen() {
-  const { goTo } = useNav();
   const c = useContent();
   const t = useT();
   const { lang } = useLang();
@@ -145,21 +149,21 @@ export default function HomeScreen() {
           variants={rise}
           className="mt-5 flex flex-col gap-2.5 lg:col-start-1 lg:row-start-3 lg:mt-9 lg:flex-row lg:gap-4"
         >
-          <motion.button
+          <MotionLink
             whileTap={{ scale: 0.98 }}
-            onClick={() => goTo("bars")}
+            href={ROUTES.bars}
             className="btn-coral group inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-[0.95rem] font-semibold tracking-wide lg:px-8 lg:py-4 lg:text-[1rem]"
           >
             {t.home.chooseBar}
             <ArrowRight className="h-[18px] w-[18px] transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />
-          </motion.button>
-          <motion.button
+          </MotionLink>
+          <MotionLink
             whileTap={{ scale: 0.98 }}
-            onClick={() => goTo("about")}
+            href={ROUTES.about}
             className="btn-ghost inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-[0.9rem] font-semibold tracking-wide lg:px-8 lg:py-4 lg:text-[0.95rem]"
           >
             {t.home.ourStory}
-          </motion.button>
+          </MotionLink>
         </motion.div>
 
         {/* What's inside — three signature pillars */}

@@ -10,30 +10,6 @@ import {
   type ReactNode,
 } from "react";
 import type { ProductId } from "./content";
-import { scrollToTop } from "./scroll";
-
-const VIEWS: ViewId[] = [
-  "home",
-  "bars",
-  "nutrition",
-  "about",
-  "ordering",
-  "wholesale",
-];
-
-function viewFromHash(): ViewId {
-  if (typeof window === "undefined") return "home";
-  const h = window.location.hash.replace("#", "") as ViewId;
-  return VIEWS.includes(h) ? h : "home";
-}
-
-export type ViewId =
-  | "home"
-  | "bars"
-  | "nutrition"
-  | "about"
-  | "ordering"
-  | "wholesale";
 
 export type AboutDrawerId = "about-us" | "philosophy" | "gifting";
 
@@ -44,9 +20,7 @@ type Overlay =
   | null;
 
 interface Nav {
-  view: ViewId;
   overlay: Overlay;
-  goTo: (view: ViewId) => void;
   openMenu: () => void;
   openProduct: (productId: ProductId) => void;
   openAboutDrawer: (drawerId: AboutDrawerId) => void;
@@ -55,36 +29,22 @@ interface Nav {
 
 const NavContext = createContext<Nav | null>(null);
 
+/**
+ * Overlay state only. Navigation moved to real App Router routes in Tier 2 —
+ * this no longer knows which screen is showing, and nothing here reads the URL.
+ *
+ * `openProduct` and the `product` overlay survive on borrowed time: the product
+ * detail modal is replaced by /bars/<slug> pages in Task 4, which deletes both.
+ */
 export function NavProvider({ children }: { children: ReactNode }) {
-  const [view, setView] = useState<ViewId>("home");
   const [overlay, setOverlay] = useState<Overlay>(null);
 
-  // Sync view <-> URL hash so the browser back button works and views
-  // are deep-linkable. This is what makes the app feel like real pages.
+  // Own scroll position ourselves — stop the browser (esp. iOS Safari) from
+  // restoring a scroll offset on navigation. Belongs to the app-shell scroll
+  // model (body never scrolls; each screen is its own scroll container), not
+  // to the router, so it stays here even though routing left.
   useEffect(() => {
-    // Own scroll position ourselves — stop the browser (esp. iOS Safari)
-    // from restoring a scroll offset on hash navigation.
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-    setView(viewFromHash());
-    const onHash = () => setView(viewFromHash());
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
-
-  const goTo = useCallback((next: ViewId) => {
-    setOverlay(null);
-    setView(next);
-    if (typeof window !== "undefined") {
-      if (next === "home") {
-        history.replaceState(null, "", window.location.pathname);
-      } else if (window.location.hash !== `#${next}`) {
-        window.location.hash = next;
-      }
-      // Reset inside the tap gesture — iOS Safari honors gesture-context
-      // scrolls far more reliably than a later effect. The App view-change
-      // effect re-asserts (rAF + timeout) and covers hash/back navigation.
-      scrollToTop();
-    }
   }, []);
 
   const openMenu = useCallback(() => setOverlay({ type: "menu" }), []);
@@ -100,15 +60,13 @@ export function NavProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<Nav>(
     () => ({
-      view,
       overlay,
-      goTo,
       openMenu,
       openProduct,
       openAboutDrawer,
       closeOverlay,
     }),
-    [view, overlay, goTo, openMenu, openProduct, openAboutDrawer, closeOverlay],
+    [overlay, openMenu, openProduct, openAboutDrawer, closeOverlay],
   );
 
   return <NavContext.Provider value={value}>{children}</NavContext.Provider>;

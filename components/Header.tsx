@@ -1,15 +1,22 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
 import Logo from "./Logo";
-import { useNav, type ViewId } from "@/lib/store";
+import { useNav } from "@/lib/store";
+import { ROUTES } from "@/lib/routes";
 import { useT } from "@/lib/i18n";
+
+/** Created once at module scope — re-creating a motion component during render
+    remounts it and loses the animation state. */
+const MotionLink = motion.create(Link);
 
 /** Desktop-only inline nav. Mirrors StickyNav's destinations, which stays the
     primary nav on mobile (this header nav is hidden below lg, that one above). */
 const deskItems: {
-  id: ViewId | "menu";
+  id: "menu" | Exclude<keyof typeof ROUTES, "home">;
   labelKey: "bars" | "nutrition" | "order" | "menu";
 }[] = [
   { id: "bars", labelKey: "bars" },
@@ -19,7 +26,8 @@ const deskItems: {
 ];
 
 export default function Header() {
-  const { view, overlay, goTo, openMenu } = useNav();
+  const { overlay, openMenu } = useNav();
+  const pathname = usePathname();
   const t = useT();
 
   return (
@@ -39,13 +47,13 @@ export default function Header() {
           </button>
         </div>
 
-        <button
-          onClick={() => goTo("home")}
+        <Link
+          href={ROUTES.home}
           aria-label={t.header.home}
           className="shrink-0 lg:me-10"
         >
           <Logo size="md" />
-        </button>
+        </Link>
 
         <nav
           aria-label="Primary"
@@ -54,14 +62,9 @@ export default function Header() {
           {deskItems.map(({ id, labelKey }) => {
             const label = t.nav[labelKey];
             const active =
-              id === "menu" ? overlay?.type === "menu" : view === id;
-            return (
-              <button
-                key={id}
-                onClick={() => (id === "menu" ? openMenu() : goTo(id as ViewId))}
-                aria-current={active ? "page" : undefined}
-                className="relative rounded-full px-4 py-2 transition-colors"
-              >
+              id === "menu" ? overlay?.type === "menu" : pathname === ROUTES[id];
+            const inner = (
+              <>
                 {active && (
                   // Distinct layoutId from StickyNav's pill: both navs stay
                   // mounted (the other is merely display:none), and Framer
@@ -81,20 +84,43 @@ export default function Header() {
                 >
                   {label}
                 </span>
+              </>
+            );
+            const className = "relative rounded-full px-4 py-2 transition-colors";
+
+            // "Menu" opens an overlay rather than navigating, so it stays a
+            // button; the rest are real destinations and must be crawlable.
+            return id === "menu" ? (
+              <button
+                key={id}
+                onClick={openMenu}
+                aria-current={active ? "page" : undefined}
+                className={className}
+              >
+                {inner}
               </button>
+            ) : (
+              <Link
+                key={id}
+                href={ROUTES[id]}
+                aria-current={active ? "page" : undefined}
+                className={className}
+              >
+                {inner}
+              </Link>
             );
           })}
         </nav>
 
         <div className="flex flex-1 items-center justify-end lg:flex-none">
-          <motion.button
+          <MotionLink
             whileTap={{ scale: 0.94 }}
-            onClick={() => goTo("ordering")}
+            href={ROUTES.ordering}
             aria-label={t.header.ordering}
             className="flex h-10 w-10 items-center justify-center rounded-full text-cream/90 transition-colors hover:bg-white/5 hover:text-coral"
           >
             <ShoppingBag className="h-[22px] w-[22px]" strokeWidth={1.5} />
-          </motion.button>
+          </MotionLink>
         </div>
       </div>
     </header>

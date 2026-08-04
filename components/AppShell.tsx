@@ -2,8 +2,10 @@
 
 import { useEffect } from "react";
 import type { ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import { NavProvider, useNav } from "@/lib/store";
+import { LEGACY_HASH_ROUTES } from "@/lib/routes";
 import { scrollToTop } from "@/lib/scroll";
 import { useIsoLayoutEffect } from "@/lib/useIsoLayoutEffect";
 import { LangProvider } from "@/lib/i18n";
@@ -15,27 +17,39 @@ import AboutDrawer from "./AboutDrawer";
 import { useContent } from "@/lib/i18n";
 
 function Shell({ children }: { children: ReactNode }) {
-  const { view, overlay, closeOverlay } = useNav();
+  const { overlay, closeOverlay } = useNav();
   const c = useContent();
+  const pathname = usePathname();
+  const router = useRouter();
 
   // Lock the active screen's internal scroll while any overlay is open.
   // (The document itself never scrolls — see body { overflow:hidden }.)
-  // Keyed on both the overlay state and the view, since a view change mounts
-  // a fresh screen element that would otherwise lose the lock.
+  // Keyed on both the overlay state and the pathname, since a route change
+  // mounts a fresh screen element that would otherwise lose the lock.
   const hasOverlay = overlay !== null;
   useEffect(() => {
     const screen = document.querySelector<HTMLElement>("main > section");
     if (screen) screen.style.overflowY = hasOverlay ? "hidden" : "";
-  }, [hasOverlay, view]);
+  }, [hasOverlay, pathname]);
 
-  // Every view is its own "page" and starts at the top automatically: changing
-  // `view` unmounts the old screen and mounts a brand-new scroll container,
-  // which the browser starts at scrollTop 0 — no programmatic scroll needed
-  // (the fix for iOS Safari, which ignored scrollTo/scrollTop/scrollIntoView).
-  // scrollToTop() is a harmless belt-and-suspenders reset of the container.
+  // Every route is its own page and starts at the top automatically: navigating
+  // unmounts the old screen and mounts a brand-new scroll container, which the
+  // browser starts at scrollTop 0 — no programmatic scroll needed (the fix for
+  // iOS Safari, which ignored scrollTo/scrollTop/scrollIntoView). This is why
+  // ScreenShell lives inside each screen and must never be hoisted into a
+  // layout: a layout-level shell would persist across routes and stop
+  // remounting. scrollToTop() is a belt-and-suspenders reset of the container.
   useIsoLayoutEffect(() => {
     scrollToTop();
-  }, [view]);
+  }, [pathname]);
+
+  // Links shared before Tier 2 used #bars, #nutrition, etc. Send them to the
+  // real route once on mount, so nothing previously shared lands on Home.
+  useEffect(() => {
+    const key = window.location.hash.replace("#", "");
+    const target = LEGACY_HASH_ROUTES[key];
+    if (target) router.replace(target);
+  }, [router]);
 
   return (
     <main className="grain relative h-full w-full overflow-hidden">

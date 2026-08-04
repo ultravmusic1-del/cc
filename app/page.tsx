@@ -1,5 +1,5 @@
-import ScreenSwitch from "@/components/ScreenSwitch";
+import HomeScreen from "@/components/screens/HomeScreen";
 
 export default function HomePage() {
-  return <ScreenSwitch />;
+  return <HomeScreen />;
 }
