@@ -86,12 +86,12 @@ const EN: ContentBundle = {
       "Handcrafted in Bahrain with whole grain oats, dark chocolate, and real ingredients.",
   },
   heroBenefits: [
-    { icon: "/images/icons/wholegrain-oats-v2.png", title: "Wholegrain Oats" },
+    { icon: "/images/icons/wholegrain-oats-v3.png", title: "Wholegrain Oats" },
     {
-      icon: "/images/icons/dark-chocolate-chunks-v2.png",
+      icon: "/images/icons/dark-chocolate-chunks-v3.png",
       title: "Dark Chocolate Chunks",
     },
-    { icon: "/images/icons/smart-snacking-v2.png", title: "Smart Snacking" },
+    { icon: "/images/icons/smart-snacking-v3.png", title: "Smart Snacking" },
   ],
   products: {
     cookie: {
@@ -199,12 +199,12 @@ const AR: ContentBundle = {
       "مصنوع يدويًا في البحرين من الشوفان الكامل والشوكولاتة الداكنة ومكوّنات حقيقية.",
   },
   heroBenefits: [
-    { icon: "/images/icons/wholegrain-oats-v2.png", title: "شوفان كامل الحبة" },
+    { icon: "/images/icons/wholegrain-oats-v3.png", title: "شوفان كامل الحبة" },
     {
-      icon: "/images/icons/dark-chocolate-chunks-v2.png",
+      icon: "/images/icons/dark-chocolate-chunks-v3.png",
       title: "قطع شوكولاتة داكنة",
     },
-    { icon: "/images/icons/smart-snacking-v2.png", title: "وجبة خفيفة ذكية" },
+    { icon: "/images/icons/smart-snacking-v3.png", title: "وجبة خفيفة ذكية" },
   ],
   products: {
     cookie: {
