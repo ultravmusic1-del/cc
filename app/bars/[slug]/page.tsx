@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CONTENT } from "@/lib/content";
 import { PRODUCT_SLUGS, productIdFromSlug } from "@/lib/routes";
+import { buildBreadcrumbJsonLd } from "@/lib/seo";
 import ProductScreen from "@/components/screens/ProductScreen";
 
 export function generateStaticParams() {
@@ -34,5 +35,21 @@ export default async function ProductPage({
   const { slug } = await params;
   const id = productIdFromSlug(slug);
   if (!id) notFound();
-  return <ProductScreen productId={id} />;
+
+  // `<` is escaped so a literal "</script>" in any content value cannot close
+  // this tag early — same guard as components/seo/JsonLd.tsx.
+  const breadcrumb = JSON.stringify(buildBreadcrumbJsonLd(id)).replace(
+    /</g,
+    "\\u003c",
+  );
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: breadcrumb }}
+      />
+      <ProductScreen productId={id} />
+    </>
+  );
 }

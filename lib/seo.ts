@@ -1,4 +1,5 @@
 import { CONTACT, CONTENT, type ProductId } from "./content";
+import { productPath } from "./routes";
 
 /**
  * Canonical origin — the only host that should ever appear in a sitemap,
@@ -91,6 +92,33 @@ for (const id of Object.keys(PRICE_PER_BAR_BHD) as ProductId[]) {
  *  - `availableLanguage` says the *website* is bilingual; whether the WhatsApp
  *    sales channel is staffed in both is not something the repo can attest.
  */
+/**
+ * `BreadcrumbList` for a product page: Home → Bars → <product>.
+ *
+ * Emitted per product page rather than in the global graph, because a
+ * breadcrumb describes one page's position in the hierarchy — putting it in the
+ * site-wide graph would claim every page sits at the same place.
+ *
+ * English names, matching `buildJsonLd()`: structured data describes the
+ * entity, and the document Google indexes is `lang="en"`.
+ */
+export function buildBreadcrumbJsonLd(id: ProductId) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Bars", item: `${SITE_URL}/bars` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: CONTENT.en.products[id].name,
+        item: `${SITE_URL}${productPath(id)}`,
+      },
+    ],
+  };
+}
+
 export function buildJsonLd() {
   const c = CONTENT.en;
 
@@ -126,13 +154,17 @@ export function buildJsonLd() {
       name: p.name,
       description: p.description,
       image: `${SITE_URL}${p.image}`,
+      // The product's own page. Before Tier 2 this was the homepage, because
+      // that was the only URL that existed — pointing an Offer at a page that
+      // does not describe the product is exactly the mismatch Google penalises.
+      url: `${SITE_URL}${productPath(id)}`,
       brand: { "@type": "Brand", name: c.brand.name },
       offers: {
         "@type": "Offer",
         price: PRICE_PER_BAR_BHD[id].toFixed(2),
         priceCurrency: "BHD",
         availability: "https://schema.org/InStock",
-        url: SITE_URL,
+        url: `${SITE_URL}${productPath(id)}`,
         seller: { "@id": `${SITE_URL}/#organization` },
         eligibleQuantity: {
           "@type": "QuantitativeValue",
