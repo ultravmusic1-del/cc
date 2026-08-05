@@ -61,8 +61,13 @@ export default function Header() {
         >
           {deskItems.map(({ id, labelKey }) => {
             const label = t.nav[labelKey];
+            // Bars stays active on its product pages — see StickyNav.
             const active =
-              id === "menu" ? overlay?.type === "menu" : pathname === ROUTES[id];
+              id === "menu"
+                ? overlay?.type === "menu"
+                : id === "bars"
+                  ? pathname === ROUTES.bars || pathname.startsWith(`${ROUTES.bars}/`)
+                  : pathname === ROUTES[id];
             const inner = (
               <>
                 {active && (

@@ -61,8 +61,16 @@ export default function StickyNav() {
         >
           {items.map(({ id, labelKey, icon: Ico, img }) => {
             const label = t.nav[labelKey];
+            // Bars matches its product pages too, so /bars/oat-protein-bar
+            // still shows the user which section they are in. Without the
+            // prefix match, nothing is active two levels deep and the nav
+            // claims they are nowhere.
             const active =
-              id === "menu" ? overlay?.type === "menu" : pathname === ROUTES[id];
+              id === "menu"
+                ? overlay?.type === "menu"
+                : id === "bars"
+                  ? pathname === ROUTES.bars || pathname.startsWith(`${ROUTES.bars}/`)
+                  : pathname === ROUTES[id];
             const iconClass = `relative z-10 h-[19px] w-[19px] transition-colors ${
               active ? "text-coral" : "text-[rgba(227,210,194,0.7)]"
             }`;

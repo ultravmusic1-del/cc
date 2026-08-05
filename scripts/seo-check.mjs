@@ -36,7 +36,7 @@ const ROUTES = [
 
 // Fixed check count. If you add or remove a check, update this — the summary
 // prints a warning when the two disagree, so it cannot silently rot.
-const EXPECTED_CHECKS = 85;
+const EXPECTED_CHECKS = 101;
 
 let passed = 0;
 const failures = [];
@@ -147,12 +147,33 @@ async function main() {
     check(`${route.path} canonical is self-referencing`, href === want,
       href ? `got ${href}` : "absent");
 
+    // Ordering happens by pasting links into WhatsApp, so a per-page og:url
+    // matters as much as the canonical. Without per-page openGraph, Next
+    // inherits the root layout's wholesale and every route shares the homepage
+    // card AND og:url — which WhatsApp/Facebook treat as canonical identity.
+    const routeOg = attr(routeHtml, /<meta[^>]*property="og:url"[^>]*>/i, "content");
+    check(`${route.path} og:url is self-referencing`, routeOg === want,
+      routeOg ? `got ${routeOg}` : "absent");
+
     // The scroll model: each route must ship its own .screen-scroll container.
     // See HANDOFF.md — this is the iOS Safari fix and must not silently vanish.
     check(`${route.path} has a .screen-scroll container`,
       routeHtml.includes("screen-scroll"));
 
     check(`${route.path} is listed in the sitemap`, sitemapBody.includes(`<loc>${want}</loc>`));
+
+    // Per-route text floor. The aggregate check below cannot detect one page
+    // going empty — deleting any single non-product route still leaves the
+    // total above 4000. This is the guard that actually catches a page losing
+    // its server-rendered content.
+    const routeText = routeHtml
+      .replace(/<script[\s\S]*?<\/script>/g, " ")
+      .replace(/<style[\s\S]*?<\/style>/g, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    check(`${route.path} server-renders at least 250 chars`,
+      routeText.length >= 250, `${routeText.length} chars`);
   }
 
   // ── product pages must contain the detail, not just a shell ──────
@@ -171,7 +192,15 @@ async function main() {
   const barsRes = await get("/bars");
   const barsHtml = barsRes.status === 200 ? await barsRes.text() : "";
   for (const slug of ["oat-cookie-bar", "oat-protein-bar"]) {
-    check(`/bars links to /bars/${slug}`, barsHtml.includes(`/bars/${slug}`));
+    // MUST assert `href=`, not a bare substring. The site-wide JSON-LD in the
+    // body contains "url":".../bars/oat-cookie-bar" on EVERY page, so a
+    // substring check passes even on /wholesale — and would stay green if
+    // ProductCard's <Link> ever regressed to a <button>, which is precisely
+    // the regression this check exists to catch.
+    check(
+      `/bars links to /bars/${slug}`,
+      barsHtml.includes(`href="/bars/${slug}"`),
+    );
   }
 
   // Indexable text is the metric Tier 2 actually exists to move. Before it, the
@@ -182,8 +211,13 @@ async function main() {
   // 4623 characters across 8 routes. The original threshold here was 5000,
   // which was guessed before any of this was built and never met — rather than
   // leave a permanently-red check or pretend 5000 was meaningful, the floor is
-  // set below the real figure with enough headroom that losing a page's worth
-  // of server-rendered content trips it.
+  // set below the real figure.
+  //
+  // Be honest about what this does and does not catch: per-route the split is
+  // / 275, /bars 486, products ~1100 each, and the rest 350-440. So deleting
+  // any single NON-product route still leaves 4137-4348 and this stays green.
+  // Only losing a product page trips it. The per-route >=250 check inside the
+  // loop above is what actually guards an individual page going empty.
   //
   // Worth knowing: 4623 chars over 8 pages is ~580 per page, which is thin.
   // That is a copywriting problem, not an engineering one — routes cannot

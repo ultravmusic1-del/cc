@@ -42,10 +42,16 @@ function Shell({ children }: { children: ReactNode }) {
 
   // Links shared before Tier 2 used #bars, #nutrition, etc. Send them to the
   // real route once on mount, so nothing previously shared lands on Home.
+  //
+  // `Object.hasOwn` rather than a bare lookup: LEGACY_HASH_ROUTES is an object
+  // literal, so `/#constructor`, `/#toString` and `/#__proto__` would otherwise
+  // resolve to inherited members and hand a function to router.replace().
+  // That happens to be benign in Next 15.5.22, but it is an accident rather
+  // than a design and the next upgrade owns whether it stays that way.
   useEffect(() => {
     const key = window.location.hash.replace("#", "");
-    const target = LEGACY_HASH_ROUTES[key];
-    if (target) router.replace(target);
+    if (!Object.hasOwn(LEGACY_HASH_ROUTES, key)) return;
+    router.replace(LEGACY_HASH_ROUTES[key]);
   }, [router]);
 
   return (

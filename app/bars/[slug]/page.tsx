@@ -20,10 +20,18 @@ export async function generateMetadata({
   const id = productIdFromSlug(slug);
   if (!id) return {};
   const p = CONTENT.en.products[id];
+  const title = `${p.name} | Candy Couture`;
+  const description = `${p.description} ${p.pricePerBar} per bar, ${p.pricePerBox} per pack of 10. Handmade in Bahrain.`;
   return {
-    title: `${p.name} | Candy Couture`,
-    description: `${p.description} ${p.pricePerBar} per bar, ${p.pricePerBox} per pack of 10. Handmade in Bahrain.`,
+    title,
+    description,
     alternates: { canonical: `/bars/${slug}` },
+    // Without this the page inherits the root layout's openGraph, so pasting a
+    // product URL into WhatsApp renders the generic homepage card — and og:url
+    // would point at the homepage, which WhatsApp/Facebook treat as canonical
+    // identity, consolidating every product share onto one object. Ordering
+    // happens over WhatsApp here, so that is the path that matters most.
+    openGraph: { title, description, url: `/bars/${slug}` },
   };
 }
 
