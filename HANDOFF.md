@@ -33,59 +33,75 @@ both because navigation set `location.hash` instead of changing the pathname.
 Plan: `docs/superpowers/plans/2026-08-04-seo-tier-2.md`
 Design: `docs/superpowers/specs/2026-08-04-seo-tier-2-real-routes-design.md`
 
-### Progress: 4 of 6 tasks
+### Progress: all 6 tasks done — awaiting Vivaan's merge approval
 
 | Task | Status | Commit |
 |---|---|---|
-| T2-1 Extend harness to 85 assertions | ✅ done | `1ac372d` |
-| T2-2 Extract `AppShell` (pure refactor) | ✅ done | `929f44c` |
-| T2-3 Convert six screens to routes | ✅ done | `76573c5` |
-| T2-4 Product pages, delete modal | ⚠️ **code done, visuals unverified** | `8debc9a` |
-| T2-5 Sitemap → 8 routes, `offers.url`, breadcrumbs | ⬜ not started | — |
-| T2-6 Two-viewport verification sweep | ⬜ not started | — |
+| T2-1 Extend harness to 85 assertions | ✅ | `1ac372d` |
+| T2-2 Extract `AppShell` (pure refactor) | ✅ | `929f44c` |
+| T2-3 Convert six screens to routes | ✅ | `76573c5` |
+| T2-4 Product pages, delete modal | ✅ | `8debc9a` |
+| T2-5 Sitemap → 8 routes, `offers.url`, breadcrumbs | ✅ | `5600d24` |
+| T2-6 Two-viewport verification sweep | ✅ | this commit |
 
-**Harness right now: `npm run seo:check` → 77 passed, 8 failed** (baseline was
-32/53). Run it against a **local** production build, never the live host — see
-the challenge-mode note below.
+**`npm run seo:check` → 85 passed, 0 failed, exit 0.** Baseline was 32/53.
+Run it against a **local** production build, never the live host — see the
+challenge-mode note below.
 
-### The 8 remaining reds, and what closes them
+### T2-6 sweep results
 
-Seven are `<route> is listed in the sitemap` — `app/sitemap.ts` still returns a
-single entry. **T2-5 closes all seven** by deriving the sitemap from
-`lib/routes.ts`.
+Mobile **375×812** and desktop **1440×900**, every route:
 
-The eighth is `indexable text across all routes exceeds 5000 chars — 4623 chars`.
-Be aware: **5000 was my guess when writing the harness, not a measured target.**
-Actual indexable text went 275 → 4623 characters, a 17× improvement, and T2-5
-adds structured data rather than visible copy so it will not move much. Decide
-deliberately: either lower the threshold to something honest like 4000, or add
-real copy. Do not quietly delete the check — it is the only assertion that
-measures whether Tier 2 achieved its actual purpose.
+- `body { overflow: hidden }` held on all 8 routes at both viewports — the iOS
+  scroll invariant survived the refactor
+- exactly one `.screen-scroll` container per route, remounting per navigation
+- no horizontal overflow at 375px anywhere
+- mobile: sticky bottom nav shown, desktop header nav hidden. Desktop: the
+  reverse, content centred at 1120px. Correct at both.
+- zero `[role=dialog]` anywhere — the modal is genuinely gone
+- client-side navigation works; breadcrumb returns to `/bars`; back/forward fine
+- Arabic toggle persists across route changes **and** across a full page load
+- WhatsApp CTAs carry correct per-product intents
+- legacy `/#wholesale` → `/wholesale` redirect works
+- zero console errors
 
-### ⚠️ T2-4 is committed but NOT visually verified
+Four suspected bugs were investigated and all four were measurement artifacts of
+the hidden browser pane (`naturalWidth: 0`, an apparently-3840px image, a
+seemingly-visible sticky nav on desktop, a missing LCP `priority`). Each was
+disproven before being reported. **Do not trust DOM measurements taken while
+`document.visibilityState === "hidden"`** — see the rAF gotcha below; the same
+trap applies to image decode and layout.
 
-The agent implementing it was interrupted after its file edits and before its
-browser step. Verified: `tsc` clean, `build` clean, `● /bars/[slug]` prerenders
-2 SSG pages, harness 77/8, no dangling `ProductDetailModal`/`openProduct` refs.
+### ⚠️ Known issue, NOT fixed: orphan pages
 
-**Never verified: nobody has looked at the product pages.** No screenshot, no
-viewport testing, no interaction sweep. The site owner's explicit requirement is
-*"thorough testing before any merging… mobile first site which should also look
-great on PC"* — that is T2-6 and it has not run.
+`/wholesale` has **zero inbound internal links** in server-rendered HTML, and
+`/about` has exactly one (the homepage "Our Story" CTA). The mobile menu does
+link them, but it lives inside an `AnimatePresence` and only exists in the DOM
+once opened — so crawlers never see those links.
 
-**Do not merge to `main` until T2-6 passes and Vivaan approves.**
+Both are in the sitemap, so Google will find them, but orphan pages receive no
+internal link equity and read as unimportant. `components/Footer.tsx` renders on
+only three screens and contains a copyright line, no links.
 
-### Next actions, in order
+**The fix is a footer nav linking all eight routes, rendered on every screen.**
+Not done because it is a visible design change and Vivaan approves those. Small
+and low-risk when he wants it.
 
-1. **T2-5** — `app/sitemap.ts` to 8 routes from `lib/routes.ts`; point
-   `offers.url` in `lib/seo.ts` at the product pages (currently both point at the
-   homepage, which is now wrong); add `BreadcrumbList` to product pages.
-   ⚠️ Keep the homepage sitemap entry as the **bare origin, no trailing slash** —
-   the harness derives the canonical and sitemap expectations identically, so a
-   trailing slash flips two checks red at once.
-2. **T2-6** — the verification sweep: 390×844 and 1440×900 across all 8 routes,
-   scroll invariant, no horizontal overflow, interaction sweep, screenshots.
-3. Update this section, then ask Vivaan before merging.
+### Also worth knowing
+
+**Indexable text is 4623 chars over 8 pages — about 580 per page, which is thin.**
+Tier 2 fixed the structural problem; routes cannot manufacture words. Further
+gains are a copywriting job. The harness floor is 4000, deliberately set below
+the real figure as a regression guard, with the reasoning written in the comment.
+
+### Next actions
+
+1. **Vivaan reviews and approves the merge.** Nothing has touched `main`.
+2. Optionally take the footer-nav fix above first.
+3. After merging: submit the updated 8-URL sitemap in Search Console and request
+   indexing for the new routes.
+4. **Tier 3** (`/ar` routes + hreflang) is the remaining SEO tier and now
+   unblocked — it depends on this routing work.
 
 ---
 
