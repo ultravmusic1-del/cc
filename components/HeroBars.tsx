@@ -110,7 +110,7 @@ export default function HeroBars() {
               <div data-momentum-target>
                 <Image
                   src={bar.src}
-                  alt={i === 1 ? c.products.cookie.imageAlt : ""}
+                  alt={i === 1 ? c.hero.imageAlt : ""}
                   aria-hidden={i !== 1}
                   width={785}
                   height={698}

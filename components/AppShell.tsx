@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { NavProvider, useNav } from "@/lib/store";
-import { LangProvider, useLang } from "@/lib/i18n";
+import { LangProvider, useLang, useT } from "@/lib/i18n";
 import { LEGACY_HASH_ROUTES } from "@/lib/routes";
 import { ScrollTrigger, registerGsap } from "@/lib/gsap";
 import { CurtainProvider } from "./motion/Curtain";
@@ -15,6 +15,7 @@ import MobileMenu from "./MobileMenu";
 function Shell({ children }: { children: ReactNode }) {
   const { overlay, closeOverlay } = useNav();
   const { lang } = useLang();
+  const t = useT();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -51,8 +52,13 @@ function Shell({ children }: { children: ReactNode }) {
   return (
     <>
       <SmoothScroll />
+      <a href="#main" className="skip-link">
+        {t.header.skipToContent}
+      </a>
       <Header />
-      <main className="grain relative">{children}</main>
+      <main id="main" tabIndex={-1} className="grain relative">
+        {children}
+      </main>
       <Footer />
       {overlay?.type === "menu" && <MobileMenu onClose={closeOverlay} />}
     </>

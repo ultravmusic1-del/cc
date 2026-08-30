@@ -13,7 +13,12 @@ import { CONTENT, type ContentBundle, type Lang } from "./content";
 // ── UI strings (component-level copy) ─────────────────────────
 export interface UIStrings {
   nav: { bars: string; nutrition: string; order: string; menu: string };
-  header: { openMenu: string; home: string; ordering: string };
+  header: {
+    openMenu: string;
+    home: string;
+    ordering: string;
+    skipToContent: string;
+  };
   menu: {
     aria: string;
     back: string;
@@ -165,6 +170,7 @@ const EN_UI: UIStrings = {
   nav: { bars: "Bars", nutrition: "Nutrition", order: "Order", menu: "Menu" },
   header: {
     openMenu: "Open menu",
+    skipToContent: "Skip to content",
     home: "Candy Couture — home",
     ordering: "Ordering information",
   },
@@ -331,6 +337,7 @@ const AR_UI: UIStrings = {
   },
   header: {
     openMenu: "فتح القائمة",
+    skipToContent: "تخطَّ إلى المحتوى",
     home: "كاندي كوتور — الرئيسية",
     ordering: "معلومات الطلب",
   },

@@ -45,7 +45,16 @@ export default function TransitionLink({
     }
 
     e.preventDefault();
-    await cover();
+
+    // Race the cover against a deadline. `await cover()` alone makes every
+    // navigation depend on a GSAP timeline resolving, and that timeline is
+    // rAF-driven — in a throttled tab, or if GSAP ever threw, clicking a link
+    // would silently do nothing at all. A link must always navigate; the
+    // animation is decoration on top of that, never a gate in front of it.
+    await Promise.race([
+      cover(),
+      new Promise((resolve) => window.setTimeout(resolve, 900)),
+    ]);
     router.push(target);
   };
 

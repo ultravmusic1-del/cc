@@ -131,7 +131,7 @@ export default function HomeScreen() {
                     src={b.icon}
                     className="h-14 w-14 shrink-0 text-brand-coral"
                   />
-                  <span className="text-[0.72rem] font-bold uppercase leading-tight tracking-[0.12em] text-brand-burgundy">
+                  <span className="text-[0.75rem] font-bold uppercase leading-tight tracking-[0.12em] text-brand-burgundy">
                     {b.title}
                   </span>
                 </div>

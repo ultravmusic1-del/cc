@@ -152,6 +152,44 @@
     color: var(--cream);
   }
 
+  /* Keyboard focus.
+     There were no author focus styles at all, which left the browser default:
+     Chrome paints a 1px amber ring, Safari and Firefox paint something else.
+     That is technically visible, but it is off-palette and inconsistent across
+     browsers. Taking the slab's own ink guarantees 10.75:1 against every
+     ground the ring can land on — the same pair the buttons use.
+     :focus-visible, not :focus, so a mouse click on a button does not leave a
+     ring behind. */
+  :focus-visible {
+    outline: 3px solid var(--slab-ink);
+    outline-offset: 3px;
+  }
+  /* Chrome does not always drop its own ring when only `outline` is set on a
+     replaced/inline element; this makes the override explicit. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Skip link — the first thing in the tab order, visible only once focused.
+     Without it a keyboard user tabs the wordmark, language toggle, menu button
+     and three nav pills before reaching any page content, on every route. */
+  .skip-link {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 3000;
+    transform: translateY(-120%);
+    background: var(--burgundy);
+    color: var(--cream);
+    padding: 0.85rem 1.35rem;
+    border-radius: 0 0 999px 0;
+    font-weight: 700;
+    transition: transform 0.2s var(--ease-couture);
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
   h1,
   h2,
   h3,
@@ -357,7 +395,9 @@
     font-family: var(--font-body), sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.26em;
-    font-size: 0.7rem;
+    /* 12px floor. Was 11.2px — uppercase at 0.26em tracking needs the size
+       back. Nothing on this site renders type below 12px. */
+    font-size: 0.75rem;
     font-weight: 700;
     color: var(--slab-ink-soft);
   }

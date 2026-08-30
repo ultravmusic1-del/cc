@@ -110,7 +110,7 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
             aria-label={t.menu.close}
             className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-brand-cream text-brand-burgundy transition-transform duration-300 ease-couture hover:scale-105"
           >
-            <X className="h-5 w-5" strokeWidth={2.5} />
+            <X className="h-5 w-5" strokeWidth={2} />
           </button>
         </div>
 

@@ -65,7 +65,7 @@ export default function ProductCard({
               </h3>
             </div>
             <span className="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-burgundy text-brand-cream transition-transform duration-300 ease-couture group-hover:rotate-45">
-              <ArrowUpRight className="h-4 w-4" strokeWidth={2.5} />
+              <ArrowUpRight className="h-4 w-4" strokeWidth={2} />
             </span>
           </div>
 
@@ -77,7 +77,7 @@ export default function ProductCard({
             {product.ingredientChips.slice(0, 3).map((chip) => (
               <span
                 key={chip}
-                className="rounded-full bg-brand-pink px-3 py-1.5 text-[0.68rem] font-bold leading-none"
+                className="rounded-full bg-brand-pink px-3 py-1.5 text-[0.75rem] font-bold leading-none"
               >
                 {chip}
               </span>

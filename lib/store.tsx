@@ -4,7 +4,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -35,14 +34,6 @@ const NavContext = createContext<Nav | null>(null);
  */
 export function NavProvider({ children }: { children: ReactNode }) {
   const [overlay, setOverlay] = useState<Overlay>(null);
-
-  // Own scroll position ourselves — stop the browser (esp. iOS Safari) from
-  // restoring a scroll offset on navigation. Belongs to the app-shell scroll
-  // model (body never scrolls; each screen is its own scroll container), not
-  // to the router, so it stays here even though routing left.
-  useEffect(() => {
-    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-  }, []);
 
   const openMenu = useCallback(() => setOverlay({ type: "menu" }), []);
   const openAboutDrawer = useCallback(

@@ -45,7 +45,7 @@ export interface ContentBundle {
     storyBody: string;
     storyClose: string;
   };
-  hero: { subtext: string };
+  hero: { subtext: string; imageAlt: string };
   heroBenefits: { icon: string; title: string }[];
   products: Record<ProductId, Product>;
   ordering: {
@@ -84,6 +84,8 @@ const EN: ContentBundle = {
   hero: {
     subtext:
       "Handcrafted in Bahrain with whole grain oats, dark chocolate, and real ingredients.",
+    imageAlt:
+      "A stack of Candy Couture oat bars, cut to show dark chocolate chunks, beside two bars in their packaging.",
   },
   heroBenefits: [
     { icon: "/images/icons/wholegrain-oats-v3.png", title: "Wholegrain Oats" },
@@ -197,6 +199,8 @@ const AR: ContentBundle = {
   hero: {
     subtext:
       "مصنوع يدويًا في البحرين من الشوفان الكامل والشوكولاتة الداكنة ومكوّنات حقيقية.",
+    imageAlt:
+      "ألواح شوفان كاندي كوتور مكدّسة ومقطوعة تُظهر قطع الشوكولاتة الداكنة، بجانب لوحين في تغليفهما.",
   },
   heroBenefits: [
     { icon: "/images/icons/wholegrain-oats-v3.png", title: "شوفان كامل الحبة" },

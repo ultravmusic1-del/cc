@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger, registerGsap, prefersReducedMotion } from "@/lib/gsap";
@@ -57,10 +57,30 @@ export default function SmoothScroll() {
 
   // A new route means a new page of content: go to the top without animating,
   // then let ScrollTrigger re-measure against the new document height.
+  // Back and forward are not new pages — they are a return to somewhere the
+  // visitor has already been, and they expect to land where they left off.
+  // Scrolling to the top unconditionally meant browsing halfway down /bars,
+  // opening a product and pressing Back put you at the top of /bars again.
+  // `history.scrollRestoration` is left at its "auto" default (the previous
+  // "manual" override belonged to the removed app-shell model), so the browser
+  // restores the offset on a pop and we simply stay out of its way.
+  const cameFromHistory = useRef(false);
   useEffect(() => {
-    const lenis = window.__lenis;
-    if (lenis) lenis.scrollTo(0, { immediate: true });
-    else window.scrollTo(0, 0);
+    const onPop = () => {
+      cameFromHistory.current = true;
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  useEffect(() => {
+    if (cameFromHistory.current) {
+      cameFromHistory.current = false;
+    } else {
+      const lenis = window.__lenis;
+      if (lenis) lenis.scrollTo(0, { immediate: true });
+      else window.scrollTo(0, 0);
+    }
 
     // Images and fonts settle a frame or two after mount and change the page
     // height under ScrollTrigger's feet; refresh once they have.

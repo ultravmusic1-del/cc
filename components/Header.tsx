@@ -83,7 +83,7 @@ export default function Header() {
             aria-label={t.header.openMenu}
             className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-brand-burgundy text-brand-cream shadow-drop transition-transform duration-300 ease-couture hover:scale-105"
           >
-            <Menu className="h-5 w-5" strokeWidth={2.5} />
+            <Menu className="h-5 w-5" strokeWidth={2} />
           </button>
         </div>
       </div>

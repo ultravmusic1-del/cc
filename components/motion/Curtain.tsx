@@ -81,7 +81,13 @@ export function CurtainProvider({ children }: { children: ReactNode }) {
           "55%": { drawSVG: "0% 100%", attr: { "stroke-width": THIN * 2.5 } },
           "100%": { drawSVG: "0% 100%", attr: { "stroke-width": FLOOD } },
         },
-        duration: 1.1,
+        // 0.62s, not the 1.1s this started at. The curtain runs twice per
+        // navigation — cover, then reveal — so its duration is paid double on
+        // every single link click. At 1.1s that was ~2.2s of waiting between
+        // pages on an eight-page site whose whole job is getting someone to a
+        // WhatsApp order. The reveal is additionally sped up (see below), which
+        // lands the round trip near 1s while keeping the gesture legible.
+        duration: 0.62,
         ease: "couture",
       },
       0,
@@ -93,10 +99,10 @@ export function CurtainProvider({ children }: { children: ReactNode }) {
         scale: 1,
         rotate: 0,
         autoAlpha: 1,
-        duration: 0.65,
+        duration: 0.5,
         ease: "elastic.out(1, 0.72)",
       },
-      0.55,
+      0.3,
     );
 
     return tl;
@@ -159,7 +165,7 @@ export function CurtainProvider({ children }: { children: ReactNode }) {
     if (!tl) return Promise.resolve();
     return new Promise<void>((resolve) => {
       tl.eventCallback("onComplete", () => resolve());
-      tl.play();
+      tl.timeScale(1).play();
     });
   }, [getTl]);
 
@@ -178,12 +184,15 @@ export function CurtainProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Jump to fully-covered, then run the same timeline backwards.
+    // Jump to fully-covered, then run the same timeline backwards at 1.5x.
+    // Uncovering is the half the visitor is waiting on — the content is
+    // already there, the curtain is just in the way — so it should not take as
+    // long as the deliberate wipe that got them here.
     tl.eventCallback("onComplete", null);
     tl.progress(1).eventCallback("onReverseComplete", () => {
       gsap.set(rootRef.current, { autoAlpha: 0, pointerEvents: "none" });
     });
-    tl.reverse();
+    tl.timeScale(1.5).reverse();
   }, [getTl, armFailsafe]);
 
   const api = useMemo(() => ({ cover, reveal }), [cover, reveal]);
