@@ -52,7 +52,7 @@ export default function ProductScreen({ productId }: { productId: ProductId }) {
         shapes="a"
         shapeColor="var(--cream)"
         shapeOpacity={0.8}
-        innerClassName="pt-32 lg:pt-36"
+        innerClassName="pt-[calc(var(--chrome-h)+1.5rem)] lg:pt-[calc(var(--chrome-h)+2.5rem)]"
       >
         <TransitionLink
           href={ROUTES.bars}

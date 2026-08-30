@@ -65,7 +65,7 @@ export default function Header() {
         <TransitionLink
           href={ROUTES.home}
           aria-label={t.header.home}
-          className="pointer-events-auto chrome-pill inline-flex items-center rounded-full px-4 py-2.5"
+          className="pointer-events-auto chrome-pill inline-flex min-h-11 items-center rounded-full px-4"
         >
           <span className="font-display text-lg font-black leading-none tracking-tight text-brand-burgundy">
             Candy
@@ -93,9 +93,16 @@ export default function Header() {
         aria-label="Primary"
         className="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center px-gutter pt-[4.75rem] lg:pt-gutter"
       >
+        {/* max-w-full + overflow-x-auto: the Arabic labels are much longer than
+            the English ones and pushed this cluster to 353px inside 351px of
+            available width. Two pixels was enough to give the whole page a
+            horizontal overflow and shove the fixed chrome off the left edge.
+            Capping the width contains it here instead of leaking into the page,
+            and the scroll is the fallback for narrower phones than the 375px
+            this was measured at. */}
         <div
           data-nav-cluster
-          className="pointer-events-auto chrome-pill flex items-center gap-1 rounded-full p-1.5 will-change-transform"
+          className="no-scrollbar pointer-events-auto chrome-pill flex max-w-full items-center gap-1 overflow-x-auto rounded-full p-1.5 will-change-transform"
         >
           {items.map((item) => {
             const active = pathname === item.href;
@@ -104,7 +111,10 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`rounded-full px-4 py-2 text-[0.82rem] font-bold leading-none transition-colors duration-300 ease-couture ${
+                // min-h-11: this cluster is the primary navigation and spends
+                // most of the page floating at the bottom edge, in thumb
+                // reach. It measured 29px tall, which is too small to hit.
+                className={`inline-flex min-h-11 shrink-0 items-center rounded-full px-3 text-[0.82rem] font-bold leading-none transition-colors duration-300 ease-couture sm:px-4 ${
                   active
                     ? "bg-brand-burgundy text-brand-cream"
                     : "text-brand-burgundy hover:bg-brand-pink"

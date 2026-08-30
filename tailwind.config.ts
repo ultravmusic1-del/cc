@@ -76,7 +76,7 @@ const config: Config = {
       },
       spacing: {
         gutter: "var(--gutter)",
-        header: "var(--header-h)",
+        chrome: "var(--chrome-h)",
       },
       maxWidth: {
         measure: "var(--measure)",

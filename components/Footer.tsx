@@ -88,12 +88,17 @@ export default function Footer() {
           {columns.map((col) => (
             <nav key={col.title} aria-label={col.title}>
               <p className="eyebrow">{col.title}</p>
-              <ul className="mt-4 space-y-2.5">
+              {/* Links are inline-block with vertical padding so each is ~36px
+                  tall. They measured 20px, under the 24px WCAG 2.5.8 minimum.
+                  36 rather than 44 here: this is a dense utility list, and a
+                  column of eight 44px rows makes the footer enormous on a
+                  phone. Primary nav and CTAs do get the full 44. */}
+              <ul className="mt-2 space-y-0.5">
                 {col.links.map((link) => (
                   <li key={link.href + link.label}>
                     <TransitionLink
                       href={link.href}
-                      className="text-[0.95rem] leading-snug transition-colors duration-300 ease-couture hover:text-[var(--slab-accent)]"
+                      className="inline-block py-2 text-[0.95rem] leading-snug transition-colors duration-300 ease-couture hover:text-[var(--slab-accent)]"
                     >
                       {link.label}
                     </TransitionLink>
@@ -110,7 +115,7 @@ export default function Footer() {
           </p>
           <a
             href={`mailto:${CONTACT.email}`}
-            className="transition-colors duration-300 ease-couture hover:text-[var(--slab-accent)]"
+            className="inline-block py-2 transition-colors duration-300 ease-couture hover:text-[var(--slab-accent)]"
           >
             {CONTACT.email}
           </a>

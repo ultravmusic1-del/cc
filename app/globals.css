@@ -78,7 +78,16 @@
   --ease-couture: cubic-bezier(0.625, 0.05, 0, 1);
   --ease-energy: cubic-bezier(0.32, 0.72, 0, 1);
 
-  --header-h: 4.5rem;
+  /* Where the fixed chrome ends, measured from the top of the viewport.
+     On phones the chrome stacks — wordmark row, then the nav cluster on a
+     second line — so content has to clear the LOWER of the two:
+       gutter 0.75 + wordmark 2.75 = 3.5rem, cluster starts at 4.75rem
+       and is 2.75rem tall + 0.75rem padding = 8.25rem.
+     Anything opening a page pads down from this rather than hard-coding a
+     number, because the cluster's height moved once already: raising the nav
+     pills to a 44px touch target grew it 15px and it landed on the hero
+     eyebrow. */
+  --chrome-h: 8.25rem;
 }
 
 @media (min-width: 768px) {
@@ -94,7 +103,8 @@
     --gutter: 1.5rem;
     --slab-radius: 5rem;
     --pad-x: 4rem;
-    --header-h: 5.5rem;
+    /* One row on desktop: the cluster sits beside the wordmark, not below it. */
+    --chrome-h: 5rem;
   }
 }
 
@@ -117,7 +127,13 @@
     font-family: var(--font-body), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    overflow-x: hidden;
+    /* `clip`, not `hidden`. `hidden` makes this a scroll container, and in RTL
+       the hero art that deliberately hangs off the left edge then counts as
+       scrollable overflow — the page kept its 375px width but the whole
+       document was offset 20px, pushing the fixed chrome off-screen. `clip`
+       clips without ever becoming scrollable, and unlike `hidden` it does not
+       force the other axis away from `visible`. */
+    overflow-x: clip;
   }
 
   html.lenis,
@@ -173,6 +189,10 @@
     background: var(--slab-bg);
     color: var(--slab-ink);
     isolation: isolate;
+    /* Contain decorative horizontal overflow — the hero bars are positioned to
+       hang past the column edges on purpose — inside the section that owns it,
+       rather than letting it reach the document and widen the page. */
+    overflow-x: clip;
   }
 
   .slab--cream {
@@ -347,9 +367,14 @@
 
   /* ── Pills & buttons ─────────────────────────────────────────────
      Everything round. The reference has no square corners anywhere. */
+  /* min-height, not just padding: the ghost variants were landing at 43px,
+     a pixel under the 44px touch target every mobile guideline asks for, and
+     padding alone leaves that dependent on the font's line box. */
   .pill {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
     gap: 0.5rem;
     border-radius: 999px;
     font-weight: 700;

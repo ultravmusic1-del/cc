@@ -33,7 +33,7 @@ export default function PageHero({
       shapes={shapes}
       shapeColor="var(--pink)"
       shapeOpacity={0.75}
-      innerClassName="pt-36 lg:pt-40"
+      innerClassName="pt-[calc(var(--chrome-h)+1.5rem)] lg:pt-[calc(var(--chrome-h)+2.5rem)]"
     >
       <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
         <div>

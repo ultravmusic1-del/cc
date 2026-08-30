@@ -40,7 +40,7 @@ export default function HomeScreen() {
         className="min-h-[100svh]"
         // 1.25/0.75 rather than an even split: the headline needs the room, and
         // the bars read better crowded into a corner than centred in a column.
-        innerClassName="flex min-h-[100svh] flex-col justify-center gap-10 pt-28 lg:grid lg:grid-cols-[1.25fr_0.75fr] lg:items-center lg:gap-8"
+        innerClassName="flex min-h-[100svh] flex-col justify-center gap-10 pt-[calc(var(--chrome-h)+1.5rem)] lg:grid lg:grid-cols-[1.25fr_0.75fr] lg:items-center lg:gap-8"
       >
         <div className="relative z-10">
           <p className="eyebrow">{t.home.eyebrow}</p>

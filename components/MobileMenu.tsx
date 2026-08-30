@@ -165,7 +165,7 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
             <WhatsAppButton />
             <a
               href={`mailto:${CONTACT.email}`}
-              className="text-[0.85rem] text-[var(--slab-ink-soft)] transition-colors duration-300 ease-couture hover:text-[var(--slab-accent)]"
+              className="inline-block py-2 text-[0.85rem] text-[var(--slab-ink-soft)] transition-colors duration-300 ease-couture hover:text-[var(--slab-accent)]"
             >
               {CONTACT.email}
             </a>
