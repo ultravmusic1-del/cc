@@ -1,42 +1,91 @@
 import type { Config } from "tailwindcss";
 
+/**
+ * Two colour groups here, and the distinction matters:
+ *
+ *   `brand.*`  — the literal palette. Use when a colour is fixed regardless
+ *                of surroundings (the burgundy curtain, a coral blob).
+ *   `slab.*`   — context colours published by the enclosing `.slab--*`.
+ *                Use for anything that must recolour itself depending on
+ *                which slab it lands in (nearly all text and buttons).
+ *
+ * Reaching for `brand.cream` on text is usually a bug: it will be invisible
+ * the moment that component is dropped onto a cream slab.
+ */
 const config: Config = {
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
     "./lib/**/*.{ts,tsx}",
   ],
+  /**
+   * Slab tone classes are built as `slab--${tone}`, so the literal strings
+   * never appear in the source and Tailwind drops them from @layer components
+   * as unused. That failed silently and very convincingly: every slab rendered
+   * cream except burgundy, which survived only because Footer, MobileMenu and
+   * not-found happen to spell it out. Keep this list in sync with SlabTone.
+   */
+  safelist: [
+    "slab--cream",
+    "slab--beige",
+    "slab--pink",
+    "slab--coral",
+    "slab--olive",
+    "slab--burgundy",
+  ],
   theme: {
     extend: {
       colors: {
-        burgundy: {
-          DEFAULT: "#611224",
-          deep: "#4a0d1b",
-          dark: "#3a0a15",
-          soft: "#71182b",
+        brand: {
+          burgundy: "var(--burgundy)",
+          "burgundy-soft": "var(--burgundy-soft)",
+          "burgundy-deep": "var(--burgundy-deep)",
+          "burgundy-dark": "var(--burgundy-dark)",
+          coral: "var(--coral)",
+          olive: "var(--olive)",
+          pink: "var(--pink)",
+          "pink-soft": "var(--pink-soft)",
+          "pink-pale": "var(--pink-pale)",
+          beige: "var(--beige)",
+          cream: "var(--cream)",
         },
-        coral: "#ec5b45",
-        olive: "#9f9536",
-        pink: "#e9adbe",
-        beige: "#e3d2c2",
-        cream: "#f4e8dc",
+        slab: {
+          bg: "var(--slab-bg)",
+          ink: "var(--slab-ink)",
+          "ink-soft": "var(--slab-ink-soft)",
+          accent: "var(--slab-accent)",
+          note: "var(--slab-note)",
+          rule: "var(--slab-rule)",
+          "cta-bg": "var(--slab-cta-bg)",
+          "cta-ink": "var(--slab-cta-ink)",
+        },
       },
       fontFamily: {
-        display: ["var(--font-display)", "Georgia", "serif"],
-        heading: ["var(--font-heading)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
         body: ["var(--font-body)", "system-ui", "sans-serif"],
-      },
-      boxShadow: {
-        card: "0 24px 60px -30px rgba(20, 4, 9, 0.85)",
-        float: "0 40px 80px -24px rgba(15, 3, 7, 0.75)",
-        pill: "0 10px 30px -12px rgba(236, 91, 69, 0.55)",
+        note: ["var(--font-note)", "cursive"],
+        couture: ["var(--font-couture)", "Georgia", "serif"],
       },
       borderRadius: {
-        xl2: "1.75rem",
-        xl3: "2rem",
+        slab: "var(--slab-radius)",
+        card: "clamp(1.25rem, 3vw, 2.25rem)",
+      },
+      spacing: {
+        gutter: "var(--gutter)",
+        header: "var(--header-h)",
+      },
+      maxWidth: {
+        measure: "var(--measure)",
       },
       transitionTimingFunction: {
-        luxe: "cubic-bezier(0.22, 1, 0.36, 1)",
+        couture: "cubic-bezier(0.625, 0.05, 0, 1)",
+        energy: "cubic-bezier(0.32, 0.72, 0, 1)",
+      },
+      boxShadow: {
+        // Contact shadows for objects that "sit" on a slab. Burgundy-tinted
+        // rather than neutral black so shadows stay inside the palette.
+        drop: "0 26px 50px -24px color-mix(in srgb, var(--burgundy) 55%, transparent)",
+        lift: "0 40px 80px -32px color-mix(in srgb, var(--burgundy) 60%, transparent)",
       },
     },
   },

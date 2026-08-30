@@ -1,65 +1,77 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Boxes, Gift, MapPin, Store } from "lucide-react";
-import ScreenShell from "../ScreenShell";
+import Slab from "../Slab";
+import PageHero from "../PageHero";
+import PlopIn from "../motion/PlopIn";
+import SplitReveal from "../motion/SplitReveal";
+import Marquee from "../motion/Marquee";
 import WhatsAppButton from "../ui/WhatsAppButton";
-import Footer from "../Footer";
-import { useT } from "@/lib/i18n";
+import { useContent, useT } from "@/lib/i18n";
 
-const icons = [Store, Boxes, Gift, MapPin];
+const ICONS = [Store, Boxes, Gift, MapPin];
 
 export default function WholesaleScreen() {
+  const c = useContent();
   const t = useT();
-  const points = t.wholesale.p.map((p, i) => ({ ...p, icon: icons[i] }));
+  const points = t.wholesale.p.map((p, i) => ({ ...p, Icon: ICONS[i] }));
 
   return (
-    <ScreenShell>
-      <header className="text-center">
-        <p className="eyebrow text-[rgba(233,173,190,0.8)]">
-          {t.wholesale.eyebrow}
-        </p>
-        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream lg:text-[2.75rem]">
-          {t.wholesale.title}
-        </h1>
-        <p className="mt-2 text-[0.9rem] text-[rgba(227,210,194,0.72)]">
-          {t.wholesale.subtitle}
-        </p>
-      </header>
+    <>
+      <PageHero
+        eyebrow={t.wholesale.eyebrow}
+        title={t.wholesale.title}
+        note={t.wholesale.subtitle}
+      />
 
-      <div className="mt-6 flex flex-col gap-3 lg:mt-10 lg:grid lg:grid-cols-2 lg:gap-5">
-        {points.map((p, i) => (
-          <motion.div
-            key={p.t}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.06 * i, ease: [0.22, 1, 0.36, 1] }}
-            className="glass-card flex items-center gap-4 rounded-2xl px-4 py-4 lg:px-6 lg:py-6"
-          >
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[rgba(233,173,190,0.35)]">
-              <p.icon className="h-5 w-5 text-pink" strokeWidth={1.5} />
-            </span>
-            <span className="flex-1">
-              <span className="block font-heading text-[1.02rem] font-semibold text-cream">
-                {p.t}
-              </span>
-              <span className="block text-[0.78rem] text-[rgba(227,210,194,0.64)]">
-                {p.n}
-              </span>
-            </span>
-          </motion.div>
-        ))}
-      </div>
+      <Slab tone="pink" inset stack shapes="b" shapeColor="var(--cream)">
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {points.map((point, i) => (
+            <PlopIn
+              as="li"
+              key={point.t}
+              delay={i * 0.07}
+              settle={i % 2 === 0 ? -2 : 2.4}
+            >
+              <div className="card flex h-full items-center gap-5 px-6 py-6 shadow-drop">
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-pink">
+                  <point.Icon
+                    className="h-6 w-6 text-brand-burgundy"
+                    strokeWidth={2}
+                    aria-hidden
+                  />
+                </span>
+                <span className="flex-1">
+                  <span className="block font-display text-[1.15rem] font-black leading-tight text-brand-burgundy">
+                    {point.t}
+                  </span>
+                  <span className="mt-1 block text-[0.88rem] text-[color-mix(in_srgb,var(--burgundy)_72%,transparent)]">
+                    {point.n}
+                  </span>
+                </span>
+              </div>
+            </PlopIn>
+          ))}
+        </ul>
+      </Slab>
 
-      <p className="mt-6 text-center text-[0.85rem] leading-relaxed text-[rgba(227,210,194,0.72)] lg:mx-auto lg:max-w-[62ch]">
-        {t.wholesale.closing}
-      </p>
+      <Slab tone="coral" as="div" innerClassName="!py-0 !px-0 !max-w-none">
+        <Marquee
+          items={[t.wholesale.subtitle, c.brand.location, t.wholesale.title]}
+          className="py-6"
+          speed={32}
+          reverse
+        />
+      </Slab>
 
-      <div className="mx-auto mt-4 w-full max-w-[24rem]">
-        <WhatsAppButton intent="wholesale" label={t.wholesale.enquire} />
-      </div>
-
-      <Footer />
-    </ScreenShell>
+      <Slab tone="burgundy" shapes="a" shapeColor="var(--pink)" shapeOpacity={0.4}>
+        <div className="flex flex-col items-center gap-7 text-center">
+          <SplitReveal as="h2" className="display-m font-display font-black">
+            {t.wholesale.closing}
+          </SplitReveal>
+          <WhatsAppButton intent="wholesale" label={t.wholesale.enquire} />
+        </div>
+      </Slab>
+    </>
   );
 }

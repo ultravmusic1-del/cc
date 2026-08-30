@@ -20,18 +20,18 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="stage-bg flex min-h-[100dvh] flex-col items-center justify-center px-6 text-center">
+    <div className="slab slab--burgundy flex min-h-[100dvh] flex-col items-center justify-center px-6 text-center">
       <div className="relative z-10 flex max-w-sm flex-col items-center">
-        <p className="eyebrow text-[rgba(233,173,190,0.8)]">Something went wrong</p>
-        <h1 className="mt-3 font-heading text-2xl font-semibold text-cream">
+        <p className="eyebrow ">Something went wrong</p>
+        <h1 className="mt-3 font-display text-3xl font-black tracking-tight">
           A small hiccup on our end
         </h1>
-        <p className="mt-2 text-[0.9rem] leading-relaxed text-[rgba(227,210,194,0.72)]">
+        <p className="mt-2 text-[0.9rem] leading-relaxed text-[var(--slab-ink-soft)]">
           The page hit an unexpected error. Try again — your place is kept.
         </p>
         <button
           onClick={reset}
-          className="btn-coral mt-6 inline-flex items-center justify-center rounded-full px-7 py-3 text-[0.9rem] font-semibold tracking-wide"
+          className="pill pill--solid mt-7 px-7 py-3.5"
         >
           Try again
         </button>

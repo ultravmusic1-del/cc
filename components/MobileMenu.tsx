@@ -1,342 +1,177 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence, useIsPresent } from "framer-motion";
-import {
-  X,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUpRight,
-  Leaf,
-  Sprout,
-  Heart,
-  Lock,
-  Mail,
-  Instagram,
-  MessageCircle,
-} from "lucide-react";
-import Logo from "./Logo";
-import { useNav, type AboutDrawerId } from "@/lib/store";
-import { ROUTES, type RouteKey } from "@/lib/routes";
+import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { X } from "lucide-react";
+import TransitionLink from "./TransitionLink";
+import WhatsAppButton from "./ui/WhatsAppButton";
+import { gsap, registerGsap, prefersReducedMotion } from "@/lib/gsap";
+import { ROUTES, productPath } from "@/lib/routes";
 import { CONTACT } from "@/lib/content";
-import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
-import { useT, useLang } from "@/lib/i18n";
+import { useContent, useT, useLang } from "@/lib/i18n";
 
-type MenuLevel = "main" | "about" | "contact";
-
-/** Created once at module scope — re-creating a motion component during render
-    remounts it and loses the animation state. */
-const MotionLink = motion.create(Link);
-
-const mainItems: {
-  id: RouteKey | "about-expand" | "contact-expand";
-  key: "home" | "bars" | "nutrition" | "about" | "ordering" | "wholesale" | "contact";
-}[] = [
-  { id: "home", key: "home" },
-  { id: "bars", key: "bars" },
-  { id: "nutrition", key: "nutrition" },
-  { id: "about-expand", key: "about" },
-  { id: "ordering", key: "ordering" },
-  { id: "wholesale", key: "wholesale" },
-  { id: "contact-expand", key: "contact" },
-];
-
-const contactItems: {
-  key: "email" | "instagram" | "whatsapp";
-  value: string;
-  href: string;
-  icon: typeof Mail;
-}[] = [
-  {
-    key: "email",
-    value: CONTACT.email,
-    href: `mailto:${CONTACT.email}`,
-    icon: Mail,
-  },
-  {
-    key: "instagram",
-    value: CONTACT.instagram,
-    href: CONTACT.instagramUrl,
-    icon: Instagram,
-  },
-  {
-    key: "whatsapp",
-    value: CONTACT.whatsapp,
-    href: `https://wa.me/${WHATSAPP_NUMBER}`,
-    icon: MessageCircle,
-  },
-];
-
-const aboutItems: {
-  id: AboutDrawerId | "soon";
-  key: "aboutUs" | "philosophy" | "gifting" | "testimonials";
-  icon: typeof Leaf;
-  soon?: boolean;
-}[] = [
-  { id: "about-us", key: "aboutUs", icon: Leaf },
-  { id: "philosophy", key: "philosophy", icon: Sprout },
-  { id: "gifting", key: "gifting", icon: Heart },
-  { id: "soon", key: "testimonials", icon: Lock, soon: true },
-];
-
-const listStagger = {
-  animate: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
-};
-const rowRise = {
-  initial: { opacity: 0, y: 18 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
-};
-
+/**
+ * Full-screen menu.
+ *
+ * Focus is trapped while it is open and returned to whatever opened it on
+ * close, because this covers the whole page — a keyboard user tabbing past the
+ * last link would otherwise land on the site behind it with no way back.
+ */
 export default function MobileMenu({ onClose }: { onClose: () => void }) {
-  const { openAboutDrawer } = useNav();
-  const router = useRouter();
+  const c = useContent();
   const t = useT();
   const { lang, setLang } = useLang();
-  const [level, setLevel] = useState<MenuLevel>("main");
-  // Once dismissed, stop intercepting clicks immediately — even if the exit
-  // animation stalls (e.g. RAF-throttled), so it can never wedge the page.
-  const isPresent = useIsPresent();
+  const pathname = usePathname();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
 
-  // Scroll lock is handled centrally in App's Shell (keyed on any overlay
-  // being open). This effect only wires up Escape-to-close.
+  const links = [
+    { href: ROUTES.home, label: t.menu.items.home },
+    { href: ROUTES.bars, label: t.menu.items.bars },
+    { href: productPath("cookie"), label: c.products.cookie.name },
+    { href: productPath("protein"), label: c.products.protein.name },
+    { href: ROUTES.nutrition, label: t.menu.items.nutrition },
+    { href: ROUTES.ordering, label: t.menu.items.ordering },
+    { href: ROUTES.wholesale, label: t.menu.items.wholesale },
+    { href: ROUTES.about, label: t.menu.items.about },
+  ];
+
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    openerRef.current = document.activeElement as HTMLElement | null;
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    registerGsap();
+
+    const focusables = panel.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled])',
+    );
+    focusables[0]?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || focusables.length === 0) return;
+
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+
+    const ctx = gsap.context(() => {
+      if (prefersReducedMotion()) return;
+      gsap.from(panel, { yPercent: -100, duration: 0.7, ease: "couture" });
+      gsap.from("[data-menu-item]", {
+        opacity: 0,
+        y: 26,
+        duration: 0.6,
+        stagger: 0.045,
+        delay: 0.18,
+        ease: "couture",
+      });
+    }, panel);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      ctx.revert();
+      openerRef.current?.focus();
+    };
   }, [onClose]);
 
-  // These both navigate and open a drawer, so they stay buttons: the drawer is
-  // overlay state the URL does not carry. openAboutDrawer replaces the menu
-  // overlay, which is what closes the menu here.
-  const openDrawer = (id: AboutDrawerId) => {
-    router.push(ROUTES.about);
-    openAboutDrawer(id);
-  };
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.28 }}
-      style={{ pointerEvents: isPresent ? undefined : "none" }}
-      className="stage-bg fixed inset-0 z-[60] flex flex-col"
+    <div
       role="dialog"
       aria-modal="true"
       aria-label={t.menu.aria}
+      ref={panelRef}
+      className="slab slab--burgundy fixed inset-0 z-[1200] overflow-y-auto"
     >
-
-      {/* top bar */}
-      <div className="relative z-10 flex items-center justify-between px-4 pt-safe">
-        <div className="flex h-16 items-center">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.button
-              key={level}
-              initial={{ opacity: 0, x: -6 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -6 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => (level !== "main" ? setLevel("main") : onClose())}
-              aria-label={level !== "main" ? t.menu.back : t.menu.close}
-              className="flex h-10 w-10 items-center justify-center rounded-full text-cream/90 transition-colors hover:bg-white/5"
-            >
-              {level !== "main" ? (
-                <ArrowLeft className="h-6 w-6 rtl:-scale-x-100" strokeWidth={1.5} />
-              ) : (
-                <X className="h-6 w-6" strokeWidth={1.5} />
-              )}
-            </motion.button>
-          </AnimatePresence>
+      <div className="flex min-h-full flex-col px-gutter py-gutter">
+        <div className="flex items-center justify-between">
+          <p className="font-display text-lg font-black leading-none tracking-tight">
+            Candy
+            <span className="ml-1.5 font-couture italic text-[var(--slab-accent)]">
+              Couture
+            </span>
+          </p>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t.menu.close}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-brand-cream text-brand-burgundy transition-transform duration-300 ease-couture hover:scale-105"
+          >
+            <X className="h-5 w-5" strokeWidth={2.5} />
+          </button>
         </div>
 
-        <div className="translate-y-[2px]">
-          <Logo size="sm" />
-        </div>
-
-        <div className="h-10 w-10" />
-      </div>
-
-      <div className="relative z-10 mx-4 mt-1 hairline" />
-
-      {/* levels — scroll vertically when the list is taller than the viewport
-          (e.g. short phones or when the mobile browser toolbar is showing) so
-          the last row (Contact) is never clipped. min-h-0 lets this flex child
-          shrink; overflow-x stays hidden for the level slide animation. */}
-      <div className="soft-scroll relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-4">
-        <AnimatePresence mode="wait" initial={false}>
-          {level === "main" && (
-            <motion.nav
-              key="main"
-              variants={listStagger}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0, transition: { staggerChildren: 0.06, delayChildren: 0.05 } }}
-              exit={{ opacity: 0, x: -30, transition: { duration: 0.2 } }}
-              className="flex flex-col px-6 pt-6 lg:mx-auto lg:w-full lg:max-w-[640px] lg:pt-10"
-            >
-              {mainItems.map((item) => {
-                const expands =
-                  item.id === "about-expand" || item.id === "contact-expand";
-                const rowClass =
-                  "group flex items-center justify-between border-b border-[var(--hairline)] py-5 text-start";
-                const rowInner = (
-                  <>
-                    <span className="font-display text-[2.1rem] font-medium leading-none text-cream transition-colors group-hover:text-pink">
-                      {t.menu.items[item.key]}
-                    </span>
-                    <ArrowRight className="h-6 w-6 text-coral transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />
-                  </>
-                );
-
-                // The two "expand" rows push a deeper menu level rather than
-                // navigating, so they stay buttons; every other row is a real
-                // destination and must be a crawlable link.
-                return expands ? (
-                  <motion.button
-                    key={item.id}
-                    variants={rowRise}
-                    onClick={() =>
-                      setLevel(item.id === "about-expand" ? "about" : "contact")
-                    }
-                    className={rowClass}
-                  >
-                    {rowInner}
-                  </motion.button>
-                ) : (
-                  <MotionLink
-                    key={item.id}
-                    variants={rowRise}
-                    href={ROUTES[item.id as RouteKey]}
+        <nav aria-label={t.menu.aria} className="mt-auto pt-16">
+          <ul>
+            {links.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <li key={link.href} data-menu-item>
+                  <TransitionLink
+                    href={link.href}
                     onClick={onClose}
-                    className={rowClass}
+                    aria-current={active ? "page" : undefined}
+                    className={`block py-2 font-display text-[clamp(2rem,8vw,4rem)] font-black leading-[1.05] tracking-tight transition-colors duration-300 ease-couture hover:text-[var(--slab-accent)] ${
+                      active ? "text-[var(--slab-accent)]" : ""
+                    }`}
                   >
-                    {rowInner}
-                  </MotionLink>
-                );
-              })}
-            </motion.nav>
-          )}
+                    {link.label}
+                  </TransitionLink>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
 
-          {level === "about" && (
-            <motion.nav
-              key="about"
-              initial={{ opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0, transition: { staggerChildren: 0.06, delayChildren: 0.05 } }}
-              exit={{ opacity: 0, x: 30, transition: { duration: 0.2 } }}
-              className="flex flex-col px-6 pt-6 lg:mx-auto lg:w-full lg:max-w-[640px] lg:pt-10"
-            >
-              <motion.p
-                variants={rowRise}
-                initial="initial"
-                animate="animate"
-                className="eyebrow mb-2 text-[rgba(233,173,190,0.7)]"
-              >
-                {t.menu.aboutHeader}
-              </motion.p>
-              {aboutItems.map((item) => (
-                <motion.button
-                  key={item.id}
-                  variants={rowRise}
-                  disabled={item.soon}
-                  onClick={() =>
-                    !item.soon && openDrawer(item.id as AboutDrawerId)
-                  }
-                  className={`group flex items-center gap-4 border-b border-[var(--hairline)] py-4 text-start ${
-                    item.soon ? "opacity-55" : ""
+        <div
+          data-menu-item
+          className="mt-auto flex flex-col gap-6 pt-14 sm:flex-row sm:items-end sm:justify-between"
+        >
+          <div className="flex flex-col gap-3">
+            <span className="eyebrow">{t.menu.language}</span>
+            <div className="flex gap-2">
+              {(["en", "ar"] as const).map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  onClick={() => setLang(l)}
+                  aria-pressed={lang === l}
+                  className={`rounded-full px-5 py-2.5 text-[0.85rem] font-bold leading-none transition-colors duration-300 ease-couture ${
+                    lang === l
+                      ? "bg-brand-cream text-brand-burgundy"
+                      : "border border-[var(--slab-rule)]"
                   }`}
                 >
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[rgba(159,149,54,0.4)]">
-                    <item.icon className="h-5 w-5 text-olive" strokeWidth={1.5} />
-                  </span>
-                  <span className="flex-1">
-                    <span className="block font-heading text-[1.35rem] font-medium text-cream">
-                      {t.menu.about[item.key]}
-                    </span>
-                    {item.soon && (
-                      <span className="text-[0.72rem] text-[rgba(227,210,194,0.55)]">
-                        {t.menu.comingSoon}
-                      </span>
-                    )}
-                  </span>
-                  {!item.soon && (
-                    <ArrowRight className="h-5 w-5 text-coral transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />
-                  )}
-                </motion.button>
+                  {l === "en" ? t.menu.langEnglish : t.menu.langArabic}
+                </button>
               ))}
-            </motion.nav>
-          )}
+            </div>
+          </div>
 
-          {level === "contact" && (
-            <motion.nav
-              key="contact"
-              initial={{ opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0, transition: { staggerChildren: 0.06, delayChildren: 0.05 } }}
-              exit={{ opacity: 0, x: 30, transition: { duration: 0.2 } }}
-              className="flex flex-col px-6 pt-6 lg:mx-auto lg:w-full lg:max-w-[640px] lg:pt-10"
+          <div className="flex flex-col items-start gap-3 sm:items-end">
+            <WhatsAppButton />
+            <a
+              href={`mailto:${CONTACT.email}`}
+              className="text-[0.85rem] text-[var(--slab-ink-soft)] transition-colors duration-300 ease-couture hover:text-[var(--slab-accent)]"
             >
-              <motion.p
-                variants={rowRise}
-                initial="initial"
-                animate="animate"
-                className="eyebrow mb-2 text-[rgba(233,173,190,0.7)]"
-              >
-                {t.menu.contactHeader}
-              </motion.p>
-              {contactItems.map((item) => (
-                <motion.a
-                  key={item.key}
-                  variants={rowRise}
-                  href={item.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group flex items-center gap-4 border-b border-[var(--hairline)] py-4 text-start"
-                >
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[rgba(159,149,54,0.4)]">
-                    <item.icon className="h-5 w-5 text-olive" strokeWidth={1.5} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[rgba(233,173,190,0.7)]">
-                      {t.menu.contact[item.key]}
-                    </span>
-                    <span className="block truncate font-heading text-[1.05rem] font-medium text-cream" dir="ltr">
-                      {item.value}
-                    </span>
-                  </span>
-                  <ArrowUpRight className="h-5 w-5 shrink-0 text-coral transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:-scale-x-100" />
-                </motion.a>
-              ))}
-            </motion.nav>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* language toggle */}
-      <div className="relative z-10 mx-6 mb-3 lg:mx-auto lg:w-full lg:max-w-[640px]">
-        <p className="eyebrow mb-2 text-center text-[rgba(233,173,190,0.6)]">
-          {t.menu.language}
-        </p>
-        <div className="flex gap-1 rounded-full border border-[var(--hairline)] p-1">
-          {(["en", "ar"] as const).map((l) => (
-            <button
-              key={l}
-              onClick={() => setLang(l)}
-              aria-pressed={lang === l}
-              className={`flex-1 rounded-full py-2 text-[0.82rem] font-semibold transition-colors ${
-                lang === l
-                  ? "btn-coral text-cream"
-                  : "text-[rgba(227,210,194,0.7)] hover:text-cream"
-              }`}
-            >
-              {l === "en" ? t.menu.langEnglish : t.menu.langArabic}
-            </button>
-          ))}
+              {CONTACT.email}
+            </a>
+          </div>
         </div>
       </div>
-
-      <p className="relative z-10 pb-8 pt-1 text-center text-[0.72rem] uppercase tracking-[0.24em] text-[rgba(227,210,194,0.45)] pb-safe">
-        {t.menu.tooGood}
-      </p>
-    </motion.div>
+    </div>
   );
 }

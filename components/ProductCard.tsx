@@ -1,130 +1,99 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import type { Product } from "@/lib/content";
+import { ArrowUpRight } from "lucide-react";
+import TransitionLink from "./TransitionLink";
 import { productPath } from "@/lib/routes";
-import { useT, fill } from "@/lib/i18n";
-import WhatsAppButton from "./ui/WhatsAppButton";
+import type { Product } from "@/lib/content";
+import { useT } from "@/lib/i18n";
 
+/**
+ * A bar, presented as an object sitting on the slab rather than a boxed tile.
+ *
+ * The image is deliberately outside the card's rounded body and overlaps its
+ * top edge, so the product breaks the frame. That overlap is what stops a row
+ * of these reading as a grid of rectangles — and it is why the wrapper cannot
+ * clip its overflow.
+ *
+ * `data-momentum-item` / `data-momentum-target` opt this into the inertia flick
+ * when an ancestor is a <MomentumHover>. Both are no-ops on touch.
+ */
 export default function ProductCard({
   product,
-  priority = false,
+  index = 0,
 }: {
   product: Product;
-  // Set on the first card only: it is the LCP element when someone deep-links
-  // to #bars, and next/image lazy-loads by default.
-  priority?: boolean;
+  index?: number;
 }) {
   const t = useT();
-  const isCoral = product.accent === "coral";
-  const accent = isCoral ? "#ec5b45" : "#e9adbe";
-  const href = productPath(product.id);
+  const badge =
+    product.id === "protein" ? t.card.highProtein : t.card.classic;
+
+  // Alternating rest angles so a pair never looks like two aligned rectangles.
+  const tilt = index % 2 === 0 ? -3 : 3.5;
 
   return (
-    <motion.article
-      className="glass-card relative flex h-full flex-col overflow-hidden rounded-[1.6rem] p-3.5"
-      style={{
-        borderColor: isCoral ? "rgba(236,91,69,0.4)" : "rgba(233,173,190,0.28)",
-      }}
+    <TransitionLink
+      href={productPath(product.id)}
+      data-momentum-item
+      className="group relative block"
     >
-      {/* accent glow */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-24"
-        style={{
-          background: `radial-gradient(70% 100% at 50% 0%, ${
-            isCoral ? "rgba(236,91,69,0.22)" : "rgba(233,173,190,0.16)"
-          }, transparent 70%)`,
-        }}
-      />
-
-      {/* tag */}
-      <div className="relative z-10 flex justify-center">
-        <span
-          className="whitespace-nowrap rounded-full px-2.5 py-1 text-[0.55rem] font-bold uppercase tracking-[0.16em]"
-          style={{
-            color: accent,
-            background: isCoral
-              ? "rgba(236,91,69,0.14)"
-              : "rgba(233,173,190,0.12)",
-            border: `1px solid ${
-              isCoral ? "rgba(236,91,69,0.4)" : "rgba(233,173,190,0.32)"
-            }`,
-          }}
-        >
-          {isCoral ? t.card.highProtein : t.card.classic}
-        </span>
-      </div>
-
-      {/* image */}
-      <Link
-        href={href}
-        className="relative z-10 mx-auto mt-1 flex aspect-square w-[82%] items-center justify-center"
-        aria-label={product.name}
+      <div
+        data-momentum-target
+        className="relative will-change-transform"
+        style={{ transform: `rotate(${tilt}deg)` }}
       >
-        <span
-          aria-hidden
-          className="absolute left-1/2 top-1/2 h-[86%] w-[92%] -translate-x-1/2 -translate-y-1/2 rounded-full"
-          style={{
-            background: `radial-gradient(ellipse at 50% 46%, ${
-              isCoral ? "rgba(236,91,69,0.34)" : "rgba(233,173,190,0.26)"
-            }, transparent 66%)`,
-          }}
-        />
-        <Image
-          src={product.image}
-          alt={product.imageAlt}
-          width={600}
-          height={600}
-          priority={priority}
-          // Desktop clause first — `sizes` is first-match, so the existing
-          // mobile clauses resolve exactly as before.
-          sizes="(min-width: 1024px) 360px, (max-width: 520px) 45vw, 220px"
-          className="relative h-auto w-full drop-shadow-[0_14px_18px_rgba(15,3,7,0.45)]"
-        />
-      </Link>
+        <div className="relative mx-auto -mb-20 w-[62%] max-w-[15rem]">
+          <Image
+            src={product.image}
+            alt={product.imageAlt}
+            width={785}
+            height={698}
+            sizes="(min-width: 768px) 240px, 45vw"
+            className="h-auto w-full drop-shadow-[0_18px_28px_color-mix(in_srgb,var(--burgundy)_45%,transparent)]"
+          />
+        </div>
 
-      {/* name + tagline */}
-      <h3 className="relative z-10 mt-1 text-center font-heading text-[1.02rem] font-semibold leading-tight text-cream">
-        {product.name}
-      </h3>
-      <p className="relative z-10 mt-1 text-center text-[0.72rem] leading-snug text-[rgba(227,210,194,0.62)]">
-        {product.tagline}
-      </p>
+        <article className="card relative flex flex-col gap-4 px-6 pb-7 pt-24 text-brand-burgundy shadow-drop">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="eyebrow !text-[color-mix(in_srgb,var(--burgundy)_60%,transparent)]">
+                {badge}
+              </p>
+              <h3 className="mt-2 font-display text-[clamp(1.4rem,3.4vw,2rem)] font-black leading-[0.95] tracking-tight">
+                {product.name}
+              </h3>
+            </div>
+            <span className="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-burgundy text-brand-cream transition-transform duration-300 ease-couture group-hover:rotate-45">
+              <ArrowUpRight className="h-4 w-4" strokeWidth={2.5} />
+            </span>
+          </div>
 
-      <div className="hairline my-3" />
+          <p className="text-[0.92rem] leading-relaxed text-[color-mix(in_srgb,var(--burgundy)_78%,transparent)]">
+            {product.tagline}
+          </p>
 
-      {/* price */}
-      <div className="relative z-10 flex items-baseline justify-center gap-1">
-        <span className="font-heading text-[1.55rem] font-bold leading-none text-cream">
-          {product.pricePerBar}
-        </span>
-        <span className="text-[0.72rem] font-medium text-[rgba(227,210,194,0.6)]">
-          {t.card.perBar}
-        </span>
+          <div className="mt-auto flex flex-wrap gap-1.5">
+            {product.ingredientChips.slice(0, 3).map((chip) => (
+              <span
+                key={chip}
+                className="rounded-full bg-brand-pink px-3 py-1.5 text-[0.68rem] font-bold leading-none"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex items-baseline gap-2 border-t border-[color-mix(in_srgb,var(--burgundy)_14%,transparent)] pt-4">
+            <span className="font-display text-2xl font-black leading-none">
+              {product.pricePerBar}
+            </span>
+            <span className="text-[0.8rem] font-semibold opacity-70">
+              {t.card.perBar}
+            </span>
+          </div>
+        </article>
       </div>
-      <p className="relative z-10 mt-1 text-center text-[0.68rem] text-[rgba(227,210,194,0.5)]">
-        {fill(t.card.perBoxOf10, { price: product.pricePerBox })}
-      </p>
-
-      {/* actions — pushed to the bottom so both cards align */}
-      <div className="relative z-10 mt-auto flex flex-col gap-2 pt-4">
-        <WhatsAppButton
-          intent={product.id}
-          label={t.card.whatsapp}
-          className="!gap-1.5 !px-3 !py-2.5 !text-[0.82rem]"
-        />
-        {/* `text-center` replaces the UA default a <button> had and an <a>
-            does not — every other class is unchanged. */}
-        <Link
-          href={href}
-          className="btn-ghost rounded-full px-4 py-2 text-center text-[0.76rem] font-semibold tracking-wide transition-colors hover:border-coral hover:text-coral"
-        >
-          {t.card.viewDetails}
-        </Link>
-      </div>
-    </motion.article>
+    </TransitionLink>
   );
 }

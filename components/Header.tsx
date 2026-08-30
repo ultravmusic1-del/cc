@@ -1,133 +1,121 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, ShoppingBag } from "lucide-react";
-import { motion } from "framer-motion";
-import Logo from "./Logo";
+import { Menu } from "lucide-react";
+import TransitionLink from "./TransitionLink";
+import LangToggle from "./ui/LangToggle";
+import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
+import { useGsapScope } from "@/lib/useGsapScope";
 import { useNav } from "@/lib/store";
 import { ROUTES } from "@/lib/routes";
 import { useT } from "@/lib/i18n";
 
-/** Created once at module scope — re-creating a motion component during render
-    remounts it and loses the animation state. */
-const MotionLink = motion.create(Link);
-
-/** Desktop-only inline nav. Mirrors StickyNav's destinations, which stays the
-    primary nav on mobile (this header nav is hidden below lg, that one above). */
-const deskItems: {
-  id: "menu" | Exclude<keyof typeof ROUTES, "home">;
-  labelKey: "bars" | "nutrition" | "order" | "menu";
-}[] = [
-  { id: "bars", labelKey: "bars" },
-  { id: "nutrition", labelKey: "nutrition" },
-  { id: "ordering", labelKey: "order" },
-  { id: "menu", labelKey: "menu" },
-];
-
+/**
+ * Site chrome: wordmark, the travelling nav cluster, and the menu button.
+ *
+ * The cluster does not stick to the top. Once you leave the hero it slides all
+ * the way down and floats above the bottom edge — lifted from the reference,
+ * where the nav migrates rather than docking. On this site it also lands where
+ * the old bottom bar used to live, so the phone ergonomics are unchanged.
+ *
+ * Everything in here rides on cream pills rather than inheriting slab ink. The
+ * chrome is fixed over sections that change colour underneath it, so giving it
+ * its own opaque ground is what keeps it legible without measuring what is
+ * behind it on every frame.
+ */
 export default function Header() {
-  const { overlay, openMenu } = useNav();
   const pathname = usePathname();
   const t = useT();
+  const { openMenu } = useNav();
+
+  const items = [
+    { href: ROUTES.bars, label: t.menu.items.bars },
+    { href: ROUTES.nutrition, label: t.menu.items.nutrition },
+    { href: ROUTES.ordering, label: t.menu.items.ordering },
+  ];
+
+  const ref = useGsapScope<HTMLDivElement>((scope) => {
+    const cluster = scope.querySelector<HTMLElement>("[data-nav-cluster]");
+    if (!cluster || prefersReducedMotion()) return;
+
+    gsap.to(cluster, {
+      // Measured in a function so a resize or a refresh recomputes the
+      // landing point instead of freezing the first viewport height.
+      y: () =>
+        window.innerHeight -
+        cluster.offsetHeight -
+        parseFloat(getComputedStyle(document.documentElement).fontSize) * 1.5,
+      duration: 0.8,
+      ease: "energy",
+      scrollTrigger: {
+        start: 220,
+        end: "max",
+        toggleActions: "play none none reverse",
+        invalidateOnRefresh: true,
+      },
+    });
+
+    ScrollTrigger.refresh();
+  }, []);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 border-b border-[var(--hairline)] bg-[rgba(70,13,27,0.92)] pt-safe backdrop-blur-md">
-      {/* Three equal-weight zones keep the wordmark dead-centre while the
-          menu and Order controls sit symmetrically at the edges.
-          On desktop the hamburger zone drops out, so the logo falls to the
-          start and the inline nav takes the freed space. */}
-      <div className="mx-auto flex h-16 w-full max-w-[var(--app-max)] items-center px-4 lg:h-20 lg:px-8">
-        <div className="flex flex-1 items-center justify-start lg:hidden">
-          <button
-            onClick={openMenu}
-            aria-label={t.header.openMenu}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-cream/90 transition-colors hover:bg-white/5"
-          >
-            <Menu className="h-[22px] w-[22px]" strokeWidth={1.5} />
-          </button>
-        </div>
-
-        <Link
+    <div ref={ref}>
+      {/* Wordmark — stays put at the top. */}
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-between px-gutter pt-gutter">
+        <TransitionLink
           href={ROUTES.home}
           aria-label={t.header.home}
-          className="shrink-0 lg:me-10"
+          className="pointer-events-auto chrome-pill inline-flex items-center rounded-full px-4 py-2.5"
         >
-          <Logo size="md" />
-        </Link>
+          <span className="font-display text-lg font-black leading-none tracking-tight text-brand-burgundy">
+            Candy
+          </span>
+          <span className="ml-1.5 font-couture text-lg italic leading-none text-brand-coral">
+            Couture
+          </span>
+        </TransitionLink>
 
-        <nav
-          aria-label="Primary"
-          className="hidden flex-1 items-center gap-1 lg:flex"
-        >
-          {deskItems.map(({ id, labelKey }) => {
-            const label = t.nav[labelKey];
-            // Bars stays active on its product pages — see StickyNav.
-            const active =
-              id === "menu"
-                ? overlay?.type === "menu"
-                : id === "bars"
-                  ? pathname === ROUTES.bars || pathname.startsWith(`${ROUTES.bars}/`)
-                  : pathname === ROUTES[id];
-            const inner = (
-              <>
-                {active && (
-                  // Distinct layoutId from StickyNav's pill: both navs stay
-                  // mounted (the other is merely display:none), and Framer
-                  // would otherwise try to animate one pill between them.
-                  <motion.span
-                    layoutId="nav-pill-desktop"
-                    className="absolute inset-0 rounded-full bg-[rgba(236,91,69,0.16)]"
-                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                  />
-                )}
-                <span
-                  className={`relative z-10 text-[0.72rem] font-semibold uppercase tracking-[0.16em] transition-colors ${
-                    active
-                      ? "text-cream"
-                      : "text-[rgba(227,210,194,0.62)] hover:text-cream"
-                  }`}
-                >
-                  {label}
-                </span>
-              </>
-            );
-            const className = "relative rounded-full px-4 py-2 transition-colors";
-
-            // "Menu" opens an overlay rather than navigating, so it stays a
-            // button; the rest are real destinations and must be crawlable.
-            return id === "menu" ? (
-              <button
-                key={id}
-                onClick={openMenu}
-                aria-current={active ? "page" : undefined}
-                className={className}
-              >
-                {inner}
-              </button>
-            ) : (
-              <Link
-                key={id}
-                href={ROUTES[id]}
-                aria-current={active ? "page" : undefined}
-                className={className}
-              >
-                {inner}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="flex flex-1 items-center justify-end lg:flex-none">
-          <MotionLink
-            whileTap={{ scale: 0.94 }}
-            href={ROUTES.ordering}
-            aria-label={t.header.ordering}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-cream/90 transition-colors hover:bg-white/5 hover:text-coral"
+        <div className="pointer-events-auto flex items-center gap-2">
+          <LangToggle />
+          <button
+            type="button"
+            onClick={openMenu}
+            aria-label={t.header.openMenu}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-brand-burgundy text-brand-cream shadow-drop transition-transform duration-300 ease-couture hover:scale-105"
           >
-            <ShoppingBag className="h-[22px] w-[22px]" strokeWidth={1.5} />
-          </MotionLink>
+            <Menu className="h-5 w-5" strokeWidth={2.5} />
+          </button>
         </div>
       </div>
-    </header>
+
+      {/* Travelling cluster. Fixed at the top, animated to the bottom. */}
+      <nav
+        aria-label="Primary"
+        className="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center px-gutter pt-[4.75rem] lg:pt-gutter"
+      >
+        <div
+          data-nav-cluster
+          className="pointer-events-auto chrome-pill flex items-center gap-1 rounded-full p-1.5 will-change-transform"
+        >
+          {items.map((item) => {
+            const active = pathname === item.href;
+            return (
+              <TransitionLink
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={`rounded-full px-4 py-2 text-[0.82rem] font-bold leading-none transition-colors duration-300 ease-couture ${
+                  active
+                    ? "bg-brand-burgundy text-brand-cream"
+                    : "text-brand-burgundy hover:bg-brand-pink"
+                }`}
+              >
+                {item.label}
+              </TransitionLink>
+            );
+          })}
+        </div>
+      </nav>
+    </div>
   );
 }

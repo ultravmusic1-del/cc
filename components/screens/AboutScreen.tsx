@@ -1,91 +1,129 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Leaf, Sprout, Heart, ArrowRight, Lock } from "lucide-react";
-import ScreenShell from "../ScreenShell";
-import Footer from "../Footer";
-import { useNav, type AboutDrawerId } from "@/lib/store";
+import Slab from "../Slab";
+import PageHero from "../PageHero";
+import SplitReveal from "../motion/SplitReveal";
+import HandwrittenNote from "../motion/HandwrittenNote";
+import Marquee from "../motion/Marquee";
+import Button from "../ui/Button";
+import WhatsAppButton from "../ui/WhatsAppButton";
+import { ROUTES } from "@/lib/routes";
 import { useContent, useT } from "@/lib/i18n";
 
+/**
+ * The story, told down the page.
+ *
+ * This used to be three cards that opened drawers. The drawers made sense
+ * under the old click-driven shell, but they hid the only real prose on the
+ * site behind a tap — which is also why this page measured so thin: the text
+ * existed, but not in the served HTML. On a scrolling page the story can simply
+ * be the page.
+ */
 export default function AboutScreen() {
-  const { openAboutDrawer } = useNav();
   const c = useContent();
   const t = useT();
 
-  const cards: {
-    id: AboutDrawerId;
-    title: string;
-    note: string;
-    icon: typeof Leaf;
-  }[] = [
-    { id: "about-us", title: t.about.aboutUsT, note: t.about.aboutUsN, icon: Leaf },
-    {
-      id: "philosophy",
-      title: t.about.philosophyT,
-      note: t.about.philosophyN,
-      icon: Sprout,
-    },
-    { id: "gifting", title: t.about.giftingT, note: t.about.giftingN, icon: Heart },
-  ];
-
   return (
-    <ScreenShell>
-      <header>
-        <p className="eyebrow text-[rgba(233,173,190,0.8)]">{t.about.eyebrow}</p>
-        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream lg:text-[2.75rem]">
-          {t.about.title}
-        </h1>
-        {/* Cap the measure — a 1120px line is unreadable. */}
-        <p className="mt-3 text-[0.92rem] leading-relaxed text-[rgba(227,210,194,0.78)] lg:max-w-[62ch] lg:text-[1.02rem]">
+    <>
+      <PageHero
+        eyebrow={t.about.eyebrow}
+        title={t.about.title}
+        note={t.drawer.quote}
+      />
+
+      <Slab tone="cream" innerClassName="!pt-0">
+        <p className="body-copy max-w-[46ch] font-display text-[clamp(1.35rem,3vw,2rem)] font-bold leading-[1.2] tracking-tight">
           {c.brand.storyLede}
         </p>
-      </header>
+      </Slab>
 
-      <div className="hairline my-6" />
-
-      <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-5">
-        {cards.map((card, i) => (
-          <motion.button
-            key={card.id}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.08 * i, ease: [0.22, 1, 0.36, 1] }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => openAboutDrawer(card.id)}
-            className="glass-card flex items-center gap-4 rounded-2xl px-4 py-4 text-start transition-colors hover:border-[rgba(236,91,69,0.5)] lg:px-6 lg:py-6"
-          >
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[rgba(159,149,54,0.45)]">
-              <card.icon className="h-5 w-5 text-olive" strokeWidth={1.5} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block font-heading text-[1.05rem] font-semibold text-cream">
-                {card.title}
-              </span>
-              <span className="block text-[0.76rem] text-[rgba(227,210,194,0.62)]">
-                {card.note}
-              </span>
-            </span>
-            <ArrowRight className="h-5 w-5 shrink-0 text-coral rtl:-scale-x-100" />
-          </motion.button>
-        ))}
-
-        {/* Coming soon */}
-        <div className="flex items-center gap-4 rounded-2xl border border-dashed border-[var(--hairline)] px-4 py-4 opacity-70 lg:px-6 lg:py-6">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[var(--hairline)]">
-            <Lock className="h-4 w-4 text-[rgba(233,173,190,0.6)]" strokeWidth={1.5} />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block font-heading text-[1.05rem] font-semibold text-[rgba(227,210,194,0.7)]">
-              {t.about.testimonialsT}
-            </span>
-            <span className="block text-[0.76rem] text-[rgba(227,210,194,0.5)]">
-              {t.about.comingSoon}
-            </span>
-          </span>
+      <Slab tone="pink" inset shapes="b" shapeColor="var(--cream)">
+        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+          <div>
+            <p className="eyebrow">{t.about.aboutUsT}</p>
+            <SplitReveal as="h2" className="display-m mt-5 font-display font-black">
+              {t.about.aboutUsN}
+            </SplitReveal>
+          </div>
+          <div className="body-copy space-y-6 text-[1.02rem] leading-relaxed">
+            <p>{c.brand.storyBody}</p>
+            <p>{c.brand.storyClose}</p>
+          </div>
         </div>
-      </div>
+      </Slab>
 
-      <Footer />
-    </ScreenShell>
+      <Slab tone="coral" as="div" innerClassName="!py-0 !px-0 !max-w-none">
+        <Marquee
+          items={[t.drawer.quote, c.brand.tagline]}
+          className="py-6"
+          speed={30}
+        />
+      </Slab>
+
+      <Slab tone="beige">
+        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+          <div>
+            <p className="eyebrow">{t.about.philosophyT}</p>
+            <SplitReveal as="h2" className="display-m mt-5 font-display font-black">
+              {t.about.philosophyN}
+            </SplitReveal>
+          </div>
+          <div className="body-copy space-y-6 text-[1.02rem] leading-relaxed">
+            <p>{c.philosophy.lede}</p>
+            <p>{c.philosophy.body}</p>
+          </div>
+        </div>
+      </Slab>
+
+      <Slab tone="burgundy" inset shapes="a" shapeColor="var(--pink)" shapeOpacity={0.4}>
+        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+          <div>
+            <p className="eyebrow">{t.about.giftingT}</p>
+            <SplitReveal as="h2" className="display-m mt-5 font-display font-black">
+              {t.about.giftingN}
+            </SplitReveal>
+          </div>
+          <div>
+            <p className="body-copy text-[1.02rem] leading-relaxed text-[var(--slab-ink-soft)]">
+              {t.drawer.giftingText}
+            </p>
+            <dl className="mt-8 grid gap-6 sm:grid-cols-3">
+              {[
+                { label: t.drawer.boxQty, value: t.drawer.boxQtyVal },
+                { label: t.drawer.giftBoxes, value: t.drawer.comingSoon },
+                { label: t.drawer.delivery, value: t.drawer.deliveryVal },
+              ].map((item) => (
+                <div key={item.label}>
+                  <dt className="eyebrow">{item.label}</dt>
+                  <dd className="mt-2 font-display text-[1.1rem] font-black leading-tight">
+                    {item.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-10 flex flex-wrap gap-3">
+              <WhatsAppButton intent="wholesale" label={t.drawer.enquire} />
+              <Button href={ROUTES.wholesale} variant="ghost">
+                {t.wholesale.title}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Slab>
+
+      <Slab tone="olive" shapes="c" shapeColor="var(--cream)" shapeOpacity={0.5}>
+        <div className="flex flex-col items-center gap-7 text-center">
+          <HandwrittenNote tilt="right" size="large">
+            {c.brand.tagline}
+          </HandwrittenNote>
+          <SplitReveal as="h2" className="display-l font-display font-black">
+            {t.home.chooseBar}
+          </SplitReveal>
+          <Button href={ROUTES.bars} arrow>
+            {t.bars.title}
+          </Button>
+        </div>
+      </Slab>
+    </>
   );
 }

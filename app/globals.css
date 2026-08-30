@@ -2,8 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════
+   Candy Couture — "candy slab" design system
+   ───────────────────────────────────────────────────────────────────
+   The page is a stack of full-width colour slabs. Burgundy is the INK
+   (headlines, handwriting, the page-transition curtain); cream and
+   beige are the grounds; pink, coral and olive are the accent slabs.
+
+   HARD RULE: the nine brand hexes below are the only colour literals in
+   this file. Every tint is those hexes composited with colour-mix — no
+   new hues enter the system. If you need a lighter pink, mix pink into
+   cream; do not invent one.
+   ═══════════════════════════════════════════════════════════════════ */
+
 :root {
+  /* ── Brand palette (the only hex literals) ──────────────────────── */
   --burgundy: #611224;
+  --burgundy-soft: #71182b;
   --burgundy-deep: #4a0d1b;
   --burgundy-dark: #3a0a15;
   --coral: #ec5b45;
@@ -11,63 +26,109 @@
   --pink: #e9adbe;
   --beige: #e3d2c2;
   --cream: #f4e8dc;
-  --hairline: rgba(233, 173, 190, 0.22);
-  --hairline-strong: rgba(227, 210, 194, 0.34);
-  /* Content column. Widens on desktop (below). */
-  --app-max: 480px;
-  /* Overlay sheets (product modal, about drawer). Deliberately a SEPARATE knob
-     from --app-max: those panels must stay sheet-sized when the page column
-     grows, or they balloon to full width on desktop. */
-  --panel-max: 480px;
-  /* The illuminated centre panel behind the column; tracks --app-max + gutters. */
-  --stage-max: 540px;
+
+  /* ── Derived tints — brand hexes composited on cream ────────────── */
+  --pink-soft: color-mix(in srgb, var(--pink) 42%, var(--cream));
+  --pink-pale: color-mix(in srgb, var(--pink) 66%, var(--cream));
+  --coral-soft: color-mix(in srgb, var(--coral) 24%, var(--cream));
+  --olive-soft: color-mix(in srgb, var(--olive) 26%, var(--cream));
+  --beige-deep: color-mix(in srgb, var(--beige) 72%, var(--burgundy) 8%);
+
+  /* Hairlines and scrims, always burgundy at low alpha */
+  --rule: color-mix(in srgb, var(--burgundy) 16%, transparent);
+  --rule-strong: color-mix(in srgb, var(--burgundy) 30%, transparent);
+  --ink-soft: color-mix(in srgb, var(--burgundy) 72%, transparent);
+  --ink-faint: color-mix(in srgb, var(--burgundy) 46%, transparent);
+
+  /* ── Slab defaults (overridden per .slab--* below) ──────────────── */
+  --slab-bg: var(--cream);
+  --slab-ink: var(--burgundy);
+  --slab-ink-soft: var(--ink-soft);
+  --slab-accent: var(--coral);
+  --slab-note: var(--burgundy);
+  --slab-rule: var(--rule);
+  /* The accessible action pair. Burgundy/cream on every light slab,
+     inverted on burgundy. Never coral — see .pill--solid. */
+  --slab-cta-bg: var(--burgundy);
+  --slab-cta-ink: var(--cream);
+
+  /* ── Shape ──────────────────────────────────────────────────────── */
+  --gutter: 0.75rem;
+  --slab-radius: 2rem;
+  --pad-x: 1.25rem;
+  /* Wide on purpose. This design puts headlines in big blocks rather than a
+     narrow reading column, and a 68rem measure squeezed the hero h1 into six
+     wrapped lines. Prose measure is capped per-element instead. */
+  --measure: 84rem;
+
+  /* ── Type scale ──────────────────────────────────────────────────
+     The caps are set by the LONGEST line each role has to carry, not by
+     what looks impressive empty. --fs-display-xl tops out at 5.25rem
+     because "Real ingredients." must survive one line in the hero column;
+     raising it re-introduces the six-line wrap. */
+  --fs-display-xxl: clamp(2.75rem, 10vw, 7rem);
+  --fs-display-xl: clamp(2.4rem, 6vw, 5.25rem);
+  --fs-display-l: clamp(2rem, 5vw, 4rem);
+  --fs-display-m: clamp(1.6rem, 3.6vw, 2.75rem);
+  --fs-display-s: clamp(1.25rem, 2.4vw, 1.75rem);
+  --fs-note-l: clamp(1.3rem, 4vw, 2.5rem);
+  --fs-note: clamp(1.05rem, 2.6vw, 1.6rem);
+
+  /* ── Motion (CSS mirrors of the GSAP eases in lib/gsap.ts) ──────── */
+  --ease-couture: cubic-bezier(0.625, 0.05, 0, 1);
+  --ease-energy: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --header-h: 4.5rem;
 }
 
-/* ── Desktop (>= 1024px) ────────────────────────────────────────────────
-   The ONLY place the layout scale changes. Everything below this width —
-   phones and tablets — renders exactly as it always has. */
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   :root {
-    --app-max: 1120px;
-    --panel-max: 560px;
-    --stage-max: 1216px;
+    --gutter: 1.25rem;
+    --slab-radius: 3.25rem;
+    --pad-x: 2.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --gutter: 1.5rem;
+    --slab-radius: 5rem;
+    --pad-x: 4rem;
+    --header-h: 5.5rem;
   }
 }
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
-    height: 100%;
+    /* Lenis drives scrolling; native smooth-scroll would fight it. */
+    scroll-behavior: auto;
   }
 
+  /* The document scrolls normally now. The previous app-shell model
+     (body{overflow:hidden} + a scroll container per screen) existed to
+     work around iOS Safari ignoring programmatic scroll after a view
+     swap. Lenis owns scroll position directly and resets it on route
+     change, so the workaround is no longer needed — and ScrollTrigger
+     requires a normally-scrolling document to measure against. */
   body {
-    /* App-shell model: the document itself never scrolls — each screen is its
-       own internal scroll container (.screen-scroll). This is what makes
-       scroll-to-top reliable on iOS Safari, where programmatic document
-       scrolling (scrollTo / scrollTop / scrollIntoView) is ignored after a
-       client-side view swap. A freshly mounted screen simply starts at the
-       top, so no scroll reset is needed. */
-    height: 100%;
-    overflow: hidden;
-    background: var(--burgundy);
-    color: var(--cream);
+    background: var(--cream);
+    color: var(--burgundy);
     font-family: var(--font-body), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    overscroll-behavior: none;
+    overflow-x: hidden;
   }
 
-  /* The per-screen scroll container. */
-  .screen-scroll {
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior-y: contain;
-    -webkit-overflow-scrolling: touch;
-    /* Keep centred content (header logo / hero) on the true centre by reserving
-       the scrollbar gutter symmetrically — matches the fixed header which spans
-       the full width. No effect with mobile overlay scrollbars. */
-    scrollbar-gutter: stable both-edges;
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
   }
 
   ::selection {
@@ -75,86 +136,287 @@
     color: var(--cream);
   }
 
-  h1, h2, h3, h4 {
-    font-family: var(--font-heading), system-ui, sans-serif;
-    letter-spacing: -0.015em;
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 0.84;
   }
 
-  /* Arabic: the Latin faces (Bodoni/Hanken/Open Sans) have no real Arabic
-     glyphs, so swap the whole page to Cairo when dir is RTL. Attribute-scoped
-     selectors outrank the Tailwind font utilities, so this also covers
-     .font-display / .font-heading / .font-body. */
+  /* Arabic: the Latin faces carry no real Arabic glyphs, so swap the
+     whole page to Cairo under RTL. Attribute-scoped selectors outrank
+     the Tailwind font utilities, so this also covers .font-display etc. */
   [lang="ar"] body,
   [lang="ar"] h1,
   [lang="ar"] h2,
   [lang="ar"] h3,
   [lang="ar"] h4,
   [lang="ar"] .font-display,
-  [lang="ar"] .font-heading,
+  [lang="ar"] .font-note,
   [lang="ar"] .font-body {
     font-family: var(--font-arabic), "Segoe UI", Tahoma, sans-serif;
     letter-spacing: 0;
+    line-height: 1.25;
   }
 }
 
 @layer components {
-  /* The atmospheric burgundy stage that every screen sits on */
-  .stage-bg {
-    background-color: #611224;
-    background-image:
-      radial-gradient(115% 80% at 80% 2%, rgba(236, 91, 69, 0.15), transparent 55%),
-      radial-gradient(100% 70% at 8% 98%, rgba(159, 149, 54, 0.08), transparent 60%),
-      linear-gradient(180deg, #6b1529 0%, #611224 46%, #57101f 100%);
+  /* ── Slab: one full-width band of colour ─────────────────────────
+     Every section is a slab. It publishes --slab-ink / --slab-accent /
+     --slab-note so children colour themselves from context instead of
+     hard-coding, which is what keeps six palettes from drifting. */
+  .slab {
+    position: relative;
+    background: var(--slab-bg);
+    color: var(--slab-ink);
+    isolation: isolate;
   }
 
-  .panel-bg {
-    background-color: #611224;
-    background-image:
-      radial-gradient(120% 70% at 85% -5%, rgba(236, 91, 69, 0.14), transparent 55%),
-      linear-gradient(180deg, #6a1428 0%, #58101f 100%);
+  .slab--cream {
+    --slab-bg: var(--cream);
+    --slab-ink: var(--burgundy);
+    --slab-accent: var(--coral);
+    --slab-note: var(--burgundy);
   }
 
-  .hairline {
-    height: 1px;
-    width: 100%;
-    background: linear-gradient(90deg, transparent, var(--hairline-strong) 18%, var(--hairline-strong) 82%, transparent);
+  .slab--beige {
+    --slab-bg: var(--beige);
+    --slab-ink: var(--burgundy);
+    --slab-accent: var(--coral);
+    --slab-note: var(--burgundy);
   }
 
-  /* Solid frosted look WITHOUT backdrop-filter. These cards sit on the
-     opaque burgundy stage, so a more opaque fill reads identically to a
-     blurred one — but costs the mobile GPU nothing. (Stacking 5–7 real
-     backdrop-filter layers per screen was a primary freeze/crash cause.) */
-  .glass-card {
-    background: linear-gradient(180deg, rgba(120, 27, 47, 0.92), rgba(74, 13, 27, 0.94));
-    border: 1px solid var(--hairline);
+  .slab--pink {
+    --slab-bg: var(--pink);
+    --slab-ink: var(--burgundy);
+    --slab-accent: var(--burgundy);
+    --slab-note: var(--burgundy);
   }
 
-  .btn-coral {
-    background: linear-gradient(180deg, #f16a54, #ec5b45);
-    color: var(--cream);
-    box-shadow: 0 12px 30px -12px rgba(236, 91, 69, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  /* ── Display-only slabs ──────────────────────────────────────────
+     Measured contrast against the brand palette (see scripts/contrast-check.mjs):
+
+       cream    on coral   2.83:1  fails outright
+       burgundy on coral   3.79:1  AA Large only
+       cream    on olive   2.55:1  fails outright
+       burgundy on olive   4.21:1  AA Large only
+
+     No brand colour clears 4.5:1 on coral or olive, so these two slabs
+     carry display type ONLY — bold, >=24px, short lines. Body copy and
+     small print belong on cream / beige / pink / burgundy, which all sit
+     at 6.9:1 or better. Ink is burgundy on both; cream would fail. */
+  .slab--coral {
+    --slab-bg: var(--coral);
+    --slab-ink: var(--burgundy);
+    --slab-ink-soft: color-mix(in srgb, var(--burgundy) 82%, transparent);
+    --slab-accent: var(--cream);
+    --slab-note: var(--burgundy);
+    --slab-rule: color-mix(in srgb, var(--burgundy) 34%, transparent);
   }
 
-  .btn-ghost {
-    border: 1px solid rgba(227, 210, 194, 0.4);
-    color: var(--cream);
+  .slab--olive {
+    --slab-bg: var(--olive);
+    --slab-ink: var(--burgundy);
+    --slab-ink-soft: color-mix(in srgb, var(--burgundy) 82%, transparent);
+    --slab-accent: var(--cream);
+    --slab-note: var(--burgundy);
+    --slab-rule: color-mix(in srgb, var(--burgundy) 34%, transparent);
+  }
+
+  /* Guard rail: anything small on a display-only slab is a mistake.
+     Kept visible in dev rather than silently shipping unreadable text. */
+  .slab--coral .body-copy,
+  .slab--olive .body-copy {
+    font-weight: 600;
+  }
+
+  .slab--burgundy {
+    --slab-cta-bg: var(--cream);
+    --slab-cta-ink: var(--burgundy);
+    --slab-bg: var(--burgundy);
+    --slab-ink: var(--cream);
+    --slab-ink-soft: color-mix(in srgb, var(--cream) 76%, transparent);
+    --slab-accent: var(--coral);
+    --slab-note: var(--pink);
+    --slab-rule: color-mix(in srgb, var(--pink) 30%, transparent);
+  }
+
+  /* Inset slab — the reference's clip-path: inset(margin round 10em).
+     Margin + radius reads identically and keeps shadows intact. */
+  .slab--inset {
+    margin-inline: var(--gutter);
+    border-radius: var(--slab-radius);
+    overflow: clip;
+  }
+
+  .slab--stack {
+    margin-block-start: calc(var(--gutter) * -1);
+  }
+
+  .slab__inner {
+    position: relative;
+    z-index: 1;
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding-inline: var(--pad-x);
+    padding-block: clamp(3.5rem, 9vw, 8rem);
+  }
+
+  /* ── Type roles ──────────────────────────────────────────────────
+     Tight measures (12–18ch) are what turn headlines into the chunky
+     blocks the reference is built on. */
+  .display-xxl {
+    font-size: var(--fs-display-xxl);
+    line-height: 0.82;
+    letter-spacing: -0.035em;
+  }
+  .display-xl {
+    font-size: var(--fs-display-xl);
+    line-height: 0.84;
+    letter-spacing: -0.03em;
+    max-width: 15ch;
+  }
+  .display-l {
+    font-size: var(--fs-display-l);
+    line-height: 0.86;
+    letter-spacing: -0.025em;
+    max-width: 18ch;
+  }
+  /* Body copy keeps a real reading measure even though the slab is wide. */
+  .body-copy {
+    max-width: 58ch;
+  }
+  .display-m {
+    font-size: var(--fs-display-m);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    max-width: 20ch;
+  }
+  .display-s {
+    font-size: var(--fs-display-s);
+    line-height: 1;
+    letter-spacing: -0.015em;
+  }
+
+  .note {
+    font-family: var(--font-note), var(--font-body), cursive;
+    color: var(--slab-note);
+    font-size: var(--fs-note);
+    line-height: 1.05;
+    max-width: 14ch;
+    text-align: center;
+  }
+  .note--l {
+    font-size: var(--fs-note-l);
+  }
+  /* Handwriting is always off-axis. Mirrored under RTL so the tilt
+     leans away from the text rather than into it. */
+  .note--tilt-r {
+    transform: rotate(4.54deg);
+  }
+  .note--tilt-l {
+    transform: rotate(-10.95deg);
+  }
+  [dir="rtl"] .note--tilt-r {
+    transform: rotate(-4.54deg);
+  }
+  [dir="rtl"] .note--tilt-l {
+    transform: rotate(10.95deg);
+  }
+
+  /* Direction multiplier for transforms that must follow the text direction.
+     Components read `var(--seg-dir)` instead of duplicating an RTL variant. */
+  [dir="rtl"] {
+    --seg-dir: -1;
   }
 
   .eyebrow {
     font-family: var(--font-body), sans-serif;
     text-transform: uppercase;
-    letter-spacing: 0.34em;
-    font-size: 0.66rem;
-    font-weight: 600;
+    letter-spacing: 0.26em;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--slab-ink-soft);
+  }
+  [lang="ar"] .eyebrow {
+    letter-spacing: 0.08em;
   }
 
-  /* Faint oversized C watermark */
-  .c-watermark {
-    font-family: var(--font-display), serif;
-    color: rgba(233, 173, 190, 0.055);
-    line-height: 0.7;
-    user-select: none;
+  /* ── Pills & buttons ─────────────────────────────────────────────
+     Everything round. The reference has no square corners anywhere. */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    transition:
+      background-color 0.3s var(--ease-couture),
+      color 0.3s var(--ease-couture),
+      transform 0.3s var(--ease-couture);
+  }
+
+  /* The primary action is always ink-on-slab or slab-on-ink — never coral.
+     Coral fails contrast as text on every light slab (2.83:1 on cream) and
+     as a fill it only clears AA Large, which a 16px button label is not.
+     So coral does backgrounds, big display words and decorative shapes;
+     buttons stay burgundy/cream, which sits at 10.75:1 everywhere. */
+  .pill--solid {
+    background: var(--slab-cta-bg);
+    color: var(--slab-cta-ink);
+  }
+  .pill--solid:hover {
+    transform: scale(1.03);
+  }
+  .pill--ink {
+    background: var(--slab-ink);
+    color: var(--slab-bg);
+  }
+  .pill--ghost {
+    background: transparent;
+    color: var(--slab-ink);
+    box-shadow: inset 0 0 0 1.5px var(--slab-rule);
+  }
+  .pill--ghost:hover {
+    background: var(--slab-ink);
+    color: var(--slab-bg);
+  }
+
+  /* Fixed chrome (wordmark, nav cluster, language toggle).
+     A plain cream pill disappears against the cream slabs, and a burgundy one
+     disappears against the burgundy slabs — the chrome is fixed over sections
+     of every tone, so neither fill works alone. A cream fill plus an inset
+     burgundy hairline reads as an outlined pill on light tones and a solid one
+     on dark, with no need to measure what is behind it. */
+  .chrome-pill {
+    background: var(--cream);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--burgundy) 16%, transparent),
+      0 18px 36px -22px color-mix(in srgb, var(--burgundy) 62%, transparent);
+  }
+
+  .card {
+    background: var(--cream);
+    border-radius: clamp(1.25rem, 3vw, 2.25rem);
+    overflow: clip;
+  }
+
+  /* Paper grain. Pinned behind content with no blend mode — a fixed
+     full-viewport blended layer forces a whole-page recomposite every
+     frame, which is what used to freeze this site on mobile. */
+  .grain::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -5;
     pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 }
 
@@ -162,40 +424,24 @@
   .pb-safe {
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
   }
-  .pt-safe {
-    padding-top: calc(env(safe-area-inset-top, 0px));
-  }
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
   .no-scrollbar {
     -ms-overflow-style: none;
-    scrollbar-thickness: none;
     scrollbar-width: none;
   }
-  /* Film-grain texture. A *fixed*, full-viewport layer with
-     mix-blend-mode forces the browser to re-composite the entire page
-     every frame — a documented iOS Safari crash / Android freeze trigger.
-     Dropping the blend mode (and pinning it behind content instead of at
-     z-60 over everything) keeps the texture while removing the cost. */
-  .grain::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -5;
-    pointer-events: none;
-    opacity: 0.045;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* SplitText targets. Set here rather than inline so the pre-animation
+     state is styled even if GSAP hasn't run yet. */
+  .split-line {
+    display: block;
+    overflow: hidden;
   }
-}
-
-/* Thin custom scrollbar for scrollable panels */
-.soft-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-.soft-scroll::-webkit-scrollbar-thumb {
-  background: rgba(233, 173, 190, 0.25);
-  border-radius: 999px;
+  .split-word,
+  .split-char {
+    display: inline-block;
+    will-change: transform;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -206,5 +452,9 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+  .note--tilt-r,
+  .note--tilt-l {
+    transform: none;
   }
 }

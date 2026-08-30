@@ -1,70 +1,72 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Box, Tag, Truck } from "lucide-react";
-import ScreenShell from "../ScreenShell";
+import Slab from "../Slab";
+import PageHero from "../PageHero";
 import ProductCard from "../ProductCard";
+import MomentumHover from "../motion/MomentumHover";
+import PlopIn from "../motion/PlopIn";
+import WhatsAppButton from "../ui/WhatsAppButton";
 import { useContent, useT, fill } from "@/lib/i18n";
 
 export default function BarsScreen() {
   const c = useContent();
   const t = useT();
-  const products = [c.products.cookie, c.products.protein];
 
-  const infoItems = [
+  const info = [
     { icon: Box, title: t.bars.onePack, note: t.bars.onePackVal },
     { icon: Tag, title: t.bars.wholesale, note: t.bars.wholesaleVal },
     { icon: Truck, title: t.bars.delivery, note: t.bars.deliveryVal },
   ];
 
   return (
-    <ScreenShell>
-      <header className="text-center">
-        <p className="eyebrow text-[rgba(233,173,190,0.8)]">{t.bars.eyebrow}</p>
-        <h1 className="mt-3 font-heading text-[2rem] font-semibold leading-tight text-cream lg:text-[2.75rem]">
-          {t.bars.title}
-        </h1>
-      </header>
+    <>
+      <PageHero
+        eyebrow={t.bars.eyebrow}
+        title={t.bars.title}
+        note={t.bars.tagline}
+      />
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mx-auto lg:mt-10 lg:w-full lg:max-w-[880px] lg:gap-8">
-        {products.map((p, i) => (
-          <motion.div
-            key={p.id}
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="h-full"
-          >
-            <ProductCard product={p} priority={i === 0} />
-          </motion.div>
-        ))}
-      </div>
+      <Slab tone="pink" inset stack shapes="a" shapeColor="var(--cream)">
+        <MomentumHover className="grid gap-24 sm:grid-cols-2 sm:gap-8">
+          {(["cookie", "protein"] as const).map((id, i) => (
+            <ProductCard key={id} product={c.products[id]} index={i} />
+          ))}
+        </MomentumHover>
 
-      {/* footer info strip */}
-      <div className="glass-card mt-5 flex items-stretch justify-between rounded-2xl px-2 py-3 lg:mx-auto lg:mt-8 lg:w-full lg:max-w-[880px] lg:px-6 lg:py-5">
-        {infoItems.map((it, i) => (
-          <div
-            key={it.title}
-            className={`flex flex-1 flex-col items-center gap-1 px-1 text-center ${
-              i < infoItems.length - 1
-                ? "border-e border-[var(--hairline)]"
-                : ""
-            }`}
-          >
-            <it.icon className="h-4 w-4 text-[rgba(233,173,190,0.85)]" strokeWidth={1.5} />
-            <span className="text-[0.66rem] font-semibold uppercase tracking-[0.12em] text-cream">
-              {it.title}
-            </span>
-            <span className="text-[0.62rem] text-[rgba(227,210,194,0.6)]">
-              {it.note}
-            </span>
-          </div>
-        ))}
-      </div>
+        <p className="body-copy mt-12 text-[0.92rem] font-semibold text-[var(--slab-ink-soft)]">
+          {fill(t.bars.boxNote, { n: c.products.cookie.boxQty })}
+        </p>
+      </Slab>
 
-      <p className="mt-4 text-center text-[0.75rem] text-[rgba(227,210,194,0.5)]">
-        {fill(t.bars.boxNote, { n: c.products.cookie.boxQty })}
-      </p>
-    </ScreenShell>
+      <Slab tone="beige">
+        <ul className="grid gap-4 sm:grid-cols-3">
+          {info.map((item, i) => (
+            <PlopIn
+              as="li"
+              key={item.title}
+              delay={i * 0.07}
+              settle={i % 2 === 0 ? -2 : 2.5}
+            >
+              <div className="card flex h-full flex-col gap-3 px-6 py-7 shadow-drop">
+                <item.icon
+                  className="h-6 w-6 text-brand-coral"
+                  strokeWidth={2}
+                  aria-hidden
+                />
+                <span className="eyebrow">{item.title}</span>
+                <span className="font-display text-[1.15rem] font-black leading-tight text-brand-burgundy">
+                  {item.note}
+                </span>
+              </div>
+            </PlopIn>
+          ))}
+        </ul>
+
+        <div className="mt-12">
+          <WhatsAppButton label={t.ordering.orderCta} />
+        </div>
+      </Slab>
+    </>
   );
 }

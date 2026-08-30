@@ -1,10 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import Button from "./Button";
 import { whatsappLink, type WhatsAppIntent } from "@/lib/whatsapp";
 import { useLang, useT } from "@/lib/i18n";
 
-/** Simple inline WhatsApp glyph so we don't pull in a brand-icon pack. */
+/** Inline WhatsApp glyph, so we don't pull in a brand-icon pack. */
 function WhatsAppGlyph({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
@@ -13,43 +13,39 @@ function WhatsAppGlyph({ className = "" }: { className?: string }) {
   );
 }
 
-interface Props {
-  intent?: WhatsAppIntent;
-  label?: string;
-  variant?: "outline" | "solid";
-  className?: string;
-  onClick?: () => void;
-}
-
+/**
+ * The site's one conversion action — every order starts as a WhatsApp message.
+ *
+ * Deliberately uses the standard slab CTA colours rather than WhatsApp green.
+ * Green is outside the brand palette, and the previous version hard-coded a
+ * dark-theme fill that is invisible on a cream slab. The glyph carries the
+ * recognition on its own.
+ */
 export default function WhatsAppButton({
   intent = "general",
   label,
-  variant = "outline",
+  variant = "solid",
   className = "",
-  onClick,
-}: Props) {
+}: {
+  intent?: WhatsAppIntent;
+  label?: string;
+  variant?: "solid" | "ghost" | "ink";
+  className?: string;
+}) {
   const { lang } = useLang();
   const t = useT();
   const text = label ?? t.whatsapp.defaultLabel;
-  const base =
-    "inline-flex w-full items-center justify-center gap-2.5 rounded-full px-6 py-3.5 text-sm font-semibold tracking-wide transition-colors";
-  const styles =
-    variant === "solid"
-      ? "bg-[#1f7a4d] text-cream hover:bg-[#228855]"
-      : "border border-[rgba(159,149,54,0.55)] bg-[rgba(58,10,21,0.5)] text-[#cfe0b5] hover:border-olive hover:text-cream";
 
   return (
-    <motion.a
+    <Button
       href={whatsappLink(intent, lang)}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={onClick}
-      whileTap={{ scale: 0.97 }}
-      className={`${base} ${styles} ${className}`}
-      aria-label={`${t.whatsapp.ariaPrefix} — ${text}`}
+      external
+      variant={variant}
+      className={className}
+      ariaLabel={`${t.whatsapp.ariaPrefix} — ${text}`}
+      icon={<WhatsAppGlyph className="h-[18px] w-[18px] shrink-0" />}
     >
-      <WhatsAppGlyph className="h-[18px] w-[18px]" />
       {text}
-    </motion.a>
+    </Button>
   );
 }
