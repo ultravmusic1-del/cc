@@ -26,6 +26,10 @@ const config: Config = {
    * not-found happen to spell it out. Keep this list in sync with SlabTone.
    */
   safelist: [
+    // Created by GSAP SplitText at runtime, so it appears in no source file.
+    // Without it the descender fix in globals.css is purged and every headline
+    // gets its g/y/p sliced off again.
+    "split-line-mask",
     "slab--cream",
     "slab--beige",
     "slab--pink",

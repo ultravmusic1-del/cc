@@ -432,10 +432,36 @@
     scrollbar-width: none;
   }
   /* SplitText targets. Set here rather than inline so the pre-animation
-     state is styled even if GSAP hasn't run yet. */
+     state is styled even if GSAP hasn't run yet.
+
+     .split-line is the element that MOVES. It must never clip: only the mask
+     around it does, or the line clips itself as it travels. */
   .split-line {
     display: block;
-    overflow: hidden;
+  }
+
+  /* The mask SplitText wraps around each line (`mask: "lines"`).
+     Display type runs at line-height 0.82–0.9, which makes the line box
+     SHORTER than the glyphs inside it — about 0.17em short at these sizes. A
+     mask clipped to that box slices the descender off every g, y, p and q,
+     which is exactly what was cutting the headlines.
+     overflow clips at the padding edge, so padding the bottom extends the
+     visible region over the descenders; the matching negative margin gives
+     the space straight back, leaving line spacing untouched.
+     Keep in sync with LINE_REVEAL_FROM in components/motion/SplitReveal.tsx —
+     a taller mask needs the incoming line to start lower to stay hidden. */
+  .split-line-mask {
+    padding-bottom: 0.22em;
+    margin-bottom: -0.22em;
+  }
+
+  /* Arabic needs more room than the Latin faces even at the looser 1.25
+     line-height set above: Cairo's descenders sit deeper and diacritics extend
+     further below the baseline. Measured at 6px short with the 0.22em
+     allowance on a 64px heading. */
+  [lang="ar"] .split-line-mask {
+    padding-bottom: 0.38em;
+    margin-bottom: -0.38em;
   }
   .split-word,
   .split-char {

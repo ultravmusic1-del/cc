@@ -19,6 +19,17 @@ import { useLang } from "@/lib/i18n";
  * Arabic is split by word, not character: Arabic script is cursive and
  * splitting it per-glyph breaks the joining forms into isolated letters.
  */
+/**
+ * How far below its mask each line starts, as a percentage of its own height.
+ *
+ * Must exceed mask height / line height, or the top of the incoming line is
+ * already peeking out before the animation begins. The mask is padded by
+ * 0.22em to clear descenders (see .split-line-mask in globals.css), and with
+ * display line-heights of 0.82–0.9 that ratio peaks around 127%. 135% leaves
+ * room. Raise this if the mask padding grows.
+ */
+const LINE_REVEAL_FROM = 135;
+
 export default function SplitReveal({
   children,
   as: Tag = "h2",
@@ -51,7 +62,7 @@ export default function SplitReveal({
 
       gsap.set(scope, { opacity: 1 });
       gsap.from(split.lines, {
-        yPercent: 115,
+        yPercent: LINE_REVEAL_FROM,
         duration: 0.9,
         delay,
         stagger,
