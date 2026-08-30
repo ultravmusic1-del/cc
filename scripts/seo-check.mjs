@@ -36,7 +36,7 @@ const ROUTES = [
 
 // Fixed check count. If you add or remove a check, update this — the summary
 // prints a warning when the two disagree, so it cannot silently rot.
-const EXPECTED_CHECKS = 101;
+const EXPECTED_CHECKS = 117;
 
 let passed = 0;
 const failures = [];
@@ -155,10 +155,21 @@ async function main() {
     check(`${route.path} og:url is self-referencing`, routeOg === want,
       routeOg ? `got ${routeOg}` : "absent");
 
-    // The scroll model: each route must ship its own .screen-scroll container.
-    // See HANDOFF.md — this is the iOS Safari fix and must not silently vanish.
-    check(`${route.path} has a .screen-scroll container`,
-      routeHtml.includes("screen-scroll"));
+    // The scroll model. This used to assert a `.screen-scroll` container per
+    // route — the app-shell model, where the document never scrolled and each
+    // screen was its own scroll container, as an iOS Safari workaround.
+    //
+    // The redesign removed that model deliberately: ScrollTrigger measures
+    // against a normally-scrolling document, and Lenis owns scroll position
+    // (including the reset on navigation that .screen-scroll existed to
+    // guarantee). The assertion is replaced rather than dropped, so the
+    // invariant is still pinned — just the current one.
+    check(`${route.path} does not reinstate the app-shell scroll container`,
+      !routeHtml.includes("screen-scroll"));
+    check(`${route.path} renders exactly one <main>`,
+      (routeHtml.match(/<main[\s>]/g) || []).length === 1);
+    check(`${route.path} renders at least one colour slab`,
+      /class="[^"]*\bslab\b/.test(routeHtml));
 
     check(`${route.path} is listed in the sitemap`, sitemapBody.includes(`<loc>${want}</loc>`));
 

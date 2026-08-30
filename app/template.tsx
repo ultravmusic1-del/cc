@@ -11,13 +11,18 @@ import { useCurtain } from "@/components/motion/Curtain";
  * useEffect rather than useLayoutEffect — the reveal should start after the
  * browser has painted the incoming page, otherwise the curtain retracts over a
  * blank frame.
+ *
+ * reveal() is called directly and NOT deferred through requestAnimationFrame.
+ * It was, and that was a bug: rAF does not fire in a fully throttled tab, so
+ * the call never happened — taking the curtain's own failsafe down with it,
+ * since arming that was the first thing reveal() did. Anything responsible for
+ * uncovering the page must not depend on the frame loop.
  */
 export default function Template({ children }: { children: ReactNode }) {
   const { reveal } = useCurtain();
 
   useEffect(() => {
-    const id = window.requestAnimationFrame(() => reveal());
-    return () => window.cancelAnimationFrame(id);
+    reveal();
   }, [reveal]);
 
   return <>{children}</>;

@@ -111,14 +111,16 @@ export default function ProductScreen({ productId }: { productId: ProductId }) {
       <Slab tone="cream">
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <SplitReveal as="h2" className="display-m font-display font-black">
-            {t.modal.heroIngredients}
+            {t.modal.tabs.ingredients}
           </SplitReveal>
           <HandwrittenNote tilt="right" className="md:mb-1">
             {c.brand.tagline}
           </HandwrittenNote>
         </div>
 
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <p className="eyebrow mt-10">{t.modal.heroIngredients}</p>
+
+        <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {product.ingredientChips.map((chip, i) => (
             <PlopIn
               as="li"

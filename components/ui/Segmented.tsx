@@ -6,7 +6,7 @@
  * The indicator is a single absolutely-positioned pill moved by percentage
  * rather than one highlight per option cross-fading. That keeps it a real
  * continuous movement, and it needs no layout measurement — which is what the
- * previous framer-motion `layoutId` version was doing.
+ * previous version was doing with a framer-motion `layoutId`.
  *
  * Under RTL the track is laid out right-to-left by the browser, so the offset
  * is negated to travel the same visual direction as the labels.
@@ -26,7 +26,12 @@ export default function Segmented<T extends string>({
     0,
     options.findIndex((o) => o.id === value),
   );
-  const width = 100 / options.length;
+
+  // The track has 0.375rem of padding on each side (p-1.5), so the space the
+  // options actually share is `100% - 0.75rem`. Sizing the indicator to exactly
+  // one nth of THAT means translating by a whole multiple of its own width
+  // lands it precisely on each slot, at any option count — no drift to correct.
+  const slot = `calc((100% - 0.75rem) / ${options.length})`;
 
   return (
     <div
@@ -37,7 +42,7 @@ export default function Segmented<T extends string>({
         aria-hidden
         className="absolute inset-y-1.5 rounded-full bg-[var(--slab-ink)] transition-transform duration-500 ease-couture ltr:left-1.5 rtl:right-1.5"
         style={{
-          width: `calc(${width}% - 0.75rem + ${0.75 / options.length}rem)`,
+          width: slot,
           transform: `translateX(calc(var(--seg-dir, 1) * ${index * 100}%))`,
         }}
       />

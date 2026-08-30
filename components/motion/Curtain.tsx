@@ -105,7 +105,37 @@ export function CurtainProvider({ children }: { children: ReactNode }) {
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const failsafeRef = useRef<number | undefined>(undefined);
 
-  useEffect(() => () => window.clearTimeout(failsafeRef.current), []);
+  /**
+   * Failsafe.
+   *
+   * The curtain covers the entire page, so anything that stops the reveal
+   * finishing takes the whole site down with it. The animation is rAF-driven,
+   * and rAF is throttled to a standstill in a background tab — a link opened
+   * in one can sit fully covered indefinitely. A GSAP failure would do the
+   * same thing permanently.
+   *
+   * setTimeout is deliberately used here: it still fires when the frame loop
+   * is frozen, which is precisely the case this has to survive. Nothing on
+   * this path may depend on rAF. Worst case the reveal is un-animated; the
+   * page is never unreachable.
+   */
+  const armFailsafe = useCallback(() => {
+    window.clearTimeout(failsafeRef.current);
+    failsafeRef.current = window.setTimeout(() => {
+      const root = rootRef.current;
+      if (!root || getComputedStyle(root).opacity === "0") return;
+      gsap.killTweensOf(root);
+      gsap.set(root, { autoAlpha: 0, pointerEvents: "none" });
+    }, 2600);
+  }, []);
+
+  // Armed on mount as well as in reveal(), so the page still uncovers even if
+  // nothing ever calls reveal() — a template that failed to mount, an error
+  // boundary swallowing the render, a route that never committed.
+  useEffect(() => {
+    armFailsafe();
+    return () => window.clearTimeout(failsafeRef.current);
+  }, [armFailsafe]);
 
   const getTl = useCallback(() => {
     if (!tlRef.current) tlRef.current = build();
@@ -132,28 +162,6 @@ export function CurtainProvider({ children }: { children: ReactNode }) {
       tl.play();
     });
   }, [getTl]);
-
-  /**
-   * Failsafe.
-   *
-   * The curtain covers the entire page, so anything that stops the reveal
-   * finishing takes the whole site with it. The animation is rAF-driven, and
-   * rAF is throttled to a standstill in a background tab — a link opened in
-   * one can sit fully covered indefinitely. A GSAP failure would do the same
-   * thing permanently.
-   *
-   * setTimeout is not rAF, so it still fires when the ticker is frozen. Worst
-   * case the reveal is un-animated; the page is never unreachable.
-   */
-  const armFailsafe = useCallback(() => {
-    window.clearTimeout(failsafeRef.current);
-    failsafeRef.current = window.setTimeout(() => {
-      const root = rootRef.current;
-      if (!root || getComputedStyle(root).opacity === "0") return;
-      gsap.killTweensOf(root);
-      gsap.set(root, { autoAlpha: 0, pointerEvents: "none" });
-    }, 2600);
-  }, []);
 
   const reveal = useCallback(() => {
     armFailsafe();
