@@ -32,11 +32,13 @@ const ROUTES = [
   { path: "/ordering", titleContains: "Ordering" },
   { path: "/wholesale", titleContains: "Wholesale" },
   { path: "/about", titleContains: "About" },
+  { path: "/gifting", titleContains: "Gifting" },
 ];
 
 // Fixed check count. If you add or remove a check, update this — the summary
 // prints a warning when the two disagree, so it cannot silently rot.
-const EXPECTED_CHECKS = 101;
+// 101 after Tier 2; +8 per-route checks and +2 content checks for /gifting.
+const EXPECTED_CHECKS = 111;
 
 let passed = 0;
 const failures = [];
@@ -180,6 +182,9 @@ async function main() {
   for (const [path, needles] of [
     ["/bars/oat-cookie-bar", ["1.5 BD", "Ingredients", "Allergens", "Contains gluten"]],
     ["/bars/oat-protein-bar", ["1.8 BD", "Ingredients", "Allergens", "Contains gluten"]],
+    // The gifting page must carry both box prices in the server-rendered
+    // HTML — the prices are the reason the page exists.
+    ["/gifting", ["12 BD", "20 BD"]],
   ]) {
     const res = await get(path);
     const body = res.status === 200 ? await res.text() : "";
@@ -262,11 +267,12 @@ async function main() {
     "JSON-LD includes an Organization",
     nodes.some((n) => n && n["@type"] === "Organization"),
   );
+  // Two bars plus two gift boxes (added with the gifting collection).
   const products = nodes.filter((n) => n && n["@type"] === "Product");
-  check("JSON-LD includes both products", products.length === 2, `found ${products.length}`);
+  check("JSON-LD includes both bars and both gift boxes", products.length === 4, `found ${products.length}`);
   check(
     "every product carries a BHD offer",
-    products.length === 2 &&
+    products.length === 4 &&
       products.every(
         (p) => p.offers && p.offers.priceCurrency === "BHD" && Number(p.offers.price) > 0,
       ),

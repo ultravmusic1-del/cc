@@ -12,7 +12,13 @@ import { CONTENT, type ContentBundle, type Lang } from "./content";
 
 // ── UI strings (component-level copy) ─────────────────────────
 export interface UIStrings {
-  nav: { bars: string; nutrition: string; order: string; menu: string };
+  nav: {
+    bars: string;
+    nutrition: string;
+    order: string;
+    gifting: string;
+    menu: string;
+  };
   header: { openMenu: string; home: string; ordering: string };
   menu: {
     aria: string;
@@ -25,6 +31,7 @@ export interface UIStrings {
       home: string;
       bars: string;
       nutrition: string;
+      gifting: string;
       about: string;
       ordering: string;
       wholesale: string;
@@ -35,7 +42,6 @@ export interface UIStrings {
     about: {
       aboutUs: string;
       philosophy: string;
-      gifting: string;
       testimonials: string;
     };
     comingSoon: string;
@@ -93,8 +99,39 @@ export interface UIStrings {
     philosophyN: string;
     giftingT: string;
     giftingN: string;
+    wholesaleT: string;
+    wholesaleN: string;
     testimonialsT: string;
     comingSoon: string;
+  };
+  gifting: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    intro: string;
+    perBox: string;
+    inside: string;
+    orderBox: string;
+    detailsTitle: string;
+    delivery: string;
+    deliveryVal: string;
+    deliveryFee: string;
+    deliveryFeeVal: string;
+    cutoff: string;
+    cutoffVal: string;
+    freshness: string;
+    freshnessVal: string;
+    closing: string;
+    enquire: string;
+  };
+  promo: {
+    aria: string;
+    eyebrow: string;
+    title: string;
+    body: string;
+    cta: string;
+    dismiss: string;
+    close: string;
   };
   wholesale: {
     eyebrow: string;
@@ -145,24 +182,21 @@ export interface UIStrings {
   drawer: {
     aboutUs: string;
     philosophy: string;
-    gifting: string;
     quote: string;
     handcraftedIn: string; // "Handcrafted in {location}."
-    boxQty: string;
-    boxQtyVal: string;
-    giftBoxes: string;
-    comingSoon: string;
-    delivery: string;
-    deliveryVal: string;
-    giftingText: string;
-    enquire: string;
   };
   whatsapp: { defaultLabel: string; ariaPrefix: string };
   footer: { copyright: string }; // "© {year} Candy Couture · Bahrain"
 }
 
 const EN_UI: UIStrings = {
-  nav: { bars: "Bars", nutrition: "Nutrition", order: "Order", menu: "Menu" },
+  nav: {
+    bars: "Bars",
+    nutrition: "Nutrition",
+    order: "Order",
+    gifting: "Gifting",
+    menu: "Menu",
+  },
   header: {
     openMenu: "Open menu",
     home: "Candy Couture — home",
@@ -179,6 +213,7 @@ const EN_UI: UIStrings = {
       home: "Home",
       bars: "Bars",
       nutrition: "Nutrition",
+      gifting: "Gifting",
       about: "About",
       ordering: "Ordering",
       wholesale: "Wholesale",
@@ -189,7 +224,6 @@ const EN_UI: UIStrings = {
     about: {
       aboutUs: "About Us",
       philosophy: "Product Philosophy",
-      gifting: "Gifting",
       testimonials: "Brand Testimonials",
     },
     comingSoon: "Coming soon",
@@ -246,19 +280,52 @@ const EN_UI: UIStrings = {
     aboutUsN: "Why we started Candy Couture",
     philosophyT: "Product Philosophy",
     philosophyN: "Real ingredients, no shortcuts",
-    giftingT: "Gifting & Wholesale",
-    giftingN: "Packs, bulk & business orders",
+    giftingT: "Gifting",
+    giftingN: "Gift boxes for every occasion",
+    wholesaleT: "Wholesale",
+    wholesaleN: "Packs, bulk & business orders",
     testimonialsT: "Brand Testimonials",
     comingSoon: "Coming soon",
   },
+  gifting: {
+    eyebrow: "The Gifting Collection",
+    title: "Made to be gifted",
+    subtitle: "Handcrafted oat bars in a signature Candy Couture box.",
+    intro:
+      "Both bars, individually wrapped and boxed for the occasion. Choose a box of six or twelve. Every one is baked fresh in Bahrain and delivered to your door.",
+    perBox: "per box",
+    inside: "Inside",
+    orderBox: "Order this box",
+    detailsTitle: "Good to know",
+    delivery: "Delivery",
+    deliveryVal: "Bahrain only",
+    deliveryFee: "Delivery fee",
+    deliveryFeeVal: "2 BD · free over 50 BD",
+    cutoff: "Order cutoff",
+    cutoffVal: "2:00 PM · next-day",
+    freshness: "Freshness",
+    freshnessVal: "15 days from production date",
+    closing:
+      "Gifting a team, an event or someone special? Message us and we'll put the perfect order together.",
+    enquire: "Ask about gifting on WhatsApp",
+  },
+  promo: {
+    aria: "New: the Gifting Collection",
+    eyebrow: "New",
+    title: "The Gifting Collection is here",
+    body: "Handcrafted oat bars, beautifully boxed. Two sizes, from 12 BD.",
+    cta: "Explore Gifting",
+    dismiss: "Continue browsing",
+    close: "Close",
+  },
   wholesale: {
-    eyebrow: "For business & gifting",
-    title: "Wholesale & Gifting",
+    eyebrow: "For business",
+    title: "Wholesale",
     subtitle: "Designed for every occasion",
     p: [
       { t: "Wholesale orders", n: "Available through WhatsApp" },
       { t: "Pack quantity", n: "10 bars per pack" },
-      { t: "Premium gift packs", n: "Coming soon" },
+      { t: "Events & bulk orders", n: "Handled personally" },
       { t: "Delivery", n: "Bahrain only" },
     ],
     closing: "Tell us what you need and we'll take care of the rest.",
@@ -305,18 +372,8 @@ const EN_UI: UIStrings = {
   drawer: {
     aboutUs: "About Us",
     philosophy: "Product Philosophy",
-    gifting: "Gifting & Wholesale",
     quote: "Too good to share.",
     handcraftedIn: "Handcrafted in {location}.",
-    boxQty: "Pack quantity",
-    boxQtyVal: "10 bars",
-    giftBoxes: "Premium gift packs",
-    comingSoon: "Coming soon",
-    delivery: "Delivery",
-    deliveryVal: "Bahrain only",
-    giftingText:
-      "Planning a corporate order, event or bulk gifting? Wholesale orders are handled personally over WhatsApp.",
-    enquire: "Enquire on WhatsApp",
   },
   whatsapp: { defaultLabel: "WhatsApp", ariaPrefix: "Order on WhatsApp" },
   footer: { copyright: "© {year} Candy Couture · Bahrain" },
@@ -327,6 +384,7 @@ const AR_UI: UIStrings = {
     bars: "ألواح الشوفان",
     nutrition: "القيم الغذائية",
     order: "اطلب",
+    gifting: "الإهداء",
     menu: "القائمة",
   },
   header: {
@@ -345,6 +403,7 @@ const AR_UI: UIStrings = {
       home: "الرئيسية",
       bars: "ألواح الشوفان",
       nutrition: "القيم الغذائية",
+      gifting: "الإهداء",
       about: "من نحن",
       ordering: "كيفية الطلب",
       wholesale: "البيع بالجملة",
@@ -355,7 +414,6 @@ const AR_UI: UIStrings = {
     about: {
       aboutUs: "من نحن",
       philosophy: "فلسفة المنتج",
-      gifting: "الإهداء",
       testimonials: "آراء العملاء",
     },
     comingSoon: "قريبًا",
@@ -411,19 +469,52 @@ const AR_UI: UIStrings = {
     aboutUsN: "لماذا أنشأنا كاندي كوتور",
     philosophyT: "فلسفة المنتج",
     philosophyN: "مكوّنات حقيقية بلا اختصارات",
-    giftingT: "الإهداء والبيع بالجملة",
-    giftingN: "عبوات وطلبات بالجملة وللشركات",
+    giftingT: "الإهداء",
+    giftingN: "علب هدايا لكل مناسبة",
+    wholesaleT: "البيع بالجملة",
+    wholesaleN: "عبوات وطلبات بالجملة وللشركات",
     testimonialsT: "آراء العملاء",
     comingSoon: "قريبًا",
   },
+  gifting: {
+    eyebrow: "مجموعة الإهداء",
+    title: "صُنعت لتُهدى",
+    subtitle: "ألواح شوفان مصنوعة يدويًا في علبة كاندي كوتور المميزة.",
+    intro:
+      "اللوحان معًا، مغلّفان كلٌّ على حدة ومرتّبان في علبة تليق بالمناسبة. اختر علبة من ستة ألواح أو اثني عشر. كل علبة تُخبز طازجة في البحرين وتصلك حتى باب منزلك.",
+    perBox: "للعلبة",
+    inside: "المحتويات",
+    orderBox: "اطلب هذه العلبة",
+    detailsTitle: "معلومات مفيدة",
+    delivery: "التوصيل",
+    deliveryVal: "البحرين فقط",
+    deliveryFee: "رسوم التوصيل",
+    deliveryFeeVal: "2 د.ب · مجاني عند تجاوز 50 د.ب",
+    cutoff: "آخر موعد للطلب",
+    cutoffVal: "2:00 ظهرًا · اليوم التالي",
+    freshness: "الطزاجة",
+    freshnessVal: "15 يومًا من تاريخ الإنتاج",
+    closing:
+      "هدية لفريق عمل أو مناسبة أو شخص عزيز؟ راسلنا وسنجهّز لك الطلب المثالي.",
+    enquire: "استفسر عن الإهداء عبر واتساب",
+  },
+  promo: {
+    aria: "جديد: مجموعة الإهداء",
+    eyebrow: "جديد",
+    title: "مجموعة الإهداء وصلت",
+    body: "ألواح شوفان مصنوعة يدويًا في علبة أنيقة. حجمان، ابتداءً من 12 د.ب.",
+    cta: "اكتشف مجموعة الإهداء",
+    dismiss: "متابعة التصفح",
+    close: "إغلاق",
+  },
   wholesale: {
-    eyebrow: "للأعمال والإهداء",
-    title: "البيع بالجملة والإهداء",
+    eyebrow: "للأعمال",
+    title: "البيع بالجملة",
     subtitle: "مصمّمة لكل مناسبة",
     p: [
       { t: "طلبات الجملة", n: "متاحة عبر واتساب" },
       { t: "كمية العبوة", n: "10 ألواح في العبوة" },
-      { t: "عبوات هدايا فاخرة", n: "قريبًا" },
+      { t: "المناسبات والطلبات الكبيرة", n: "تُدار شخصيًا" },
       { t: "التوصيل", n: "البحرين فقط" },
     ],
     closing: "أخبرنا بما تحتاجه وسنتكفّل بالباقي.",
@@ -470,18 +561,8 @@ const AR_UI: UIStrings = {
   drawer: {
     aboutUs: "من نحن",
     philosophy: "فلسفة المنتج",
-    gifting: "الإهداء والبيع بالجملة",
     quote: "ألذّ من أن يُشارَك.",
     handcraftedIn: "صُنع يدويًا في {location}.",
-    boxQty: "كمية العبوة",
-    boxQtyVal: "10 ألواح",
-    giftBoxes: "عبوات هدايا فاخرة",
-    comingSoon: "قريبًا",
-    delivery: "التوصيل",
-    deliveryVal: "البحرين فقط",
-    giftingText:
-      "تخطط لطلب مؤسسي أو مناسبة أو إهداء بالجملة؟ تُدار طلبات الجملة شخصيًا عبر واتساب.",
-    enquire: "استفسر عبر واتساب",
   },
   whatsapp: { defaultLabel: "واتساب", ariaPrefix: "اطلب عبر واتساب" },
   footer: { copyright: "© {year} كاندي كوتور · البحرين" },

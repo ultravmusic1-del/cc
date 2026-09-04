@@ -13,6 +13,7 @@ import Header from "./Header";
 import StickyNav from "./StickyNav";
 import MobileMenu from "./MobileMenu";
 import AboutDrawer from "./AboutDrawer";
+import GiftingPromo from "./GiftingPromo";
 
 function Shell({ children }: { children: ReactNode }) {
   const { overlay, closeOverlay } = useNav();
@@ -126,6 +127,9 @@ function Shell({ children }: { children: ReactNode }) {
           />
         )}
       </AnimatePresence>
+
+      {/* Launch announcement — owns its own AnimatePresence and trigger. */}
+      <GiftingPromo />
     </main>
   );
 }

@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { motion, useDragControls, useIsPresent } from "framer-motion";
 import { X } from "lucide-react";
-import WhatsAppButton from "./ui/WhatsAppButton";
 import type { AboutDrawerId } from "@/lib/store";
 import { useContent, useT, fill } from "@/lib/i18n";
 
@@ -23,7 +22,6 @@ export default function AboutDrawer({
   const titles: Record<AboutDrawerId, string> = {
     "about-us": ui.drawer.aboutUs,
     philosophy: ui.drawer.philosophy,
-    gifting: ui.drawer.gifting,
   };
 
   // ESC to close + initial focus. (Scroll lock is centralized in App's Shell.)
@@ -131,42 +129,6 @@ export default function AboutDrawer({
             </div>
           )}
 
-          {drawerId === "gifting" && (
-            <div className="space-y-4">
-              <div className="glass-card space-y-3 rounded-2xl px-4 py-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-[0.84rem] text-[rgba(227,210,194,0.72)]">
-                    {ui.drawer.boxQty}
-                  </span>
-                  <span className="text-[0.88rem] font-semibold text-cream">
-                    {ui.drawer.boxQtyVal}
-                  </span>
-                </div>
-                <div className="hairline" />
-                <div className="flex items-center justify-between">
-                  <span className="text-[0.84rem] text-[rgba(227,210,194,0.72)]">
-                    {ui.drawer.giftBoxes}
-                  </span>
-                  <span className="rounded-full border border-[rgba(233,173,190,0.4)] px-3 py-1 text-[0.68rem] font-semibold text-pink">
-                    {ui.drawer.comingSoon}
-                  </span>
-                </div>
-                <div className="hairline" />
-                <div className="flex items-center justify-between">
-                  <span className="text-[0.84rem] text-[rgba(227,210,194,0.72)]">
-                    {ui.drawer.delivery}
-                  </span>
-                  <span className="text-[0.88rem] font-semibold text-cream">
-                    {ui.drawer.deliveryVal}
-                  </span>
-                </div>
-              </div>
-              <p className="text-[0.88rem] leading-relaxed text-[rgba(227,210,194,0.78)]">
-                {ui.drawer.giftingText}
-              </p>
-              <WhatsAppButton intent="wholesale" label={ui.drawer.enquire} />
-            </div>
-          )}
         </div>
       </motion.div>
     </div>

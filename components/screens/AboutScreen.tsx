@@ -1,32 +1,77 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Leaf, Sprout, Heart, ArrowRight, Lock } from "lucide-react";
+import { Leaf, Sprout, Gift, Store, ArrowRight, Lock } from "lucide-react";
 import ScreenShell from "../ScreenShell";
 import Footer from "../Footer";
 import { useNav, type AboutDrawerId } from "@/lib/store";
+import { ROUTES } from "@/lib/routes";
 import { useContent, useT } from "@/lib/i18n";
+
+/** Created once at module scope — re-creating a motion component during render
+    remounts it and loses the animation state. */
+const MotionLink = motion.create(Link);
+
+type Card = {
+  id: string;
+  title: string;
+  note: string;
+  icon: typeof Leaf;
+} & (
+  // Story content opens in a drawer (overlay state the URL does not carry);
+  // Gifting and Wholesale are real pages and must be crawlable links.
+  { kind: "drawer"; drawerId: AboutDrawerId } | { kind: "link"; href: string }
+);
 
 export default function AboutScreen() {
   const { openAboutDrawer } = useNav();
   const c = useContent();
   const t = useT();
 
-  const cards: {
-    id: AboutDrawerId;
-    title: string;
-    note: string;
-    icon: typeof Leaf;
-  }[] = [
-    { id: "about-us", title: t.about.aboutUsT, note: t.about.aboutUsN, icon: Leaf },
+  const cards: Card[] = [
+    {
+      id: "about-us",
+      kind: "drawer",
+      drawerId: "about-us",
+      title: t.about.aboutUsT,
+      note: t.about.aboutUsN,
+      icon: Leaf,
+    },
     {
       id: "philosophy",
+      kind: "drawer",
+      drawerId: "philosophy",
       title: t.about.philosophyT,
       note: t.about.philosophyN,
       icon: Sprout,
     },
-    { id: "gifting", title: t.about.giftingT, note: t.about.giftingN, icon: Heart },
+    {
+      id: "gifting",
+      kind: "link",
+      href: ROUTES.gifting,
+      title: t.about.giftingT,
+      note: t.about.giftingN,
+      icon: Gift,
+    },
+    {
+      id: "wholesale",
+      kind: "link",
+      href: ROUTES.wholesale,
+      title: t.about.wholesaleT,
+      note: t.about.wholesaleN,
+      icon: Store,
+    },
   ];
+
+  const cardClass =
+    "glass-card flex items-center gap-4 rounded-2xl px-4 py-4 text-start transition-colors hover:border-[rgba(236,91,69,0.5)] lg:px-6 lg:py-6";
+  const entrance = (i: number) => ({
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.4, delay: 0.08 * i, ease: [0.22, 1, 0.36, 1] },
+    whileTap: { scale: 0.98 },
+  });
 
   return (
     <ScreenShell>
@@ -44,30 +89,44 @@ export default function AboutScreen() {
       <div className="hairline my-6" />
 
       <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-5">
-        {cards.map((card, i) => (
-          <motion.button
-            key={card.id}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.08 * i, ease: [0.22, 1, 0.36, 1] }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => openAboutDrawer(card.id)}
-            className="glass-card flex items-center gap-4 rounded-2xl px-4 py-4 text-start transition-colors hover:border-[rgba(236,91,69,0.5)] lg:px-6 lg:py-6"
-          >
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[rgba(159,149,54,0.45)]">
-              <card.icon className="h-5 w-5 text-olive" strokeWidth={1.5} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block font-heading text-[1.05rem] font-semibold text-cream">
-                {card.title}
+        {cards.map((card, i) => {
+          const inner = (
+            <>
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[rgba(159,149,54,0.45)]">
+                <card.icon className="h-5 w-5 text-olive" strokeWidth={1.5} />
               </span>
-              <span className="block text-[0.76rem] text-[rgba(227,210,194,0.62)]">
-                {card.note}
+              <span className="min-w-0 flex-1">
+                <span className="block font-heading text-[1.05rem] font-semibold text-cream">
+                  {card.title}
+                </span>
+                <span className="block text-[0.76rem] text-[rgba(227,210,194,0.62)]">
+                  {card.note}
+                </span>
               </span>
-            </span>
-            <ArrowRight className="h-5 w-5 shrink-0 text-coral rtl:-scale-x-100" />
-          </motion.button>
-        ))}
+              <ArrowRight className="h-5 w-5 shrink-0 text-coral rtl:-scale-x-100" />
+            </>
+          );
+
+          return card.kind === "link" ? (
+            <MotionLink
+              key={card.id}
+              href={card.href}
+              {...entrance(i)}
+              className={cardClass}
+            >
+              {inner}
+            </MotionLink>
+          ) : (
+            <motion.button
+              key={card.id}
+              {...entrance(i)}
+              onClick={() => openAboutDrawer(card.drawerId)}
+              className={cardClass}
+            >
+              {inner}
+            </motion.button>
+          );
+        })}
 
         {/* Coming soon */}
         <div className="flex items-center gap-4 rounded-2xl border border-dashed border-[var(--hairline)] px-4 py-4 opacity-70 lg:px-6 lg:py-6">

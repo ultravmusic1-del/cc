@@ -10,17 +10,22 @@ import {
   type ReactNode,
 } from "react";
 
-export type AboutDrawerId = "about-us" | "philosophy" | "gifting";
+export type AboutDrawerId = "about-us" | "philosophy";
 
 type Overlay =
   | { type: "menu" }
   | { type: "about-drawer"; drawerId: AboutDrawerId }
+  // The one-time launch announcement (components/GiftingPopup.tsx). Lives in
+  // the store so the shared scroll lock applies and it can never stack on top
+  // of the menu or a drawer.
+  | { type: "promo" }
   | null;
 
 interface Nav {
   overlay: Overlay;
   openMenu: () => void;
   openAboutDrawer: (drawerId: AboutDrawerId) => void;
+  openPromo: () => void;
   closeOverlay: () => void;
 }
 
@@ -49,6 +54,12 @@ export function NavProvider({ children }: { children: ReactNode }) {
     (drawerId: AboutDrawerId) => setOverlay({ type: "about-drawer", drawerId }),
     [],
   );
+  // Only opens over nothing: if the visitor already has the menu or a drawer
+  // up, the announcement must not replace it.
+  const openPromo = useCallback(
+    () => setOverlay((prev) => (prev === null ? { type: "promo" } : prev)),
+    [],
+  );
   const closeOverlay = useCallback(() => setOverlay(null), []);
 
   const value = useMemo<Nav>(
@@ -56,9 +67,10 @@ export function NavProvider({ children }: { children: ReactNode }) {
       overlay,
       openMenu,
       openAboutDrawer,
+      openPromo,
       closeOverlay,
     }),
-    [overlay, openMenu, openAboutDrawer, closeOverlay],
+    [overlay, openMenu, openAboutDrawer, openPromo, closeOverlay],
   );
 
   return <NavContext.Provider value={value}>{children}</NavContext.Provider>;

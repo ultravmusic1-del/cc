@@ -1,5 +1,5 @@
-import { CONTACT, CONTENT, type ProductId } from "./content";
-import { productPath } from "./routes";
+import { CONTACT, CONTENT, type GiftBoxId, type ProductId } from "./content";
+import { ROUTES, productPath } from "./routes";
 
 /**
  * Canonical origin — the only host that should ever appear in a sitemap,
@@ -45,7 +45,30 @@ export const PRICE_PER_BAR_BHD: Record<ProductId, number> = {
  */
 export const MIN_ORDER_BARS = 10;
 
+/**
+ * Gift box prices in BHD — the same deliberate duplication as
+ * PRICE_PER_BAR_BHD, guarded by the same drift check below. A box is priced
+ * as a unit, so there is no per-bar figure and no minimum quantity.
+ */
+export const GIFT_BOX_PRICE_BHD: Record<GiftBoxId, number> = {
+  six: 12,
+  twelve: 20,
+};
+
 // ── Drift guard for the duplicated numerics above ────────────────────────────
+for (const id of Object.keys(GIFT_BOX_PRICE_BHD) as GiftBoxId[]) {
+  for (const lang of ["en", "ar"] as const) {
+    const box = CONTENT[lang].gifting.boxes[id];
+    const shown = Number.parseFloat(box.price.replace(/[^\d.]/g, ""));
+    if (shown !== GIFT_BOX_PRICE_BHD[id]) {
+      throw new Error(
+        `Structured-data price drift: lib/seo.ts has gift box "${id}" at ` +
+          `${GIFT_BOX_PRICE_BHD[id]} but content.ts (${lang}) displays "${box.price}". Update both.`,
+      );
+    }
+  }
+}
+
 // Runs at import time, so a mismatch fails the build rather than shipping a
 // stale price. TypeScript already catches a *missing* product via the Record
 // type; only value drift needs this.
@@ -175,5 +198,32 @@ export function buildJsonLd() {
     };
   });
 
-  return { "@context": "https://schema.org", "@graph": [organization, ...products] };
+  // Gift boxes are products in their own right: a unit price, no minimum,
+  // and their own page. The image is the shared collection photograph.
+  const giftBoxes = (Object.keys(GIFT_BOX_PRICE_BHD) as GiftBoxId[]).map((id) => {
+    const box = c.gifting.boxes[id];
+    const url = `${SITE_URL}${ROUTES.gifting}`;
+    return {
+      "@type": "Product",
+      "@id": `${SITE_URL}/#gift-box-${id}`,
+      name: `Candy Couture ${box.name}`,
+      description: `${box.contents}, individually wrapped in a Candy Couture gift box. Handmade in Bahrain.`,
+      image: `${SITE_URL}${c.gifting.image}`,
+      url,
+      brand: { "@type": "Brand", name: c.brand.name },
+      offers: {
+        "@type": "Offer",
+        price: GIFT_BOX_PRICE_BHD[id].toFixed(2),
+        priceCurrency: "BHD",
+        availability: "https://schema.org/InStock",
+        url,
+        seller: { "@id": `${SITE_URL}/#organization` },
+      },
+    };
+  });
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [organization, ...products, ...giftBoxes],
+  };
 }

@@ -11,7 +11,6 @@ import {
   ArrowUpRight,
   Leaf,
   Sprout,
-  Heart,
   Lock,
   Mail,
   Instagram,
@@ -32,11 +31,20 @@ const MotionLink = motion.create(Link);
 
 const mainItems: {
   id: RouteKey | "about-expand" | "contact-expand";
-  key: "home" | "bars" | "nutrition" | "about" | "ordering" | "wholesale" | "contact";
+  key:
+    | "home"
+    | "bars"
+    | "nutrition"
+    | "gifting"
+    | "about"
+    | "ordering"
+    | "wholesale"
+    | "contact";
 }[] = [
   { id: "home", key: "home" },
   { id: "bars", key: "bars" },
   { id: "nutrition", key: "nutrition" },
+  { id: "gifting", key: "gifting" },
   { id: "about-expand", key: "about" },
   { id: "ordering", key: "ordering" },
   { id: "wholesale", key: "wholesale" },
@@ -69,15 +77,15 @@ const contactItems: {
   },
 ];
 
+// Gifting used to sit here as a drawer; it is a main-level destination now.
 const aboutItems: {
   id: AboutDrawerId | "soon";
-  key: "aboutUs" | "philosophy" | "gifting" | "testimonials";
+  key: "aboutUs" | "philosophy" | "testimonials";
   icon: typeof Leaf;
   soon?: boolean;
 }[] = [
   { id: "about-us", key: "aboutUs", icon: Leaf },
   { id: "philosophy", key: "philosophy", icon: Sprout },
-  { id: "gifting", key: "gifting", icon: Heart },
   { id: "soon", key: "testimonials", icon: Lock, soon: true },
 ];
 

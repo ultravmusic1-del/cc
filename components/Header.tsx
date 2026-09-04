@@ -17,11 +17,14 @@ const MotionLink = motion.create(Link);
     primary nav on mobile (this header nav is hidden below lg, that one above). */
 const deskItems: {
   id: "menu" | Exclude<keyof typeof ROUTES, "home">;
-  labelKey: "bars" | "nutrition" | "order" | "menu";
+  labelKey: "bars" | "nutrition" | "order" | "gifting" | "menu";
 }[] = [
   { id: "bars", labelKey: "bars" },
   { id: "nutrition", labelKey: "nutrition" },
   { id: "ordering", labelKey: "order" },
+  // Gifting is header-only: the mobile bottom bar stays at four items (a
+  // fifth crowds 375px), and the mobile menu carries it instead.
+  { id: "gifting", labelKey: "gifting" },
   { id: "menu", labelKey: "menu" },
 ];
 

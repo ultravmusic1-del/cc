@@ -12,14 +12,46 @@ Ordering happens over WhatsApp.
 
 ---
 
-## 🚧 START HERE — work in progress on `feat/seo-tier-2`
+## Gifting collection (4 Sep 2026) — built, NOT yet committed or deployed
 
-**`main` is stable and live. Tier 2 is unfinished and lives on a branch.**
-Nothing below has touched production.
+Design: `docs/superpowers/specs/2026-09-04-gifting-collection-design.md`.
+
+- **`/gifting`** is the ninth route (`ROUTES.gifting`). Facts live in
+  `lib/content.ts → gifting` (two boxes: 6 bars 12 BD, 12 bars 20 BD) with a
+  price drift guard in `lib/seo.ts` (`GIFT_BOX_PRICE_BHD`) and two extra
+  `Product` nodes in the JSON-LD graph.
+- Screen: `components/screens/GiftingScreen.tsx`. Photo:
+  `public/images/gift-box-v1.jpg` (1200×1803, 110 KB, from the client's
+  `gifting image 1.JPG`). Bump the `-v1` suffix if the photo changes.
+- Nav: desktop header gains **Gifting**; the mobile menu main list gains a
+  Gifting row; the About page's old "Gifting & Wholesale" drawer is replaced by
+  two link cards (Gifting → `/gifting`, Wholesale → `/wholesale`). The gifting
+  drawer and its `AboutDrawerId` are deleted. The bottom sticky nav is
+  unchanged at four items.
+- **Launch pop-up:** `components/GiftingPromo.tsx`, mounted in `AppShell`.
+  Opens 1.4 s after first mount, once per browser session
+  (`sessionStorage["cc-gifting-promo"]`), never on `/gifting`, never over the
+  menu or a drawer (it is the `promo` overlay in `lib/store.tsx`). To retire it,
+  delete the component and the `promo` overlay type.
+- Wholesale lost every "gifting" mention, including the
+  "Premium gift packs — Coming soon" row.
+- WhatsApp intents added: `gifting`, `giftSix`, `giftTwelve`.
+- `npm run seo:check` → **111 passed** (was 101): +8 route checks, +2 price
+  checks for `/gifting`, and the JSON-LD product count is now 4.
+- Assumption to confirm with Vivaan: the 10-bar minimum does **not** apply to
+  gift boxes, so the page states no minimum.
+
+---
+
+## SEO Tier 2 — MERGED to `main` (5 Aug 2026)
+
+The section below was written while Tier 2 lived on `feat/seo-tier-2`. That
+branch has since been merged and deleted; everything it describes is live.
+It is kept because the verification notes and gotchas still apply.
 
 ```bash
 git fetch origin
-git checkout feat/seo-tier-2
+git checkout main
 npm ci
 ```
 
@@ -193,6 +225,7 @@ Eight real routes, all statically prerendered:
 /ordering                OrderingScreen
 /wholesale               WholesaleScreen
 /about                   AboutScreen
+/gifting                 GiftingScreen   (added 4 Sep 2026)
 ```
 
 ### Navigation

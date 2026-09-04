@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import WholesaleScreen from "@/components/screens/WholesaleScreen";
 
-const title = "Wholesale & Gifting | Candy Couture";
+const title = "Wholesale | Candy Couture";
 const description =
-  "Wholesale oat bars and corporate gifting across Bahrain. Packs of 10, bulk and event orders handled personally over WhatsApp.";
+  "Wholesale oat bars across Bahrain. Packs of 10, bulk, event and business orders handled personally over WhatsApp.";
 
 export const metadata: Metadata = {
   title,

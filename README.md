@@ -36,7 +36,7 @@ npm run lint    # lint
 | --- | --- |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | Number that receives WhatsApp orders — international format, digits only (e.g. `973XXXXXXXX`). Falls back to a placeholder until set. |
 
-All product facts (prices, nutrition, ingredients, ordering rules) live in [`lib/content.ts`](lib/content.ts) as a single source of truth.
+All product facts (prices, nutrition, ingredients, ordering rules, gift boxes) live in [`lib/content.ts`](lib/content.ts) as a single source of truth. Numeric prices are mirrored in [`lib/seo.ts`](lib/seo.ts) for structured data and the build fails if the two drift.
 
 ## Deploying to Vercel
 

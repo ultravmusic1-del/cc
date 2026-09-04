@@ -36,6 +36,17 @@ export interface Product {
   imageAlt: string;
 }
 
+export type GiftBoxId = "six" | "twelve";
+
+export interface GiftBox {
+  id: GiftBoxId;
+  name: string;
+  /** What is inside, e.g. "3 Oat Cookie Bars + 3 Oat Protein Bars". */
+  contents: string;
+  price: string;
+  barCount: string;
+}
+
 export interface ContentBundle {
   brand: {
     name: string;
@@ -58,6 +69,11 @@ export interface ContentBundle {
   };
   storage: { shelfLife: string; keep: string; made: string };
   philosophy: { lede: string; body: string };
+  gifting: {
+    boxes: Record<GiftBoxId, GiftBox>;
+    image: string;
+    imageAlt: string;
+  };
 }
 
 // Contact details are values (not translated), shared across languages.
@@ -179,6 +195,27 @@ const EN: ContentBundle = {
     lede: "We believe indulgence should never come at the expense of quality.",
     body: "Every Candy Couture oat bar is thoughtfully crafted with premium ingredients, freshly baked in small batches, and free from preservatives and unnecessary additives.",
   },
+  gifting: {
+    boxes: {
+      six: {
+        id: "six",
+        name: "Gift Box of 6",
+        contents: "3 Oat Cookie Bars + 3 Oat Protein Bars",
+        price: "12 BD",
+        barCount: "6 bars",
+      },
+      twelve: {
+        id: "twelve",
+        name: "Gift Box of 12",
+        contents: "6 Oat Cookie Bars + 6 Oat Protein Bars",
+        price: "20 BD",
+        barCount: "12 bars",
+      },
+    },
+    image: "/images/gift-box-v1.jpg",
+    imageAlt:
+      "Candy Couture gift box surrounded by individually wrapped Oat Cookie Bars and Oat Protein Bars",
+  },
 };
 
 // ── Arabic (العربية) ──────────────────────────────────────────
@@ -291,6 +328,27 @@ const AR: ContentBundle = {
   philosophy: {
     lede: "نؤمن بأن المتعة يجب ألّا تأتي على حساب الجودة أبدًا.",
     body: "كل لوح شوفان من كاندي كوتور مصنوع بعناية من مكوّنات فاخرة، ويُخبز طازجًا على دفعات صغيرة، وخالٍ من المواد الحافظة والإضافات غير الضرورية.",
+  },
+  gifting: {
+    boxes: {
+      six: {
+        id: "six",
+        name: "علبة هدايا من 6 ألواح",
+        contents: "3 ألواح شوفان الكوكيز + 3 ألواح شوفان البروتين",
+        price: "12 د.ب",
+        barCount: "6 ألواح",
+      },
+      twelve: {
+        id: "twelve",
+        name: "علبة هدايا من 12 لوحًا",
+        contents: "6 ألواح شوفان الكوكيز + 6 ألواح شوفان البروتين",
+        price: "20 د.ب",
+        barCount: "12 لوحًا",
+      },
+    },
+    image: "/images/gift-box-v1.jpg",
+    imageAlt:
+      "علبة هدايا كاندي كوتور محاطة بألواح شوفان الكوكيز وألواح شوفان البروتين المغلّفة كلٌّ على حدة",
   },
 };
 

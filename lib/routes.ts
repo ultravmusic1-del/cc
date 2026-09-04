@@ -12,6 +12,7 @@ export const ROUTES = {
   ordering: "/ordering",
   wholesale: "/wholesale",
   about: "/about",
+  gifting: "/gifting",
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;

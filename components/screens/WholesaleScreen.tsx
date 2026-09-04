@@ -1,13 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Boxes, Gift, MapPin, Store } from "lucide-react";
+import { Boxes, MapPin, Store, Users } from "lucide-react";
 import ScreenShell from "../ScreenShell";
 import WhatsAppButton from "../ui/WhatsAppButton";
 import Footer from "../Footer";
 import { useT } from "@/lib/i18n";
 
-const icons = [Store, Boxes, Gift, MapPin];
+const icons = [Store, Boxes, Users, MapPin];
 
 export default function WholesaleScreen() {
   const t = useT();
