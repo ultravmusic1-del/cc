@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bodoni_Moda, Hanken_Grotesk, Open_Sans, Cairo } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import AppShell from "@/components/AppShell";
@@ -77,6 +78,7 @@ export default function RootLayout({
         <JsonLd />
         <AppShell>{children}</AppShell>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
