@@ -652,11 +652,26 @@ confirm or refute the "only the homepage is indexable" read with real data.
   - No DOM mutations occur between DOMContentLoaded and the error, and the
     server HTML and final client DOM are identical (same text, same `<main>`
     children) — React recovers by client-rendering and nobody sees a difference.
-  So it is a hydration-timing race, likely a shell-level state update or a
-  router update landing before the page segment finishes hydrating. Visitor
-  impact looks nil beyond a wasted re-render. The e2e suite exempts exactly
-  this error (annotated as `known-issue` in the report); drop that exemption in
-  `e2e/smoke.spec.ts` once it's fixed.
+  **Root cause (confirmed 19 Sep 2026)** by instrumenting Next's bundled
+  react-dom (`19.2.0-canary-0bdb9206-20250818`): every failing load reports the
+  mismatch on `<main>` itself with *zero* child fibers, hydration cursor still
+  on `<main>`'s first server node. The page `children` reaches the client as a
+  lazy RSC reference; when its inline payload script hasn't been parsed yet
+  (async main chunk ran first), it suspends while `<main>` reconciles. With no
+  Suspense boundary above it, this React build *completes* the suspended fiber
+  instead of unwinding, so `<main>` completes empty, the leftover server nodes
+  are reported as a mismatch and the root client-renders. It is not a state
+  update, prefetch or anything in the shell's own code.
+  **Tried and rejected:** `<Suspense fallback={null}>` around `{children}` or
+  around the whole shell. Around `{children}` it removed the #418 (0/1,600
+  parallel loads, from 14/512), but either placement makes the legacy
+  `/#wholesale` → `router.replace` redirect silently never commit (2/60 and
+  9/200 respectively, vs 0/260 without a boundary), so early client
+  navigations are at risk. Not worth trading an invisible recoverable error for
+  that. Likely resolution is upstream (a newer Next/React); re-measure after
+  upgrading. The e2e suite exempts exactly this error (annotated as
+  `known-issue` in the report); drop that exemption in `e2e/smoke.spec.ts` once
+  it's fixed.
 
 - **Modal exit geometry** — `exit={{ y: "100%" }}` still clears the viewport only
   when bottom-anchored, so on desktop the sheet vanishes ~80 px before it's fully
