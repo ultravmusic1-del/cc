@@ -178,12 +178,12 @@ Mobile-first — review in a phone viewport (DevTools device mode) or narrow win
 
 ## Tech stack
 
-**Next.js 15.5.22** (App Router) · React 18 · TypeScript · Tailwind CSS · Framer
+**Next.js 15.5.25** (App Router) · React 18 · TypeScript · Tailwind CSS · Framer
 Motion · **anime.js v4** · lucide-react · `@vercel/analytics`. Fonts via
 `next/font`: Bodoni Moda (couture serif), Hanken Grotesk (headings), Open Sans
 (body), Cairo (Arabic).
 
-### Why 15.5.22 specifically, and why the `overrides` block
+### Why the 15.5.x line, and why the `overrides` block
 
 Next 14 stopped receiving security backports; `14.2.35` is the final 14.x and
 carried three high-severity RSC denial-of-service advisories with no patched 14
@@ -194,12 +194,18 @@ accept React 18, so this upgrade skipped the expensive React 19 migration.
 it reintroduces audit findings:
 
 ```json
-"overrides": { "postcss": "^8.5.25", "sharp": "^0.35.3" }
+"overrides": { "postcss": "^8.5.25", "sharp": "^0.35.4" }
 ```
 
 Next 15.5.22 still pins its own `postcss@8.4.31`, and Next 15 newly pulls in
 `sharp` (`<0.35.0` has libvips CVEs). Both are in-range minor bumps. With them,
 `npm audit` reports **0 vulnerabilities**; without, 3 high.
+
+**19 Sep 2026:** bumped to Next 15.5.25 and sharp `^0.35.4` for a critical
+Image Optimization RCE (GHSA-2xp9-vwfh-vxw4 — AVIF, which `next.config.mjs`
+enables) and libheif CVEs; plain `npm audit fix` (not `--force`) cleared the
+transitive nanoid / browserslist / baseline-browser-mapping advisories.
+Stay on the 15.5.x patch line and re-run `npm audit` periodically.
 
 > `npm audit fix --force` is actively harmful here — it proposes "install
 > next@9.3.3", a downgrade across five majors. Never run it on this repo.
