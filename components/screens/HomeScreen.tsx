@@ -10,6 +10,7 @@ import MaskIcon from "../ui/MaskIcon";
 import { ROUTES } from "@/lib/routes";
 import { useContent, useT, useLang } from "@/lib/i18n";
 import { useIsoLayoutEffect } from "@/lib/useIsoLayoutEffect";
+import Footer from "../Footer";
 
 /** Created once at module scope — re-creating a motion component during render
     remounts it and loses the animation state. */
@@ -187,6 +188,12 @@ export default function HomeScreen() {
           ))}
         </motion.div>
       </motion.div>
+
+      {/* Below the hero, not inside it: the hero keeps its full-height,
+          centred layout and the footer is reached by scrolling. */}
+      <div className="relative z-10 mx-auto w-full max-w-[var(--app-max)] px-5 pb-28 lg:px-8 lg:pb-12">
+        <Footer className="!mt-0" />
+      </div>
     </section>
   );
 }

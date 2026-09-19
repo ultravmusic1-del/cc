@@ -8,6 +8,7 @@ import WhatsAppButton from "../ui/WhatsAppButton";
 import CountUp from "../ui/CountUp";
 import { type ProductId } from "@/lib/content";
 import { useContent, useT, fill } from "@/lib/i18n";
+import Footer from "../Footer";
 
 export default function NutritionScreen() {
   const [id, setId] = useState<ProductId>("cookie");
@@ -108,6 +109,7 @@ export default function NutritionScreen() {
           </div>
         </motion.div>
       </AnimatePresence>
+      <Footer />
     </ScreenShell>
   );
 }

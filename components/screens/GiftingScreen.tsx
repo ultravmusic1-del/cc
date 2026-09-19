@@ -86,15 +86,19 @@ export default function GiftingScreen() {
               // screen. Tablets and desktop have the height to spare.
               className="relative mx-auto aspect-[5/4] w-full max-w-[420px] overflow-hidden rounded-[1.6rem] border border-[var(--hairline)] shadow-card sm:aspect-[4/5] lg:sticky lg:top-24 lg:aspect-[3/4] lg:max-w-none"
             >
-              <Image
-                src={c.gifting.image}
-                alt={c.gifting.imageAlt}
-                fill
-                // LCP element on this route — never lazy-load it.
-                priority
-                sizes="(min-width: 1024px) 420px, 90vw"
-                className="object-cover object-[50%_42%]"
-              />
+              {/* `fill` needs a relative/absolute parent, and the frame above
+                  turns sticky at lg — so the image gets its own absolute box. */}
+              <div className="absolute inset-0">
+                <Image
+                  src={c.gifting.image}
+                  alt={c.gifting.imageAlt}
+                  fill
+                  // LCP element on this route — never lazy-load it.
+                  priority
+                  sizes="(min-width: 1024px) 420px, 90vw"
+                  className="object-cover object-[50%_42%]"
+                />
+              </div>
               {/* Blend the bottom edge into the stage; keep the top crisp. */}
               <div
                 aria-hidden

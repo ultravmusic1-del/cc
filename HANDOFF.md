@@ -104,7 +104,12 @@ disproven before being reported. **Do not trust DOM measurements taken while
 `document.visibilityState === "hidden"`** — see the rAF gotcha below; the same
 trap applies to image decode and layout.
 
-### ⚠️ Known issue, NOT fixed: orphan pages
+### ✅ Fixed 19 Sep 2026: orphan pages
+
+`components/Footer.tsx` is now a link list to all routes (plus the copyright
+line), rendered on every screen — Home places it below the hero so the hero's
+full-height layout is unchanged. Every page's server HTML now links /wholesale
+and /about. The original write-up follows for context.
 
 `/wholesale` has **zero inbound internal links** in server-rendered HTML, and
 `/about` has exactly one (the homepage "Our Story" CTA). The mobile menu does

@@ -9,6 +9,7 @@ import CountUp from "../ui/CountUp";
 import type { ProductId } from "@/lib/content";
 import { ROUTES } from "@/lib/routes";
 import { useContent, useT, fill } from "@/lib/i18n";
+import Footer from "../Footer";
 
 /**
  * Full product page — the replacement for the old bottom-sheet product modal
@@ -272,6 +273,7 @@ export default function ProductScreen({ productId }: { productId: ProductId }) {
           <WhatsAppButton intent={product.id} label={t.modal.orderCta} />
         </div>
       </div>
+      <Footer />
     </ScreenShell>
   );
 }

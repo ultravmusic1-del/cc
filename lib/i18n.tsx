@@ -186,7 +186,7 @@ export interface UIStrings {
     handcraftedIn: string; // "Handcrafted in {location}."
   };
   whatsapp: { defaultLabel: string; ariaPrefix: string };
-  footer: { copyright: string }; // "© {year} Candy Couture · Bahrain"
+  footer: { copyright: string; nav: string }; // "© {year} Candy Couture · Bahrain"
 }
 
 const EN_UI: UIStrings = {
@@ -376,7 +376,7 @@ const EN_UI: UIStrings = {
     handcraftedIn: "Handcrafted in {location}.",
   },
   whatsapp: { defaultLabel: "WhatsApp", ariaPrefix: "Order on WhatsApp" },
-  footer: { copyright: "© {year} Candy Couture · Bahrain" },
+  footer: { copyright: "© {year} Candy Couture · Bahrain", nav: "Site links" },
 };
 
 const AR_UI: UIStrings = {
@@ -565,7 +565,7 @@ const AR_UI: UIStrings = {
     handcraftedIn: "صُنع يدويًا في {location}.",
   },
   whatsapp: { defaultLabel: "واتساب", ariaPrefix: "اطلب عبر واتساب" },
-  footer: { copyright: "© {year} كاندي كوتور · البحرين" },
+  footer: { copyright: "© {year} كاندي كوتور · البحرين", nav: "روابط الموقع" },
 };
 
 const UI: Record<Lang, UIStrings> = { en: EN_UI, ar: AR_UI };

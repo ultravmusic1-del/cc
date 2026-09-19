@@ -5,6 +5,7 @@ import { Box, Tag, Truck } from "lucide-react";
 import ScreenShell from "../ScreenShell";
 import ProductCard from "../ProductCard";
 import { useContent, useT, fill } from "@/lib/i18n";
+import Footer from "../Footer";
 
 export default function BarsScreen() {
   const c = useContent();
@@ -65,6 +66,7 @@ export default function BarsScreen() {
       <p className="mt-4 text-center text-[0.75rem] text-[rgba(227,210,194,0.5)]">
         {fill(t.bars.boxNote, { n: c.products.cookie.boxQty })}
       </p>
+      <Footer />
     </ScreenShell>
   );
 }
