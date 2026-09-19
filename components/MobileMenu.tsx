@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, useIsPresent } from "framer-motion";
 import {
   X,
@@ -22,6 +22,7 @@ import { ROUTES, type RouteKey } from "@/lib/routes";
 import { CONTACT } from "@/lib/content";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { useT, useLang } from "@/lib/i18n";
+import { trackContact, trackLanguage, trackWhatsApp } from "@/lib/analytics";
 
 type MenuLevel = "main" | "about" | "contact";
 
@@ -100,6 +101,7 @@ const rowRise = {
 export default function MobileMenu({ onClose }: { onClose: () => void }) {
   const { openAboutDrawer } = useNav();
   const router = useRouter();
+  const pathname = usePathname();
   const t = useT();
   const { lang, setLang } = useLang();
   const [level, setLevel] = useState<MenuLevel>("main");
@@ -296,6 +298,11 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
                   key={item.key}
                   variants={rowRise}
                   href={item.href}
+                  onClick={() =>
+                    item.key === "whatsapp"
+                      ? trackWhatsApp("menu", pathname)
+                      : trackContact(item.key, pathname)
+                  }
                   target="_blank"
                   rel="noreferrer"
                   className="group flex items-center gap-4 border-b border-[var(--hairline)] py-4 text-start"
@@ -328,7 +335,10 @@ export default function MobileMenu({ onClose }: { onClose: () => void }) {
           {(["en", "ar"] as const).map((l) => (
             <button
               key={l}
-              onClick={() => setLang(l)}
+              onClick={() => {
+                if (l !== lang) trackLanguage(l);
+                setLang(l);
+              }}
               aria-pressed={lang === l}
               className={`flex-1 rounded-full py-2 text-[0.82rem] font-semibold transition-colors ${
                 lang === l

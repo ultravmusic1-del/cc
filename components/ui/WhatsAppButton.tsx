@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { whatsappLink, type WhatsAppIntent } from "@/lib/whatsapp";
 import { useLang, useT } from "@/lib/i18n";
+import { trackWhatsApp } from "@/lib/analytics";
 
 /** Simple inline WhatsApp glyph so we don't pull in a brand-icon pack. */
 function WhatsAppGlyph({ className = "" }: { className?: string }) {
@@ -30,6 +32,7 @@ export default function WhatsAppButton({
 }: Props) {
   const { lang } = useLang();
   const t = useT();
+  const pathname = usePathname();
   const text = label ?? t.whatsapp.defaultLabel;
   const base =
     "inline-flex w-full items-center justify-center gap-2.5 rounded-full px-6 py-3.5 text-sm font-semibold tracking-wide transition-colors";
@@ -43,7 +46,10 @@ export default function WhatsAppButton({
       href={whatsappLink(intent, lang)}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={onClick}
+      onClick={() => {
+        trackWhatsApp(intent, pathname);
+        onClick?.();
+      }}
       whileTap={{ scale: 0.97 }}
       className={`${base} ${styles} ${className}`}
       aria-label={`${t.whatsapp.ariaPrefix} — ${text}`}

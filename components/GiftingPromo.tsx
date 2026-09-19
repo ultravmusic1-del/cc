@@ -9,6 +9,7 @@ import { ArrowRight, X } from "lucide-react";
 import { useNav } from "@/lib/store";
 import { ROUTES } from "@/lib/routes";
 import { useContent, useT } from "@/lib/i18n";
+import { trackGiftingPromo } from "@/lib/analytics";
 
 /**
  * One-time launch announcement for the gifting collection.
@@ -57,8 +58,26 @@ function PromoCard({ onClose }: { onClose: () => void }) {
   // animation stalls (RAF-throttled tab), so it can never wedge the page.
   const isPresent = useIsPresent();
 
+  // Only the CTA counts as "explore"; every other way out is a dismissal.
+  const explore = () => {
+    trackGiftingPromo("explore");
+    onClose();
+  };
+  const dismiss = () => {
+    trackGiftingPromo("dismiss");
+    onClose();
+  };
+
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    trackGiftingPromo("shown");
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      trackGiftingPromo("dismiss");
+      onClose();
+    };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
@@ -73,7 +92,7 @@ function PromoCard({ onClose }: { onClose: () => void }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.25 }}
-        onClick={onClose}
+        onClick={dismiss}
         className="absolute inset-0 bg-[rgba(20,4,9,0.72)] backdrop-blur-sm"
       />
 
@@ -106,7 +125,7 @@ function PromoCard({ onClose }: { onClose: () => void }) {
             }}
           />
           <button
-            onClick={onClose}
+            onClick={dismiss}
             aria-label={t.promo.close}
             className="absolute end-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(244,232,220,0.3)] bg-[rgba(20,4,9,0.35)] text-cream/90 backdrop-blur-sm transition-colors hover:bg-[rgba(20,4,9,0.55)] hover:text-cream"
           >
@@ -128,7 +147,7 @@ function PromoCard({ onClose }: { onClose: () => void }) {
 
           <MotionLink
             href={ROUTES.gifting}
-            onClick={onClose}
+            onClick={explore}
             whileTap={{ scale: 0.98 }}
             className="btn-coral group mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-[0.95rem] font-semibold tracking-wide"
           >
@@ -136,7 +155,7 @@ function PromoCard({ onClose }: { onClose: () => void }) {
             <ArrowRight className="h-[18px] w-[18px] transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />
           </MotionLink>
           <button
-            onClick={onClose}
+            onClick={dismiss}
             className="btn-ghost mt-2.5 w-full rounded-full px-6 py-3 text-[0.88rem] font-semibold tracking-wide transition-colors hover:border-[rgba(227,210,194,0.7)]"
           >
             {t.promo.dismiss}
