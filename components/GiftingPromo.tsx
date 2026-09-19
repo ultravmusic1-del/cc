@@ -177,8 +177,21 @@ export default function GiftingPromo() {
       return;
     }
     if (hasSeen()) return;
-    const id = window.setTimeout(openPromo, DELAY_MS);
-    return () => window.clearTimeout(id);
+    // Kill switch: the `gifting-promo` flag in Vercel. If the check fails the
+    // popup still shows, which is how the site behaved before the flag.
+    let id: number | undefined;
+    let cancelled = false;
+    fetch("/api/flags")
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null)
+      .then((flags: { giftingPromo?: boolean } | null) => {
+        if (cancelled || flags?.giftingPromo === false) return;
+        id = window.setTimeout(openPromo, DELAY_MS);
+      });
+    return () => {
+      cancelled = true;
+      window.clearTimeout(id);
+    };
   }, [pathname, openPromo]);
 
   const dismiss = () => {
