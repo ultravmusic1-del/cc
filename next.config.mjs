@@ -20,6 +20,10 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // The e2e tests build into their own folder so they can run while
+  // `npm run dev` is up — building into the dev server's .next corrupts it.
+  // Unset everywhere else (including Vercel), so the default .next applies.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   reactStrictMode: true,
   images: {
     formats: ["image/avif", "image/webp"],

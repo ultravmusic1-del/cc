@@ -37,3 +37,8 @@ next-env.d.ts
 /.claude/
 .idea/
 .vscode/
+
+# e2e tests
+/.next-e2e/
+/playwright-report/
+/test-results/

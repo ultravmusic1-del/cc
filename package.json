@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "seo:check": "node scripts/seo-check.mjs",
-    "assets:optimize": "node scripts/optimize-assets.mjs"
+    "assets:optimize": "node scripts/optimize-assets.mjs",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "node scripts/e2e.mjs"
   },
   "engines": {
     "node": ">=18.18.0"
@@ -24,6 +26,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "^20.14.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

@@ -179,6 +179,27 @@ Mobile-first — review in a phone viewport (DevTools device mode) or narrow win
 > share `.next` and it corrupts the dev cache (pages render unstyled). If that
 > happens: stop dev, `rm -rf .next`, `npm run dev`.
 
+### Tests & CI (added 19 Sep 2026)
+
+```bash
+npm run typecheck                       # tsc --noEmit
+npm run test:e2e                        # production build → Playwright smoke suite
+npm run test:e2e -- --no-build          # rerun against the last test build
+npm run test:e2e -- -g "pop-up"         # one group
+```
+
+`test:e2e` builds into **`.next-e2e`** (via `NEXT_DIST_DIR`, see
+`next.config.mjs`), so it is safe to run while `npm run dev` is up — the gotcha
+above does not apply to it. Tests live in `e2e/smoke.spec.ts` and run at 1280px
+and 375px: every route renders with no console errors or sideways scroll, the
+footer links, WhatsApp messages per product/box, the gifting pop-up (once per
+session, never on /gifting, closes cleanly), menu/drawer close without wedging
+the page, Arabic RTL + persistence, legacy `/#hash` redirects, and the 404.
+
+`.github/workflows/ci.yml` runs typecheck → build → `seo:check` → Playwright on
+every push and PR, uploading the report on failure. **It does not gate
+Vercel** — main still deploys on push — so a red run means fix or revert.
+
 ---
 
 ## Tech stack
@@ -618,6 +639,24 @@ confirm or refute the "only the homepage is indexable" read with real data.
 ---
 
 ## Open items
+
+- **Intermittent hydration mismatch (React #418), pre-existing.** Found by the
+  e2e suite on 19 Sep 2026. Under parallel load, ~1–2% of production page loads
+  log `Minified React error #418` (`args[]=HTML`, i.e. element structure, not
+  text). Evidence gathered:
+  - Production-only: 0 in 96 parallel loads against `next dev`.
+  - Pre-dates the footer change: the `0e623f6` build hit 3/256 (all on `/`),
+    the footer build 5/256 — not a meaningful difference.
+  - Component stack ends at **`main` in `Shell` (`components/AppShell.tsx`)**, so
+    the mismatch is among `<main>`'s direct children.
+  - No DOM mutations occur between DOMContentLoaded and the error, and the
+    server HTML and final client DOM are identical (same text, same `<main>`
+    children) — React recovers by client-rendering and nobody sees a difference.
+  So it is a hydration-timing race, likely a shell-level state update or a
+  router update landing before the page segment finishes hydrating. Visitor
+  impact looks nil beyond a wasted re-render. The e2e suite exempts exactly
+  this error (annotated as `known-issue` in the report); drop that exemption in
+  `e2e/smoke.spec.ts` once it's fixed.
 
 - **Modal exit geometry** — `exit={{ y: "100%" }}` still clears the viewport only
   when bottom-anchored, so on desktop the sheet vanishes ~80 px before it's fully
